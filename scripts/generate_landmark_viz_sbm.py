@@ -41,6 +41,12 @@ _PROJECT_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(_PROJECT_ROOT / "src"))
 sys.path.insert(0, str(_PROJECT_ROOT))
 
+from scripts.run_synthetic_experiments import (
+    GRAPH_SEED,
+    generate_community_graph,
+    nx_to_graph,
+)
+
 from aac.compression.compressor import LinearCompressor
 from aac.embeddings.anchors import farthest_point_sampling
 from aac.embeddings.sssp import compute_teacher_labels
@@ -52,11 +58,6 @@ from aac.viz.style import (
     setup_style,
 )
 from experiments.utils import compute_strong_lcc, generate_queries
-from scripts.run_synthetic_experiments import (
-    GRAPH_SEED,
-    generate_community_graph,
-    nx_to_graph,
-)
 
 # Semantically named colors drawn from the canonical Okabe-Ito palette
 # (src/aac/viz/style.py).  Distinct hues per selector keep the legend

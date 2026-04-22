@@ -34,13 +34,6 @@ sys.path.insert(0, str(_PROJECT_ROOT))
 
 import numpy as np
 import torch
-
-from aac.baselines.alt import alt_preprocess, make_alt_heuristic
-from aac.embeddings.anchors import farthest_point_sampling
-from aac.embeddings.sssp import compute_teacher_labels
-from aac.search.astar import astar
-from aac.search.dijkstra import dijkstra
-from experiments.utils import compute_strong_lcc, generate_queries
 from scripts.run_ablation_selection import greedy_maximize_heuristic
 from scripts.run_synthetic_experiments import (
     GRAPH_SEED,
@@ -50,6 +43,13 @@ from scripts.run_synthetic_experiments import (
     generate_powerlaw_graph,
     nx_to_graph,
 )
+
+from aac.baselines.alt import alt_preprocess, make_alt_heuristic
+from aac.embeddings.anchors import farthest_point_sampling
+from aac.embeddings.sssp import compute_teacher_labels
+from aac.search.astar import astar
+from aac.search.dijkstra import dijkstra
+from experiments.utils import compute_strong_lcc, generate_queries
 
 OUTPUT_DIR = _PROJECT_ROOT / "results" / "greedy_max_nonroad"
 TOTAL_BUDGETS_BYTES = [32, 64, 128]

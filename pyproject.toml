@@ -48,6 +48,7 @@ build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]
 where = ["src"]
+include = ["aac*", "experiments*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
@@ -61,6 +62,7 @@ markers = [
 [tool.ruff]
 line-length = 100
 target-version = "py311"
+src = ["src"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "W"]
@@ -77,6 +79,9 @@ ignore = [
 "scripts/*.py" = ["E402", "F841"]   # sys.path manipulation before imports; result-capture vars
 "tests/*.py" = ["E402", "F841"]     # fixture imports; assertion intermediate vars
 "examples/*.py" = ["E402"]          # sys.path manipulation
+
+[tool.ruff.lint.isort]
+known-first-party = ["aac", "experiments"]
 
 [tool.mypy]
 python_version = "3.11"

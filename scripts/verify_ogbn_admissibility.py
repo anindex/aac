@@ -33,11 +33,12 @@ import torch as _torch
 _orig_load = _torch.load
 _torch.load = lambda *a, **kw: _orig_load(*a, **{**kw, "weights_only": False})
 
+from scripts.run_nonroad_real import load_ogbn_arxiv
+from scripts.run_synthetic_experiments import nx_to_graph
+
 from aac.baselines.alt import alt_preprocess, make_alt_heuristic
 from aac.search.astar import astar
 from aac.search.dijkstra import dijkstra
-from scripts.run_nonroad_real import load_ogbn_arxiv
-from scripts.run_synthetic_experiments import nx_to_graph
 
 OUTPUT_CSV = _PROJECT_ROOT / "results" / "synthetic" / "ogbn_arxiv_admissibility.csv"
 

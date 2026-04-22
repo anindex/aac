@@ -36,16 +36,17 @@ if _SRC_DIR not in sys.path:
 if _PROJECT_ROOT not in sys.path:
     sys.path.insert(0, _PROJECT_ROOT)
 
-from aac.baselines.alt import alt_preprocess, make_alt_heuristic
-from aac.graphs.io import load_graph_npz
-from aac.graphs.loaders.dimacs import load_dimacs
-from experiments.utils import generate_queries
 from scripts.run_ablation_selection import (
     dijkstra_baseline,
     get_lcc,
     run_astar_queries,
     train_aac,
 )
+
+from aac.baselines.alt import alt_preprocess, make_alt_heuristic
+from aac.graphs.io import load_graph_npz
+from aac.graphs.loaders.dimacs import load_dimacs
+from experiments.utils import generate_queries
 
 GRAPHS = [
     {

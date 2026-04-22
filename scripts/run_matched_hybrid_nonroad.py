@@ -40,6 +40,15 @@ sys.path.insert(0, str(_PROJECT_ROOT))
 import numpy as np
 import scipy.stats
 import torch
+from scripts.run_synthetic_experiments import (
+    GRAPH_SEED,
+    NUM_QUERIES,
+    QUERY_SEED,
+    SEEDS,
+    generate_community_graph,
+    generate_powerlaw_graph,
+    nx_to_graph,
+)
 
 from aac.baselines.alt import alt_preprocess, make_alt_heuristic
 from aac.compression.compressor import LinearCompressor, make_linear_heuristic
@@ -50,15 +59,6 @@ from aac.search.astar import astar
 from aac.search.dijkstra import dijkstra
 from aac.train.trainer import TrainConfig, train_linear_compressor
 from experiments.utils import compute_strong_lcc, generate_queries
-from scripts.run_synthetic_experiments import (
-    GRAPH_SEED,
-    NUM_QUERIES,
-    QUERY_SEED,
-    SEEDS,
-    generate_community_graph,
-    generate_powerlaw_graph,
-    nx_to_graph,
-)
 
 OUTPUT_DIR = _PROJECT_ROOT / "results" / "hybrid_nonroad"
 
