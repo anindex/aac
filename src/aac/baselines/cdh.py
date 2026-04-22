@@ -212,8 +212,8 @@ def cdh_preprocess(
     )  # (V, r)
 
     # Gather the stored distances per vertex.
-    V = teacher.d_out.shape[1]
-    r = pivot_indices.shape[1]
+    _V = teacher.d_out.shape[1]  # noqa: F841 (document shape)
+    _r = pivot_indices.shape[1]  # noqa: F841 (document shape)
     d_out_vp = teacher.d_out.t()  # (V, P)
     stored_fwd = torch.gather(d_out_vp, dim=1, index=pivot_indices)  # (V, r)
 

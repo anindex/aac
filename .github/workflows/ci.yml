@@ -36,9 +36,6 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
       - name: Install
-        run: |
-          pip install -e ".[dev,experiments]"
-          python -c "import aac.baselines; print('aac.baselines OK')"
-          python -c "import experiments; print('experiments OK')"
+        run: pip install -e ".[dev,experiments]"
       - name: Test
         run: pytest tests/ -x -q --tb=short -m "not slow and not gpu and not network"

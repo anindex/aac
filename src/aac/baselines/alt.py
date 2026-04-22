@@ -72,6 +72,7 @@ def make_alt_heuristic(
         Callable h(node: int, target: int) -> float.
     """
     import numpy as np
+
     from aac.utils.numerics import SENTINEL
 
     # Pre-convert to numpy for fair timing comparison with AAC
