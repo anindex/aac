@@ -54,7 +54,7 @@ texput.log
 *.pkl
 *.pbf
 data/
-baselines/
+/baselines/
 
 # Experiment run logs and PID files (not needed for reproducibility)
 results/**/*.log
