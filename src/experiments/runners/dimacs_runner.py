@@ -40,13 +40,13 @@ class DIMACSRunner(BaseRunner):
         Args:
             cfg: Hydra-composed configuration with track.graphs, method, timing.
         """
+        from aac.graphs.loaders.dimacs import load_dimacs
+        from aac.search.astar import astar
+        from aac.search.dijkstra import dijkstra
         from experiments.metrics.admissibility import check_admissibility
         from experiments.metrics.collector import MetricsCollector, PreprocessingMetrics
         from experiments.metrics.timing import time_query
         from experiments.utils import generate_queries, memory_bytes_per_vertex
-        from aac.graphs.loaders.dimacs import load_dimacs
-        from aac.search.astar import astar
-        from aac.search.dijkstra import dijkstra
 
         output_dir = Path(cfg.output_dir) / "dimacs"
         output_dir.mkdir(parents=True, exist_ok=True)
@@ -159,13 +159,13 @@ class DIMACSRunner(BaseRunner):
         Args:
             cfg: Hydra-composed configuration with track.graphs, method.K0, method.m.
         """
-        from experiments.metrics.admissibility import check_admissibility
-        from experiments.metrics.collector import MetricsCollector
-        from experiments.utils import generate_queries
         from aac.baselines.alt import alt_preprocess, make_alt_heuristic
         from aac.graphs.loaders.dimacs import load_dimacs
         from aac.search.astar import astar
         from aac.search.dijkstra import dijkstra
+        from experiments.metrics.admissibility import check_admissibility
+        from experiments.metrics.collector import MetricsCollector
+        from experiments.utils import generate_queries
 
         output_dir = Path(cfg.output_dir) / "dimacs" / "ablation"
         output_dir.mkdir(parents=True, exist_ok=True)

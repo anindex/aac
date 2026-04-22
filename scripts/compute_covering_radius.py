@@ -27,7 +27,6 @@ from aac.embeddings.anchors import farthest_point_sampling
 from aac.embeddings.sssp import compute_teacher_labels
 from aac.graphs.loaders.dimacs import load_dimacs
 from aac.graphs.loaders.osmnx import load_osmnx
-
 from experiments.utils import compute_strong_lcc
 
 PROJECT_ROOT = os.path.join(os.path.dirname(__file__), "..")

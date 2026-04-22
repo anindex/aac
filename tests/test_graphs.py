@@ -4,8 +4,8 @@ import pytest
 import scipy.sparse
 import torch
 
-from aac.graphs.types import Graph
 from aac.graphs.convert import edges_to_graph, graph_to_scipy, scipy_to_graph
+from aac.graphs.types import Graph
 from aac.graphs.validate import validate_graph
 
 

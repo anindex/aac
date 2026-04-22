@@ -26,10 +26,10 @@ sys.path.insert(0, str(_PROJECT_ROOT))
 
 import scipy.sparse.csgraph
 
-from experiments.utils import _strong_cc_labels, generate_queries
 from aac.graphs.convert import graph_to_scipy
 from aac.graphs.io import load_graph_npz
 from aac.graphs.loaders.dimacs import load_dimacs
+from experiments.utils import _strong_cc_labels, generate_queries
 
 DATA = _PROJECT_ROOT / "data"
 OUT = _PROJECT_ROOT / "results" / "scc_reachability.csv"

@@ -20,9 +20,9 @@ import torch.nn as nn
 import torch.optim as optim
 
 from aac.compression.smooth import smoothed_heuristic_directed, smoothed_heuristic_undirected
-from aac.graphs.types import Graph
 from aac.contextual.loss import contextual_loss
 from aac.contextual.pipeline import contextual_forward
+from aac.graphs.types import Graph
 
 
 @dataclass

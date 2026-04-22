@@ -22,7 +22,6 @@ All data is stored under ``data/`` relative to the repository root.
 from __future__ import annotations
 
 import argparse
-import importlib
 import subprocess
 import sys
 from pathlib import Path

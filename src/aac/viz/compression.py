@@ -13,9 +13,8 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Sequence
 
-import matplotlib
-import matplotlib.pyplot as plt
 import matplotlib.lines as mlines
+import matplotlib.pyplot as plt
 import numpy as np
 import torch
 

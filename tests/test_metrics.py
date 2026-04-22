@@ -2,9 +2,8 @@
 
 from __future__ import annotations
 
-import numpy as np
-
-from experiments.metrics.admissibility import AdmissibilityResult, check_admissibility
+from aac.search.types import SearchResult
+from experiments.metrics.admissibility import check_admissibility
 from experiments.metrics.collector import (
     MetricsCollector,
     PreprocessingMetrics,
@@ -13,8 +12,6 @@ from experiments.metrics.collector import (
 )
 from experiments.metrics.timing import TimingResult, time_query
 from experiments.utils import memory_bytes_per_vertex
-from aac.search.types import SearchResult
-
 
 # ---------------------------------------------------------------------------
 # MetricsCollector

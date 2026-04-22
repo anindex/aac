@@ -11,7 +11,6 @@ from aac.graphs.convert import edges_to_graph
 from aac.graphs.types import Graph
 from aac.utils.numerics import SENTINEL
 
-
 # ---------------------------------------------------------------------------
 # Fixtures
 # ---------------------------------------------------------------------------
@@ -42,9 +41,9 @@ def strongly_connected_5():
 
 def _build_compressed_labels_undirected(graph: Graph, m: int = 4, seed: int = 7):
     """Build compressed labels from undirected graph via teacher -> hilbert -> compress."""
-    from aac.embeddings.sssp import compute_teacher_labels
-    from aac.embeddings.hilbert import build_hilbert_embedding
     from aac.compression.compressor import PositiveCompressor
+    from aac.embeddings.hilbert import build_hilbert_embedding
+    from aac.embeddings.sssp import compute_teacher_labels
 
     V = graph.num_nodes
     anchors = torch.arange(V, dtype=torch.int64)
@@ -60,9 +59,9 @@ def _build_compressed_labels_undirected(graph: Graph, m: int = 4, seed: int = 7)
 
 def _build_compressed_labels_directed(graph: Graph, m: int = 4, seed: int = 7):
     """Build compressed labels from directed graph via teacher -> tropical -> compress."""
+    from aac.compression.compressor import PositiveCompressor
     from aac.embeddings.sssp import compute_teacher_labels
     from aac.embeddings.tropical import build_tropical_embedding
-    from aac.compression.compressor import PositiveCompressor
 
     V = graph.num_nodes
     anchors = torch.arange(V, dtype=torch.int64)

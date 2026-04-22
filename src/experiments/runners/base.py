@@ -8,8 +8,8 @@ import torch
 from omegaconf import DictConfig
 from torch.utils.tensorboard import SummaryWriter
 
-from experiments.metrics.collector import PreprocessingMetrics
 from aac.search.types import SearchResult
+from experiments.metrics.collector import PreprocessingMetrics
 
 
 class BaseRunner:

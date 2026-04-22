@@ -175,7 +175,7 @@ def main() -> None:
         patience=30,
     )
 
-    metrics = train_linear_compressor(compressor, teacher_aac, config)
+    _metrics = train_linear_compressor(compressor, teacher_aac, config)
 
     # Get compressed labels for heuristic
     compressor.eval()
@@ -192,8 +192,6 @@ def main() -> None:
     )
 
     # Memory comparison
-    alt_mem = K * V  # K landmark distances per vertex
-    aac_mem = m * V  # m compressed values per vertex
     print()
     if m == K:
         print(f"  Memory: ALT = {K} values/vertex, AAC = {m} values/vertex (matched)")
@@ -208,7 +206,7 @@ def main() -> None:
     print(f"\n  All paths optimal (cost = {result_dij.cost:.2f})")
 
     # Show the grid with AAC path
-    print(f"\n  Grid (S=start, G=goal, #=wall, *=path):")
+    print("\n  Grid (S=start, G=goal, #=wall, *=path):")
     print()
     print_grid(grid_size, obstacles, result_aac.path, node_to_rc, src_rc, tgt_rc)
 

@@ -1,7 +1,6 @@
 """Tests for the consolidated visualization style module (aac.viz.style)."""
 
 import matplotlib.pyplot as plt
-import pytest
 
 
 class TestVizStyle:
@@ -68,7 +67,7 @@ class TestVizStyle:
 
     def test_okabe_ito_palette(self):
         """OKABE_ITO is the canonical colorblind-safe palette."""
-        from aac.viz.style import OKABE_ITO, METHOD_COLORS, PALETTE
+        from aac.viz.style import METHOD_COLORS, OKABE_ITO, PALETTE
 
         # Original Okabe & Ito 2008 spec; verifiable against the publication.
         assert OKABE_ITO["blue"] == "#0072B2"

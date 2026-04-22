@@ -41,7 +41,7 @@ sys.path.insert(0, str(_ROOT / "src"))
 sys.path.insert(0, str(_ROOT))
 sys.path.insert(0, str(_ROOT / "scripts"))
 
-from aac.baselines.alt import alt_preprocess, make_alt_heuristic
+from aac.baselines.alt import make_alt_heuristic
 from aac.embeddings.anchors import farthest_point_sampling
 from aac.embeddings.sssp import compute_teacher_labels
 from aac.graphs.io import load_graph_npz

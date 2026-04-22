@@ -31,8 +31,6 @@ sys.path.insert(0, str(_PROJECT_ROOT / "src"))
 sys.path.insert(0, str(_PROJECT_ROOT))
 
 import networkx as nx
-import numpy as np
-import torch
 
 # Reuse the exact experiment runner / CSV writer from the synthetic script
 # so the schema is identical and table-generation code can be reused.
@@ -57,13 +55,12 @@ def load_ogbn_arxiv() -> nx.Graph:
     restrict to the largest weakly-connected component and relabel nodes
     to a contiguous 0..N-1 range.
     """
-    from ogb.nodeproppred import NodePropPredDataset
-
     # OGB's cached preprocessed file is a plain torch pickle, but newer
     # torch versions (>=2.6) default to weights_only=True which refuses
     # arbitrary pickled Python objects. Monkey-patch torch.load for the
     # loader call to allow the legacy format.
     import torch as _torch
+    from ogb.nodeproppred import NodePropPredDataset
     _orig_load = _torch.load
     def _patched_load(*args, **kwargs):
         kwargs.setdefault("weights_only", False)

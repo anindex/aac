@@ -24,11 +24,11 @@ Output: paper/figures/sbm_landmark_placement.pdf
 
 from __future__ import annotations
 
-import os
 import sys
 from pathlib import Path
 
 import matplotlib
+
 matplotlib.use("Agg")
 
 import matplotlib.lines as mlines

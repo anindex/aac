@@ -20,7 +20,6 @@ from aac.embeddings.sssp import compute_teacher_labels
 from aac.graphs.convert import edges_to_graph
 from aac.search.astar import astar
 
-
 # ---------------------------------------------------------------------------
 # Test graphs
 # ---------------------------------------------------------------------------

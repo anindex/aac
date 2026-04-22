@@ -46,7 +46,6 @@ from aac.search.astar import astar
 from aac.search.dijkstra import dijkstra
 from aac.train.trainer import TrainConfig, compute_teacher_heuristic
 from experiments.utils import compute_strong_lcc, generate_queries
-
 from scripts.run_synthetic_experiments import (
     GRAPH_SEED,
     NUM_QUERIES,

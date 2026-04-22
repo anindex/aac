@@ -9,7 +9,6 @@ dtype to reduce peak memory for graphs with 5M+ nodes.
 from __future__ import annotations
 
 import logging
-from typing import Optional
 
 import numpy as np
 import scipy.sparse

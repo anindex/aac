@@ -23,7 +23,6 @@ from aac.compression.compressor import LinearCompressor, make_linear_heuristic
 from aac.compression.smooth import make_aac_heuristic
 from aac.graphs.convert import edges_to_graph, graph_to_scipy
 
-
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------

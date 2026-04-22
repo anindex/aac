@@ -13,21 +13,16 @@ results elsewhere in the pipeline:
 
 from __future__ import annotations
 
-import math
-
-import numpy as np
 import pytest
 import torch
 
 from aac.compression.compressor import LinearCompressor, make_linear_heuristic
-from aac.baselines.alt import alt_preprocess, make_alt_heuristic
 from aac.embeddings.anchors import farthest_point_sampling
 from aac.embeddings.sssp import compute_teacher_labels
-from aac.graphs.convert import edges_to_graph, transpose_graph
+from aac.graphs.convert import edges_to_graph
 from aac.search.astar import astar
 from aac.search.dijkstra import dijkstra
 from aac.utils.numerics import SENTINEL
-
 
 # ---------------------------------------------------------------------------
 # Fixtures
@@ -485,6 +480,6 @@ class TestFullPipelineWeaklyConnected:
                     )
 
         assert len(violations) == 0, (
-            f"Admissibility violations on weakly-connected graph:\n"
+            "Admissibility violations on weakly-connected graph:\n"
             + "\n".join(violations[:10])
         )

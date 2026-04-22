@@ -9,7 +9,6 @@ import torch
 from aac.graphs.convert import edges_to_graph
 from aac.graphs.io import load_graph_npz, save_graph_npz
 
-
 # ---------------------------------------------------------------------------
 # Fixtures
 # ---------------------------------------------------------------------------

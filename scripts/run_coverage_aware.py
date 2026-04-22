@@ -16,12 +16,11 @@ from __future__ import annotations
 
 import csv
 import logging
-import time
 from pathlib import Path
 
 import numpy as np
+import scipy.sparse.csgraph
 import torch
-import torch.nn.functional as F
 
 from aac.baselines.alt import alt_preprocess, make_alt_heuristic
 from aac.compression.compressor import LinearCompressor, make_linear_heuristic
@@ -33,8 +32,6 @@ from aac.search.astar import astar
 from aac.search.dijkstra import dijkstra
 from aac.train.trainer import TrainConfig, compute_teacher_heuristic
 from experiments.utils import generate_queries
-
-import scipy.sparse.csgraph
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s", datefmt="%H:%M:%S")
 logger = logging.getLogger(__name__)

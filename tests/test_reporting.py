@@ -6,8 +6,6 @@ import tempfile
 from pathlib import Path
 
 import pandas as pd
-import pytest
-
 
 # ---------------------------------------------------------------------------
 # CSV writer tests

@@ -311,7 +311,7 @@ def main() -> None:
     # -----------------------------------------------------------------------
     print(f"\n{'='*70}")
     print("  COMMUNITY GRAPH (Stochastic Block Model)")
-    print(f"  5 communities x 2000 nodes = 10000 total, p_in=0.05, p_out=0.001")
+    print("  5 communities x 2000 nodes = 10000 total, p_in=0.05, p_out=0.001")
     print(f"{'='*70}")
 
     G_comm = generate_community_graph(GRAPH_SEED)
@@ -324,7 +324,7 @@ def main() -> None:
         print(f"  WARNING: {n_components} connected components. "
               f"Largest CC: {len(largest_cc)} nodes")
     else:
-        print(f"  Connected: 1 component")
+        print("  Connected: 1 component")
 
     graph_comm = nx_to_graph(G_comm, weight_seed=GRAPH_SEED)
     print(f"  Graph: {graph_comm.num_nodes:,} nodes, {graph_comm.num_edges:,} edges "
@@ -345,7 +345,7 @@ def main() -> None:
     # -----------------------------------------------------------------------
     print(f"\n{'='*70}")
     print("  POWER-LAW GRAPH (Barabasi-Albert)")
-    print(f"  10000 nodes, m=5 (attachments per new node)")
+    print("  10000 nodes, m=5 (attachments per new node)")
     print(f"{'='*70}")
 
     G_pl = generate_powerlaw_graph(GRAPH_SEED)
@@ -387,7 +387,7 @@ def main() -> None:
                   f"Hybrid_red={row['hybrid_reduction_pct']}% "
                   f"p={row['p_value_twosided']} {sig}")
 
-    print(f"\nOutput files:")
+    print("\nOutput files:")
     print(f"  {OUTPUT_DIR / 'community_results.csv'}")
     print(f"  {OUTPUT_DIR / 'powerlaw_results.csv'}")
 

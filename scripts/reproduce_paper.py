@@ -31,8 +31,6 @@ import argparse
 import os
 import subprocess
 import sys
-from pathlib import Path
-
 
 # ---------------------------------------------------------------------------
 # Experiment pipeline: (step_name, script_args, track, heavy)
@@ -652,7 +650,7 @@ def main() -> int:
 
     # ---- Verification ----
     if args.no_verify:
-        print(f"\n  Verification: SKIPPED (--no-verify)")
+        print("\n  Verification: SKIPPED (--no-verify)")
     else:
         print(f"\n{'=' * 60}")
         print("  OUTPUT VERIFICATION")

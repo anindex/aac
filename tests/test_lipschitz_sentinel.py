@@ -1,8 +1,7 @@
 """Regression tests for sentinel masking in Lipschitz heuristic (BUG-EXH01)."""
 
-import pytest
-import torch
 import numpy as np
+
 from aac.compression.lipschitz import LipschitzCompressor, make_lipschitz_heuristic
 from aac.utils.numerics import SENTINEL
 

@@ -19,9 +19,9 @@ from dataclasses import dataclass
 import torch
 import torch.nn as nn
 
-from aac.graphs.types import Graph
 from aac.contextual.encoders import build_grid_edge_index, cell_costs_to_edge_weights
 from aac.contextual.smooth_bf import graph_with_weights, smooth_bellman_ford_batched
+from aac.graphs.types import Graph
 
 
 @dataclass

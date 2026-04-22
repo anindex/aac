@@ -17,7 +17,6 @@ import numpy as np
 import pytest
 from scipy import stats
 
-
 # ---------------------------------------------------------------------------
 # Constants
 # ---------------------------------------------------------------------------
@@ -220,9 +219,9 @@ class TestDdofConsistency:
                 match="ddof=0 in reporting context",
             ) if False else None
             # Log but do not fail -- the findings are documented
-            print(f"\nSTATISTICAL AUDIT FINDINGS:\n" + "\n".join(findings))
+            print("\nSTATISTICAL AUDIT FINDINGS:\n" + "\n".join(findings))
         else:
-            print(f"\nSTATISTICAL AUDIT FINDINGS:\n" + "\n".join(findings))
+            print("\nSTATISTICAL AUDIT FINDINGS:\n" + "\n".join(findings))
 
 
 # ---------------------------------------------------------------------------

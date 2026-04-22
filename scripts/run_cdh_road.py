@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""CDH vs ALT matched-memory head-to-head on road networks.
+r"""CDH vs ALT matched-memory head-to-head on road networks.
 
 Extends scripts/run_cdh_baseline.py to four directed road graphs (OSMnx Modena,
 OSMnx Manhattan, DIMACS NY, DIMACS FLA). Same protocol as the SBM benchmark:

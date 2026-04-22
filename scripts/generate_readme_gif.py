@@ -20,10 +20,11 @@ import sys
 from pathlib import Path
 
 import matplotlib
+
 matplotlib.use("Agg")
 
-import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
+import matplotlib.pyplot as plt
 import numpy as np
 import torch
 from PIL import Image
@@ -39,7 +40,6 @@ from aac.search.astar import astar
 from aac.search.dijkstra import dijkstra
 from aac.train.trainer import TrainConfig, train_linear_compressor
 from aac.viz.style import OKABE_ITO, setup_style
-
 
 GRID_SIZE = 30
 SEED = 42
@@ -259,7 +259,7 @@ def main():
     expanded_lists = [r_dij.expanded_nodes, r_alt.expanded_nodes, r_aac.expanded_nodes]
     paths = [r_dij.path, r_alt.path, r_aac.path]
     labels = [
-        f"Dijkstra (no heuristic)",
+        "Dijkstra (no heuristic)",
         f"ALT (K={K}, {K} values/v)",
         f"▸ AAC (m={M}, {M} values/v)",
     ]

@@ -324,8 +324,8 @@ def make_linear_heuristic(
     Returns:
         Callable h(node, target) -> float.
     """
+
     import numpy as np
-    from collections.abc import Callable
 
     from aac.utils.numerics import SENTINEL
 

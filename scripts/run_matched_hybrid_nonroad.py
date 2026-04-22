@@ -50,7 +50,6 @@ from aac.search.astar import astar
 from aac.search.dijkstra import dijkstra
 from aac.train.trainer import TrainConfig, train_linear_compressor
 from experiments.utils import compute_strong_lcc, generate_queries
-
 from scripts.run_synthetic_experiments import (
     GRAPH_SEED,
     NUM_QUERIES,
@@ -60,7 +59,6 @@ from scripts.run_synthetic_experiments import (
     generate_powerlaw_graph,
     nx_to_graph,
 )
-
 
 OUTPUT_DIR = _PROJECT_ROOT / "results" / "hybrid_nonroad"
 

@@ -7,9 +7,9 @@ import math
 import torch
 from torch.autograd import gradcheck
 
+from aac.contextual.smooth_bf import graph_with_weights, smooth_bellman_ford_batched
 from aac.graphs.convert import edges_to_graph
 from aac.graphs.types import Graph
-from aac.contextual.smooth_bf import graph_with_weights, smooth_bellman_ford_batched
 
 
 def _make_chain_graph(n: int = 4, weight: float = 1.0) -> Graph:
@@ -236,7 +236,7 @@ class TestEncoders:
         # With uniform cost=1.0, edge weights should equal distance factors
         expected = dist_factors.unsqueeze(0).to(edge_weights.dtype)
         assert torch.allclose(edge_weights, expected, atol=1e-10), (
-            f"With uniform costs, weights should equal dist_factors"
+            "With uniform costs, weights should equal dist_factors"
         )
 
     def test_cell_costs_to_edge_weights_differentiable(self) -> None:

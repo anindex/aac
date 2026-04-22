@@ -9,8 +9,8 @@ All functions use the consolidated style from ``aac.viz.style``.
 
 from __future__ import annotations
 
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
 from matplotlib.cm import ScalarMappable
 
 from aac.viz.style import TMLR_COLUMN_WIDTH, TMLR_FULL_WIDTH  # noqa: F401

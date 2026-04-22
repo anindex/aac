@@ -128,7 +128,7 @@ def run_experiment(graph_name, graph, seed):
                 )
                 h_alt = make_alt_heuristic(alt_teacher)
                 heuristic = make_hybrid_heuristic(h_aac, h_alt)
-                method_name = f"AAC+ALT"
+                method_name = "AAC+ALT"
                 bytes_per_v = m * 4 + 2 * alt_K * 4  # AAC + ALT memory
             else:
                 heuristic = h_aac

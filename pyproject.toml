@@ -64,6 +64,19 @@ target-version = "py311"
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "W"]
+ignore = [
+    "E501",   # line-too-long (scientific formulae / docstrings)
+    "E702",   # multiple-statements-on-one-line (compact matplotlib tick removal)
+    "E731",   # lambda-assignment (common in functional-style scientific code)
+    "E741",   # ambiguous-variable-name (l, I, O are standard math notation)
+    "E712",   # true-false-comparison (acceptable in tests)
+    "F821",   # undefined-name (string-quoted forward references in annotations)
+]
+
+[tool.ruff.lint.per-file-ignores]
+"scripts/*.py" = ["E402", "F841"]   # sys.path manipulation before imports; result-capture vars
+"tests/*.py" = ["E402", "F841"]     # fixture imports; assertion intermediate vars
+"examples/*.py" = ["E402"]          # sys.path manipulation
 
 [tool.mypy]
 python_version = "3.11"

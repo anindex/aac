@@ -21,6 +21,7 @@ from aac.viz.style import METHOD_LABELS, TMLR_FULL_WIDTH
 
 if TYPE_CHECKING:
     from matplotlib.cm import ScalarMappable
+
     from aac.search.types import SearchResult
 
 

@@ -1,5 +1,7 @@
 """Reporting pipeline: CSV aggregation, LaTeX tables, publication-quality figures."""
 
+# Re-export consolidated style module for convenience
+from aac.viz.style import setup_style  # noqa: F401
 from experiments.reporting.csv_writer import (
     aggregate_results,
     get_git_hash,
@@ -16,9 +18,6 @@ from experiments.reporting.latex_tables import (
     generate_comparison_table,
     generate_preprocessing_table,
 )
-
-# Re-export consolidated style module for convenience
-from aac.viz.style import setup_style  # noqa: F401
 
 __all__ = [
     "aggregate_results",

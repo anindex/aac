@@ -166,7 +166,7 @@ class TestOSMnx:
         """Create MultiDiGraph with parallel edges, verify only min-weight kept."""
         import networkx as nx
 
-        from aac.graphs.loaders.osmnx import _resolve_parallel_edges, _networkx_digraph_to_graph
+        from aac.graphs.loaders.osmnx import _networkx_digraph_to_graph, _resolve_parallel_edges
 
         G = nx.MultiDiGraph()
         G.add_node(1, x=0.0, y=0.0)

@@ -7,7 +7,6 @@ from __future__ import annotations
 
 import os
 import tempfile
-from pathlib import Path
 
 import matplotlib
 
@@ -24,7 +23,6 @@ from aac.viz.compression import (
     selection_evolution_gif,
     weight_matrix_heatmap,
 )
-
 
 # ---------------------------------------------------------------------------
 # Fixtures

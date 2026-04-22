@@ -14,10 +14,8 @@ import time
 from pathlib import Path
 
 import numpy as np
-import scipy.sparse.csgraph
 
 from aac.baselines.fastmap import fastmap_preprocess, make_fastmap_heuristic
-from aac.graphs.convert import graph_to_scipy
 from aac.graphs.loaders.dimacs import load_dimacs
 from aac.search.astar import astar
 from aac.search.dijkstra import dijkstra

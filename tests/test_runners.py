@@ -3,17 +3,15 @@
 from __future__ import annotations
 
 import inspect
-from unittest.mock import MagicMock, patch
 
 import pytest
-import torch
 from omegaconf import DictConfig, OmegaConf
 
+from aac.search.types import SearchResult
 from experiments.metrics.collector import MetricsCollector
 from experiments.runners import DIMACSRunner, OSMnxRunner, get_runner
 from experiments.runners.base import BaseRunner
 from experiments.utils import memory_bytes_per_vertex
-from aac.search.types import SearchResult
 
 
 def _make_cfg(
@@ -206,7 +204,6 @@ def test_batch_throughput_wired():
     assert hasattr(BaseRunner, "measure_batch_throughput")
 
     # Verify the method imports and calls batch_throughput from collector
-    import experiments.runners.base as base_module
 
     source = inspect.getsource(BaseRunner.measure_batch_throughput)
     assert "batch_throughput" in source

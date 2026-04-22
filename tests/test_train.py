@@ -3,22 +3,21 @@
 from __future__ import annotations
 
 import torch
-import pytest
 
 from aac.compression.compressor import PositiveCompressor
 from aac.compression.smooth import (
-    smoothed_heuristic_undirected,
     make_aac_heuristic,
+    smoothed_heuristic_undirected,
 )
 from aac.embeddings.anchors import farthest_point_sampling
-from aac.embeddings.sssp import compute_teacher_labels
 from aac.embeddings.hilbert import build_hilbert_embedding
+from aac.embeddings.sssp import compute_teacher_labels
 from aac.graphs.types import Graph
 from aac.search.astar import astar
 from aac.search.dijkstra import dijkstra
-from aac.train.loss import gap_closing_loss
 from aac.train.data import QueryPairDataset, make_splits
-from aac.train.trainer import train_compressor, TrainConfig
+from aac.train.loss import gap_closing_loss
+from aac.train.trainer import TrainConfig, train_compressor
 
 
 # ---------------------------------------------------------------------------

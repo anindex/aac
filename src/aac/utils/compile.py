@@ -24,8 +24,8 @@ def compile_hot_paths() -> None:
     Safe to call multiple times (idempotent). No-op if torch.compile
     is unavailable.
     """
-    import aac.embeddings.sssp as sssp_mod
     import aac.contextual.smooth_bf as smooth_bf_mod
+    import aac.embeddings.sssp as sssp_mod
 
     if not hasattr(torch, "compile"):
         return

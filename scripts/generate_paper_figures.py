@@ -34,7 +34,6 @@ from experiments.reporting.figures import (
 from experiments.reporting.latex_tables import (
     generate_dimacs_main_table,
     generate_pareto_detail_table,
-    generate_timing_table,
 )
 
 

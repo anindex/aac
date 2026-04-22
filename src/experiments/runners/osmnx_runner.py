@@ -45,14 +45,14 @@ class OSMnxRunner(BaseRunner):
         """
         import pickle
 
-        from experiments.metrics.admissibility import check_admissibility
-        from experiments.metrics.collector import MetricsCollector, PreprocessingMetrics
-        from experiments.metrics.timing import time_query
-        from experiments.utils import generate_queries
         from aac.baselines import PHIL_REPORTED
         from aac.graphs.loaders.osmnx import _networkx_digraph_to_graph
         from aac.search.astar import astar
         from aac.search.dijkstra import dijkstra
+        from experiments.metrics.admissibility import check_admissibility
+        from experiments.metrics.collector import MetricsCollector, PreprocessingMetrics
+        from experiments.metrics.timing import time_query
+        from experiments.utils import generate_queries
 
         output_dir = Path(cfg.output_dir) / "osmnx"
         output_dir.mkdir(parents=True, exist_ok=True)
@@ -79,7 +79,7 @@ class OSMnxRunner(BaseRunner):
             elif method_name == "dijkstra":
                 def heuristic(node: int, target: int) -> float:
                     return 0.0
-                preprocess_metrics = PreprocessingMetrics(0, 0, 0, 0)
+                _preprocess_metrics = PreprocessingMetrics(0, 0, 0, 0)
             # No else needed: _validate_method already caught unsupported methods
 
             # Run exact A* with heuristic

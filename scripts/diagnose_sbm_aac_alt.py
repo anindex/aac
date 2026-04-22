@@ -12,6 +12,7 @@ Tests several hypotheses:
   H5: Does AAC(K0=8, m=8) -- identity case -- match ALT(K=8) exactly?
 """
 from __future__ import annotations
+
 import sys
 import time
 from pathlib import Path

@@ -6,8 +6,6 @@ for testing the loader without external data dependencies.
 
 from __future__ import annotations
 
-import math
-import tempfile
 from pathlib import Path
 
 import pytest

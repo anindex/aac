@@ -3,10 +3,9 @@
 import pytest
 import torch
 
-from aac.graphs.types import Graph, TeacherLabels
-from aac.graphs.convert import edges_to_graph, graph_to_scipy
+from aac.graphs.convert import edges_to_graph
+from aac.graphs.types import TeacherLabels
 from aac.utils.numerics import SENTINEL
-
 
 # ---------------------------------------------------------------------------
 # Fixtures
@@ -190,10 +189,10 @@ def test_chunked_sssp_directed(directed_graph_5):
     )
 
     assert torch.allclose(chunked.d_out, unchunked.d_out, atol=1e-10), (
-        f"Directed chunked d_out mismatch"
+        "Directed chunked d_out mismatch"
     )
     assert torch.allclose(chunked.d_in, unchunked.d_in, atol=1e-10), (
-        f"Directed chunked d_in mismatch"
+        "Directed chunked d_in mismatch"
     )
 
 
@@ -281,6 +280,7 @@ def test_backend_scipy_explicit(undirected_graph_5):
 def test_backend_auto_fallback(undirected_graph_5):
     """backend='auto' with NetworKit not installed falls back to SciPy."""
     import unittest.mock
+
     from aac.embeddings.sssp import compute_teacher_labels
 
     anchors = torch.tensor([0, 2, 4], dtype=torch.int64)

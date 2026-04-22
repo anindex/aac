@@ -170,7 +170,7 @@ def main() -> None:
     print("  AAC Demo: Context-Conditioned Terrain Routing")
     print("=" * 60)
     print(f"  Grid: {grid_size}x{grid_size}, K={K} anchors, m={m} compressed")
-    print(f"  Terrain: . = plains, f = forest, M = mountain, ~ = swamp")
+    print("  Terrain: . = plains, f = forest, M = mountain, ~ = swamp")
     print()
 
     # Step 1: Generate terrain and build graph
@@ -186,6 +186,7 @@ def main() -> None:
 
     # Step 2: Train encoder + compressor end-to-end
     import scipy.sparse.csgraph
+
     from aac.graphs.convert import graph_to_scipy
 
     features = cost_map_to_features(cost_map)  # (1, 3, H, W)
@@ -220,7 +221,7 @@ def main() -> None:
     )
 
     trainer = ContextualTrainer(encoder, compressor, config, is_directed=False)
-    print(f"\n  Training encoder + compressor (200 epochs)...")
+    print("\n  Training encoder + compressor (200 epochs)...")
     metrics = trainer.train(train_data, graph, anchor_indices)
     print(f"  Training done: {metrics.final_epoch + 1} epochs,"
           f" final loss={metrics.per_epoch_loss[-1]:.4f}")
@@ -281,7 +282,7 @@ def main() -> None:
           f" ({ctx_reduction:.1f}% reduction) [{cost_regret:.1f}% regret]")
 
     # Show terrain with path
-    print(f"\n  Terrain with static-AAC path (*):")
+    print("\n  Terrain with static-AAC path (*):")
     print()
     print_terrain(cost_map, result_static.path)
 

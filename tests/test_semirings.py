@@ -8,7 +8,6 @@ from __future__ import annotations
 import pytest
 import torch
 
-
 # ── Tropical Semiring Tests ──────────────────────────────────────────────────
 
 class TestTropicalSemiring:
@@ -310,7 +309,7 @@ class TestMinPlusSpMM:
         B = torch.rand(K, 3, dtype=torch.float64) * 100
 
         result = minplus_spmm(I_minplus, B)
-        assert torch.allclose(result, B), f"Identity * B != B"
+        assert torch.allclose(result, B), "Identity * B != B"
 
 
 # ── Autograd / Gradcheck Tests ──────────────────────────────────────────────

@@ -3,10 +3,9 @@
 import pytest
 import torch
 
-from aac.graphs.convert import edges_to_graph, graph_to_scipy
-from aac.graphs.types import Graph, TeacherLabels, Embedding
+from aac.graphs.convert import edges_to_graph
+from aac.graphs.types import Embedding
 from aac.utils.numerics import SENTINEL
-
 
 # ---------------------------------------------------------------------------
 # Fixtures
@@ -185,8 +184,8 @@ def test_boundary_anchors_uses_extremes():
 
 def test_hilbert_embedding_shape(undirected_graph_5):
     """Hilbert embedding with K=3 anchors on 5-node undirected graph -> phi shape (5, 6)."""
-    from aac.embeddings.sssp import compute_teacher_labels
     from aac.embeddings.hilbert import build_hilbert_embedding
+    from aac.embeddings.sssp import compute_teacher_labels
 
     anchors = torch.tensor([0, 2, 4], dtype=torch.int64)
     labels = compute_teacher_labels(undirected_graph_5, anchors, use_gpu=False)
@@ -201,8 +200,8 @@ def test_hilbert_embedding_shape(undirected_graph_5):
 
 def test_hilbert_rejects_directed(directed_graph_5):
     """Hilbert embedding must raise AssertionError on directed TeacherLabels."""
-    from aac.embeddings.sssp import compute_teacher_labels
     from aac.embeddings.hilbert import build_hilbert_embedding
+    from aac.embeddings.sssp import compute_teacher_labels
 
     anchors = torch.tensor([0, 2, 4], dtype=torch.int64)
     labels = compute_teacher_labels(directed_graph_5, anchors, use_gpu=False)
@@ -216,9 +215,9 @@ def test_hilbert_admissibility(undirected_graph_5):
 
     Uses all 5 vertices as anchors for strong coverage.
     """
-    from aac.embeddings.sssp import compute_teacher_labels, scipy_dijkstra_batched
-    from aac.embeddings.hilbert import build_hilbert_embedding
     from aac.embeddings.heuristic import evaluate_heuristic
+    from aac.embeddings.hilbert import build_hilbert_embedding
+    from aac.embeddings.sssp import compute_teacher_labels, scipy_dijkstra_batched
 
     all_anchors = torch.arange(5, dtype=torch.int64)
     labels = compute_teacher_labels(undirected_graph_5, all_anchors, use_gpu=False)
@@ -238,9 +237,9 @@ def test_hilbert_admissibility(undirected_graph_5):
 
 def test_hilbert_exactness_all_anchors(undirected_graph_5):
     """With K=V=5 anchors, Hilbert heuristic == d(u,t) for all (u,t) pairs (Theorem 1)."""
-    from aac.embeddings.sssp import compute_teacher_labels, scipy_dijkstra_batched
-    from aac.embeddings.hilbert import build_hilbert_embedding
     from aac.embeddings.heuristic import evaluate_heuristic
+    from aac.embeddings.hilbert import build_hilbert_embedding
+    from aac.embeddings.sssp import compute_teacher_labels, scipy_dijkstra_batched
 
     all_anchors = torch.arange(5, dtype=torch.int64)
     labels = compute_teacher_labels(undirected_graph_5, all_anchors, use_gpu=False)
@@ -285,9 +284,9 @@ def test_tropical_admissibility(strongly_connected_directed_5):
 
     Uses all 5 vertices as anchors. Strongly connected ensures all pairs are reachable.
     """
+    from aac.embeddings.heuristic import evaluate_heuristic
     from aac.embeddings.sssp import compute_teacher_labels, scipy_dijkstra_batched
     from aac.embeddings.tropical import build_tropical_embedding
-    from aac.embeddings.heuristic import evaluate_heuristic
 
     all_anchors = torch.arange(5, dtype=torch.int64)
     labels = compute_teacher_labels(strongly_connected_directed_5, all_anchors, use_gpu=False)
@@ -306,9 +305,9 @@ def test_tropical_admissibility(strongly_connected_directed_5):
 
 def test_tropical_exactness_all_anchors(strongly_connected_directed_5):
     """With K=V=5 anchors on strongly connected graph, h(u,t) == d(u,t) (Theorem 2)."""
+    from aac.embeddings.heuristic import evaluate_heuristic
     from aac.embeddings.sssp import compute_teacher_labels, scipy_dijkstra_batched
     from aac.embeddings.tropical import build_tropical_embedding
-    from aac.embeddings.heuristic import evaluate_heuristic
 
     all_anchors = torch.arange(5, dtype=torch.int64)
     labels = compute_teacher_labels(strongly_connected_directed_5, all_anchors, use_gpu=False)
@@ -334,9 +333,9 @@ def test_tropical_exactness_all_anchors(strongly_connected_directed_5):
 
 def test_heuristic_batch_shape(undirected_graph_5):
     """evaluate_heuristic_batch with B=10 queries returns (10,) tensor."""
-    from aac.embeddings.sssp import compute_teacher_labels
-    from aac.embeddings.hilbert import build_hilbert_embedding
     from aac.embeddings.heuristic import evaluate_heuristic_batch
+    from aac.embeddings.hilbert import build_hilbert_embedding
+    from aac.embeddings.sssp import compute_teacher_labels
 
     anchors = torch.tensor([0, 2, 4], dtype=torch.int64)
     labels = compute_teacher_labels(undirected_graph_5, anchors, use_gpu=False)
@@ -352,9 +351,9 @@ def test_heuristic_batch_shape(undirected_graph_5):
 
 def test_heuristic_nonnegative(undirected_graph_5):
     """All heuristic values must be >= -1e-10 (non-negative)."""
-    from aac.embeddings.sssp import compute_teacher_labels
-    from aac.embeddings.hilbert import build_hilbert_embedding
     from aac.embeddings.heuristic import evaluate_heuristic_batch
+    from aac.embeddings.hilbert import build_hilbert_embedding
+    from aac.embeddings.sssp import compute_teacher_labels
 
     all_anchors = torch.arange(5, dtype=torch.int64)
     labels = compute_teacher_labels(undirected_graph_5, all_anchors, use_gpu=False)
@@ -372,9 +371,9 @@ def test_heuristic_nonnegative(undirected_graph_5):
 
 def test_heuristic_asymmetric_directed(strongly_connected_directed_5):
     """On strongly connected directed graph, h(0,4) != h(4,0) due to asymmetric distances."""
+    from aac.embeddings.heuristic import evaluate_heuristic
     from aac.embeddings.sssp import compute_teacher_labels, scipy_dijkstra_batched
     from aac.embeddings.tropical import build_tropical_embedding
-    from aac.embeddings.heuristic import evaluate_heuristic
 
     all_anchors = torch.arange(5, dtype=torch.int64)
     labels = compute_teacher_labels(strongly_connected_directed_5, all_anchors, use_gpu=False)
@@ -394,9 +393,9 @@ def test_heuristic_asymmetric_directed(strongly_connected_directed_5):
 
 def test_evaluate_from_embedding(undirected_graph_5):
     """Convenience function produces same results as manual lookup + evaluate."""
-    from aac.embeddings.sssp import compute_teacher_labels
+    from aac.embeddings.heuristic import evaluate_from_embedding, evaluate_heuristic_batch
     from aac.embeddings.hilbert import build_hilbert_embedding
-    from aac.embeddings.heuristic import evaluate_heuristic_batch, evaluate_from_embedding
+    from aac.embeddings.sssp import compute_teacher_labels
 
     all_anchors = torch.arange(5, dtype=torch.int64)
     labels = compute_teacher_labels(undirected_graph_5, all_anchors, use_gpu=False)
@@ -418,9 +417,9 @@ def test_evaluate_from_embedding(undirected_graph_5):
 def test_hilbert_admissibility_medium_graph(medium_undirected_graph):
     """On 100-node graph with K=10 FPS anchors, h(u,t) <= d(u,t) for 200 random pairs."""
     from aac.embeddings.anchors import farthest_point_sampling
-    from aac.embeddings.sssp import compute_teacher_labels, scipy_dijkstra_batched
-    from aac.embeddings.hilbert import build_hilbert_embedding
     from aac.embeddings.heuristic import evaluate_heuristic_batch
+    from aac.embeddings.hilbert import build_hilbert_embedding
+    from aac.embeddings.sssp import compute_teacher_labels, scipy_dijkstra_batched
 
     anchors = farthest_point_sampling(medium_undirected_graph, num_anchors=10, seed_vertex=0)
     labels = compute_teacher_labels(medium_undirected_graph, anchors, use_gpu=False)

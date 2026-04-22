@@ -9,9 +9,8 @@ import torch
 import torch.nn.functional as F
 
 from aac.graphs.convert import edges_to_graph
-from aac.graphs.types import Embedding, Graph, TeacherLabels
+from aac.graphs.types import Graph
 from aac.utils.numerics import SENTINEL
-
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -20,8 +19,8 @@ from aac.utils.numerics import SENTINEL
 
 def _build_teacher_and_embedding_undirected(graph: Graph, K: int | None = None):
     """Build teacher labels + Hilbert embedding from undirected graph."""
-    from aac.embeddings.sssp import compute_teacher_labels
     from aac.embeddings.hilbert import build_hilbert_embedding
+    from aac.embeddings.sssp import compute_teacher_labels
 
     V = graph.num_nodes
     if K is None:
@@ -243,7 +242,6 @@ def test_positive_compressor_admissibility_directed(strongly_connected_5):
 def test_identity_compression_recovers_teacher(undirected_5):
     """With A=I (identity-sized), h_compressed approximately equals h_teacher."""
     from aac.compression.compressor import PositiveCompressor
-    from aac.embeddings.heuristic import evaluate_heuristic_batch
 
     labels, emb = _build_teacher_and_embedding_undirected(undirected_5)
     phi = emb.phi  # (5, 2K)

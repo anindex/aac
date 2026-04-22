@@ -41,7 +41,6 @@ from aac.embeddings.sssp import compute_teacher_labels
 from aac.search.astar import astar
 from aac.search.dijkstra import dijkstra
 from experiments.utils import compute_strong_lcc, generate_queries
-
 from scripts.run_ablation_selection import greedy_maximize_heuristic
 from scripts.run_synthetic_experiments import (
     GRAPH_SEED,
@@ -51,7 +50,6 @@ from scripts.run_synthetic_experiments import (
     generate_powerlaw_graph,
     nx_to_graph,
 )
-
 
 OUTPUT_DIR = _PROJECT_ROOT / "results" / "greedy_max_nonroad"
 TOTAL_BUDGETS_BYTES = [32, 64, 128]

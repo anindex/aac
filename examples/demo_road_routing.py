@@ -157,7 +157,7 @@ def main() -> None:
     # Pareto analysis
     print()
     print(f"  {'=' * 57}")
-    print(f"  Pareto Analysis: Memory Budget vs Expansion Reduction")
+    print("  Pareto Analysis: Memory Budget vs Expansion Reduction")
     print(f"  {'=' * 57}")
 
     # Group by memory budget

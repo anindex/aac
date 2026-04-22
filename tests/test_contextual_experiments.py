@@ -9,7 +9,6 @@ from __future__ import annotations
 from pathlib import Path
 
 import pytest
-import torch
 from omegaconf import DictConfig, OmegaConf
 
 

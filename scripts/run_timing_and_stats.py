@@ -67,21 +67,19 @@ SEED = 42
 # ---------------------------------------------------------------------------
 # Imports from the AAC library
 # ---------------------------------------------------------------------------
-from aac.graphs.loaders.dimacs import load_dimacs
-from aac.search.astar import astar
-
 # For AAC preprocessing (inline, no Hydra dependency)
 import scipy.sparse.csgraph
 
+# For ALT preprocessing
+from aac.baselines.alt import make_alt_heuristic
 from aac.compression.compressor import LinearCompressor, make_linear_heuristic
 from aac.embeddings.anchors import farthest_point_sampling
 from aac.embeddings.sssp import compute_teacher_labels
 from aac.graphs.convert import graph_to_scipy
+from aac.graphs.loaders.dimacs import load_dimacs
+from aac.search.astar import astar
 from aac.train.trainer import TrainConfig, train_linear_compressor
 from experiments.metrics.collector import PreprocessingMetrics
-
-# For ALT preprocessing
-from aac.baselines.alt import alt_preprocess, make_alt_heuristic
 
 # For queries
 from experiments.utils import generate_queries

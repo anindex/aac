@@ -4,13 +4,11 @@ Validates admissibility, optimality, memory accounting, and PHIL data structure.
 """
 
 import numpy as np
-import pytest
 import scipy.sparse.csgraph
 import torch
 
 from aac.graphs.convert import edges_to_graph, graph_to_scipy
 from aac.graphs.types import Graph
-
 
 # ---------------------------------------------------------------------------
 # Graph fixtures

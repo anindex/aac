@@ -222,7 +222,7 @@ def main() -> None:
 
     # Print summary
     print(f"\n{'='*70}")
-    print(f"  Summary")
+    print("  Summary")
     print(f"{'='*70}")
     import pandas as pd
     df = pd.DataFrame(all_results)

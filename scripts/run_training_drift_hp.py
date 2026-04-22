@@ -35,6 +35,8 @@ sys.path.insert(0, str(_ROOT / "src"))
 sys.path.insert(0, str(_ROOT))
 sys.path.insert(0, str(_ROOT / "scripts"))
 
+from run_synthetic_experiments import generate_community_graph, nx_to_graph
+
 from aac.compression.compressor import LinearCompressor, make_linear_heuristic
 from aac.embeddings.anchors import farthest_point_sampling
 from aac.embeddings.sssp import compute_teacher_labels
@@ -42,8 +44,6 @@ from aac.search.astar import astar
 from aac.search.dijkstra import dijkstra
 from aac.train.trainer import TrainConfig, train_linear_compressor
 from experiments.utils import compute_strong_lcc, generate_queries
-
-from run_synthetic_experiments import generate_community_graph, nx_to_graph
 
 OUTPUT_DIR = _ROOT / "results" / "training_drift_hp"
 NUM_QUERIES = 100

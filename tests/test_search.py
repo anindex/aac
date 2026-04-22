@@ -9,7 +9,6 @@ import torch
 from aac.graphs.convert import edges_to_graph, graph_to_scipy
 from aac.graphs.types import Graph
 
-
 # ---------------------------------------------------------------------------
 # Helper: build a grid graph with coordinates for heuristic testing
 # ---------------------------------------------------------------------------

@@ -9,8 +9,6 @@ Provides four strategies for selecting K anchor vertices:
 
 from __future__ import annotations
 
-from typing import Optional
-
 import numpy as np
 import scipy.sparse.csgraph
 import torch

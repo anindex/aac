@@ -232,7 +232,7 @@ class WarcraftRunner(BaseRunner):
         # compare path with GT optimal path on GT graph.
         test_maps = dataset["test"]["maps"]
         test_weights = dataset["test"]["weights"]
-        test_paths = dataset["test"]["paths"]
+        _test_paths = dataset["test"]["paths"]
 
         results = []
         encoder.eval()

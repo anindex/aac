@@ -3,8 +3,8 @@
 from __future__ import annotations
 
 import heapq
-from collections.abc import Callable
 from collections import defaultdict
+from collections.abc import Callable
 
 from aac.graphs.types import Graph
 from aac.search.types import SearchResult

@@ -8,20 +8,17 @@ produce uniform sampling, and are deterministic given a seed.
 from __future__ import annotations
 
 import numpy as np
-import pytest
 import scipy.sparse
 import scipy.sparse.csgraph
 from scipy.stats import chisquare
 
-from experiments.utils import compute_strong_lcc, generate_queries, seed_everything
+from aac.graphs.convert import edges_to_graph, graph_to_scipy
+from experiments.utils import compute_strong_lcc, generate_queries
 from tests.fixtures.adversarial_graphs import (
-    disconnected_directed,
     scc_boundary_graph,
     strongly_connected_directed_10,
     weakly_not_strongly_connected,
 )
-from aac.graphs.convert import edges_to_graph, graph_to_scipy
-
 
 # ---------------------------------------------------------------------------
 # Helpers

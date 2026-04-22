@@ -4,9 +4,11 @@
 Produces the detailed per-configuration table for the appendix.
 """
 from __future__ import annotations
+
 from pathlib import Path
-import pandas as pd
+
 import numpy as np
+import pandas as pd
 
 INPUT_PATH = Path("results/osmnx/large_scale_results.csv")
 OUTPUT_PATH = Path("paper/table_osmnx_full.tex")

@@ -36,7 +36,6 @@ from aac.search.dijkstra import dijkstra
 from aac.train.trainer import TrainConfig, train_linear_compressor
 from experiments.utils import compute_strong_lcc, generate_queries
 
-
 GRAPH_PATH = _PROJECT_ROOT / "data" / "osmnx" / "modena.npz"
 OUTPUT_DIR = _PROJECT_ROOT / "results" / "lambda_uniq_ablation"
 

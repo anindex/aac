@@ -25,7 +25,6 @@ import matplotlib
 matplotlib.use("Agg")
 
 import matplotlib.pyplot as plt
-import numpy as np
 import pandas as pd
 
 # Publication style (Computer Modern Roman + real LaTeX where available).

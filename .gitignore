@@ -70,3 +70,6 @@ runs/
 # OS
 .DS_Store
 Thumbs.db
+
+# Submission artifacts
+submission/
