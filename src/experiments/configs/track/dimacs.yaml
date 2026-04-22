@@ -1,0 +1,15 @@
+name: dimacs
+data_dir: data/dimacs
+graphs:
+  - name: NY
+    gr_file: USA-road-d.NY.gr
+    co_file: USA-road-d.NY.co
+  - name: BAY
+    gr_file: USA-road-d.BAY.gr
+    co_file: USA-road-d.BAY.co
+  - name: COL
+    gr_file: USA-road-d.COL.gr
+    co_file: USA-road-d.COL.co
+  - name: FLA
+    gr_file: USA-road-d.FLA.gr
+    co_file: USA-road-d.FLA.co

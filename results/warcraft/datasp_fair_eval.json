@@ -1,0 +1,10 @@
+{
+  "method": "datasp_reproduced_fair",
+  "n_test": 1000,
+  "cost_match_0001": 0.184,
+  "cost_match_01": 0.188,
+  "cost_match_05": 0.199,
+  "exact_path_match": 0.108,
+  "jaccard": 0.4076794669396473,
+  "cost_regret": 0.3838099282480238
+}

@@ -1,0 +1,6 @@
+method,path_match,jaccard,cost_regret,source
+full_e2e,0.006,0.1962413230637808,0.15833190484220286,AAC ablation (this work)
+frozen_compressor,0.006,0.2122430048689702,0.13392831369616204,AAC ablation (this work)
+frozen_encoder,0.0,0.053935031408275526,1.0116536837566814,AAC ablation (this work)
+bb_published,0.547,nan,0.173,"Vlastelica et al. (ICLR 2020) Table 1, 12x12 Warcraft"
+datasp_reproduced,0.108,0.414,0.384,"DataSP (Lahoud et al., 2024) reproduced from released code, seed=0"

@@ -1,0 +1,10 @@
+graph_type,total_budget_B,K0_teacher_pool,m_selected,alt_K_reference,dij_mean_exp,greedy_max_mean_exp,greedy_max_reduction_pct,pure_alt_mean_exp,pure_alt_reduction_pct,greedy_max_prep_s,notes
+community_sbm,32,32,8,8,5330.0,490.5,90.80,535.7,89.95,8.05,deterministic_given_graph_seed_and_queries
+community_sbm,64,64,16,16,5330.0,264.3,95.04,292.0,94.52,15.04,deterministic_given_graph_seed_and_queries
+community_sbm,128,128,32,32,5330.0,135.8,97.45,157.9,97.04,7.67,deterministic_given_graph_seed_and_queries
+powerlaw_ba,32,32,8,8,4763.6,501.8,89.47,480.9,89.90,1.05,deterministic_given_graph_seed_and_queries
+powerlaw_ba,64,64,16,16,4763.6,275.9,94.21,274.1,94.25,0.77,deterministic_given_graph_seed_and_queries
+powerlaw_ba,128,128,32,32,4763.6,149.9,96.85,146.0,96.93,1.10,deterministic_given_graph_seed_and_queries
+ogbn_arxiv,32,32,8,8,78616.5,8892.7,88.69,10885.5,86.15,50.10,deterministic_given_graph_seed_and_queries
+ogbn_arxiv,64,64,16,16,78616.5,5367.0,93.17,6818.6,91.33,33.77,deterministic_given_graph_seed_and_queries
+ogbn_arxiv,128,128,32,32,78616.5,2626.6,96.66,3804.8,95.16,23.51,deterministic_given_graph_seed_and_queries

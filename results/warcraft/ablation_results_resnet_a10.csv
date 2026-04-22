@@ -1,0 +1,4 @@
+method,encoder,alpha_cost,path_match,jaccard,cost_regret,source
+frozen_compressor,resnet,10.0,0.20333333333333334,0.5926421775876278,0.017012659743691757,"AAC ablation (3 seeds, 10000 train maps, encoder=resnet, alpha_cost=10.0)"
+frozen_encoder,resnet,10.0,0.0,0.04897343150752124,1.1551044264333286,"AAC ablation (3 seeds, 10000 train maps, encoder=resnet, alpha_cost=10.0)"
+full_e2e,resnet,10.0,0.20266666666666666,0.592876864545577,0.016983197223004586,"AAC ablation (3 seeds, 10000 train maps, encoder=resnet, alpha_cost=10.0)"

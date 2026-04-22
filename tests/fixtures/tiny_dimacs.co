@@ -1,0 +1,7 @@
+c Tiny test coordinates
+p aux sp co 5
+v 1 0 0
+v 2 100 0
+v 3 50 100
+v 4 150 100
+v 5 200 200

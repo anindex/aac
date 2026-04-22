@@ -1,0 +1,4 @@
+method,path_match_mean,path_match_std,jaccard_mean,jaccard_std,cost_regret_mean,cost_regret_std,n_seeds,n_train,encoder,alpha_cost
+frozen_compressor,0.2033,0.0235,0.5926,0.0389,0.0170,0.0173,3,10000,resnet,10.0000
+frozen_encoder,0.0000,0.0000,0.0490,0.0043,1.1551,0.1864,3,10000,resnet,10.0000
+full_e2e,0.2027,0.0217,0.5929,0.0385,0.0170,0.0174,3,10000,resnet,10.0000

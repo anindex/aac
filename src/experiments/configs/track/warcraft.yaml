@@ -1,0 +1,6 @@
+name: warcraft
+# Pogancic et al. (ICLR 2020) real Warcraft shortest path dataset
+data_dir: data/warcraft_real/warcraft_shortest_path_oneskin
+grid_size: 12
+img_size: 96
+# Pre-split dataset: train/val/test npy files (no manual splitting needed)

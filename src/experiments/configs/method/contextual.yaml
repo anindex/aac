@@ -1,0 +1,15 @@
+name: contextual
+K: 5
+m: 8
+training:
+  num_epochs: 100
+  batch_size: 24
+  lr: 0.001
+  beta_init: 1.0
+  beta_max: 30.0
+  beta_gamma: 1.05
+  alpha_cost: 1.0
+  cond_lambda: 0.01
+  T_init: 1.0
+  T_gamma: 1.05
+  patience: 15

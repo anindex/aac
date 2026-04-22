@@ -1,0 +1,16 @@
+graph,budget_bpv,alt_K,seed,num_queries,checked,admissibility_violations,max_cost_ratio,all_admissible
+ogbn_arxiv,32,4,42,100,100,0,1.000000000,True
+ogbn_arxiv,32,4,123,100,100,0,1.000000000,True
+ogbn_arxiv,32,4,456,100,100,0,1.000000000,True
+ogbn_arxiv,32,4,789,100,100,0,1.000000000,True
+ogbn_arxiv,32,4,1024,100,100,0,1.000000000,True
+ogbn_arxiv,64,8,42,100,100,0,1.000000000,True
+ogbn_arxiv,64,8,123,100,100,0,1.000000000,True
+ogbn_arxiv,64,8,456,100,100,0,1.000000000,True
+ogbn_arxiv,64,8,789,100,100,0,1.000000000,True
+ogbn_arxiv,64,8,1024,100,100,0,1.000000000,True
+ogbn_arxiv,128,16,42,100,100,0,1.000000000,True
+ogbn_arxiv,128,16,123,100,100,0,1.000000000,True
+ogbn_arxiv,128,16,456,100,100,0,1.000000000,True
+ogbn_arxiv,128,16,789,100,100,0,1.000000000,True
+ogbn_arxiv,128,16,1024,100,100,0,1.000000000,True

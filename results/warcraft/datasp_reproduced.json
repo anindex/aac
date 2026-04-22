@@ -1,0 +1,10 @@
+{
+  "method": "datasp_reproduced",
+  "n_test": 1000,
+  "n_valid": 1000,
+  "path_match": 0.054,
+  "jaccard": 0.41418815371146234,
+  "cost_regret": 0.32718704658568093,
+  "seed": 0,
+  "train_time_s": 9300.540150165558
+}

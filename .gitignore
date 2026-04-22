@@ -1,0 +1,72 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+*.egg
+dist/
+build/
+
+# Virtual environments
+.venv/
+uv.lock
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# mypy
+.mypy_cache/
+
+# Linter & formatter caches
+.ruff_cache/
+
+# Test framework caches
+.hypothesis/
+.benchmarks/
+
+# Hydra / experiment caches
+cache/
+
+# LaTeX build outputs
+*.aux
+*.bbl
+*.blg
+*.fdb_latexmk
+*.fls
+*.out
+*.log
+*.synctex.gz
+*.toc
+texput.log
+
+# Large / generated binary files
+*.npy
+*.npz
+*.pkl
+*.pbf
+data/
+baselines/
+
+# Experiment run logs and PID files (not needed for reproducibility)
+results/**/*.log
+results/**/*_log.txt
+results/**/*_pid.txt
+results/**/*log.txt
+results/paper/
+paper/main.pdf
+paper
+results/logs/
+runs/
+
+# OS
+.DS_Store
+Thumbs.db

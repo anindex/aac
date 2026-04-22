@@ -1,0 +1,16 @@
+defaults:
+  - track: dimacs
+  - method: aac
+  - _self_
+
+seed: 42
+num_queries: 1000
+output_dir: results
+log_dir: runs
+
+timing:
+  warmup_runs: 10
+  num_runs: 100
+  report_percentiles: [50, 95]
+
+batch_throughput_sizes: [1, 8, 32, 128, 1024]

@@ -1,0 +1,10 @@
+csv_path,n_rows,n_all_optimal_true,n_suboptimal
+results/ablation_selection/exp1_selection_strategy.csv,40,40,0
+results/ablation_selection/exp2_admissibility_robustness.csv,25,25,0
+results/coverage_aware/coverage_aware_results.csv,40,40,0
+results/query_distributions/query_mode_results.csv,90,90,0
+results/query_distributions/query_mode_summary.csv,18,18,0
+results/dimacs/aac_NY.csv,100,100,0
+results/dimacs/aac_FLA.csv,100,100,0
+results/dimacs/aac_BAY.csv,100,100,0
+results/dimacs/aac_COL.csv,100,100,0

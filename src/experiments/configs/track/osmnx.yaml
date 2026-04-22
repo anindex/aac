@@ -1,0 +1,9 @@
+name: osmnx
+data_dir: data/osmnx
+cities:
+  - name: modena
+    place: "Modena, Italy"
+    network_type: drive
+  - name: new_york
+    place: "Manhattan, New York, USA"
+    network_type: drive

@@ -1,0 +1,9 @@
+family,graph,num_nodes,is_directed,num_components,common_scc_fraction,common_scc_count,num_queries
+DIMACS,NY,264346,True,1,1.0,100,100
+DIMACS,BAY,321270,True,1,1.0,100,100
+DIMACS,COL,435666,True,1,1.0,100,100
+DIMACS,FLA,1070376,True,1,1.0,100,100
+OSMnx,modena,29878,True,71,1.0,100,100
+OSMnx,manhattan,4626,True,87,1.0,100,100
+OSMnx,berlin,28397,True,77,1.0,100,100
+OSMnx,los_angeles,49631,True,384,1.0,100,100

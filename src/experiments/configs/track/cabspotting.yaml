@@ -1,0 +1,11 @@
+name: cabspotting
+data_dir: data/cabspotting
+# Cabspotting graph: ~355 nodes, ~2178 edges (from DataSP paper)
+num_nodes: 355
+num_edges: 2178
+# Feature dimensions: [day_of_week (4 one-hot), is_holiday, time_start] = 6
+input_dim: 6
+# Train/test split: 70/30 by driver (matching DataSP)
+train_split: 0.7
+# DataSP uses beta=30 for Cabspotting
+beta_override: 30.0
