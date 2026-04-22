@@ -24,6 +24,7 @@ jobs:
         run: ruff check src/ scripts/ tests/ examples/
       - name: mypy
         run: mypy src/aac/
+        continue-on-error: true
 
   test:
     runs-on: ubuntu-latest

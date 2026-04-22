@@ -1,6 +1,6 @@
 # AAC: Admissible-by-Architecture Differentiable Landmark Compression for ALT
 
-[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
+[![arXiv](https://img.shields.io/badge/arXiv-2604.20744-b31b1b.svg)](https://arxiv.org/abs/2604.20744)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
 [![PyTorch](https://img.shields.io/badge/PyTorch-2.11+-red.svg)](https://pytorch.org/)
 
@@ -14,7 +14,7 @@
 
 At deployment the module reduces to classical ALT on a learned landmark subset, so the classical toolchain (BPMX, bound substitution, bidirectional search) remains available.
 
-> **Paper:** *"AAC: An Admissible-by-Architecture Differentiable Compressor for Learned ALT Landmark Selection"* -- An T. Le and Vien Ngo (TMLR submission).
+> **Paper:** *"AAC: An Admissible-by-Architecture Differentiable Compressor for Learned ALT Landmark Selection"* -- An T. Le and Vien Ngo ([arXiv:2604.20744](https://arxiv.org/abs/2604.20744)).
 
 ## Key Results
 
@@ -126,4 +126,6 @@ For the per-experiment file index and provenance chain, see [`results/README.md`
 
 ## License
 
-This project is licensed under the [Apache License 2.0](LICENSE) -- see [NOTICE](NOTICE) for the patent notice. The AAC method is patent-pending; this license grants you rights to use the software as provided. See NOTICE for details on commercial use of the underlying method.
+Copyright © 2026 An T. Le. All Rights Reserved.
+
+This code is provided solely for academic peer-review and reproducibility purposes. No license is granted for commercial or derivative use.

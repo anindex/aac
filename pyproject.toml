@@ -3,7 +3,6 @@ name = "aac"
 version = "1.0.0"
 description = "AAC: Admissible-by-Architecture Differentiable Landmark Compression for ALT"
 readme = "README.md"
-license = {text = "Apache-2.0"}
 requires-python = ">=3.11"
 authors = [
     {name = "An T. Le", email = "an@robot-learning.de"},
