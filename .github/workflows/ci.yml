@@ -17,11 +17,14 @@ jobs:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v5
       - run: uv python install 3.11
-      - run: uv venv -p 3.11 && uv pip install -e ".[dev]"
+      - name: Install
+        run: |
+          uv venv -p 3.11
+          uv pip install -e ".[dev]"
       - name: Ruff
-        run: uv run ruff check src/ scripts/ tests/ examples/
+        run: .venv/bin/ruff check src/ scripts/ tests/ examples/
       - name: mypy
-        run: uv run mypy src/aac/
+        run: .venv/bin/mypy src/aac/
 
   test:
     runs-on: ubuntu-latest
@@ -34,6 +37,8 @@ jobs:
       - name: Set up Python ${{ matrix.python-version }}
         run: uv python install ${{ matrix.python-version }}
       - name: Install
-        run: uv venv -p ${{ matrix.python-version }} && uv pip install -e ".[dev,experiments]"
+        run: |
+          uv venv -p ${{ matrix.python-version }}
+          uv pip install -e ".[dev]"
       - name: Test
-        run: uv run pytest tests/ -x -q --tb=short -m "not slow and not gpu and not network"
+        run: .venv/bin/pytest tests/ -x -q --tb=short -m "not slow and not gpu and not network"
