@@ -4,17 +4,51 @@
 [![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
 [![PyTorch](https://img.shields.io/badge/PyTorch-2.11+-red.svg)](https://pytorch.org/)
 
+**AAC** is a differentiable landmark-selection module for [ALT](https://en.wikipedia.org/wiki/A*_search_algorithm#Landmarks_and_triangle_inequality) (A\*, Landmarks, and Triangle inequality) shortest-path heuristics. It compresses a large set of teacher landmarks into a small, search-efficient subset via gradient descent -- and its outputs are **admissible by construction**: a row-stochastic compression matrix produces convex combinations of triangle-inequality lower bounds, so the heuristic is admissible for *every* parameter setting, at *every* training epoch, without convergence assumptions or post-hoc calibration.
+
+At deployment the module reduces to classical ALT on the learned subset, preserving the full classical toolchain (BPMX, bound substitution, bidirectional search).
+
+> **Paper:** *"AAC: An Admissible-by-Architecture Differentiable Compressor for Learned ALT Landmark Selection"* -- An T. Le and Vien Ngo ([arXiv:2604.20744](https://arxiv.org/abs/2604.20744)).
+
+<p align="center">
+  <img src="assets/showcase_training.gif" alt="AAC training dynamics: expansion heatmap with landmarks, selection matrix sharpening, and loss curve" width="900">
+  <br>
+  <em>AAC training on a 50×50 maze, compressing 48 FPS landmarks to 10. Left: A* expansion heatmap with teacher landmarks (gray dots) and learned AAC landmarks (colored diamonds). Middle: selection matrix sharpening from diffuse to one-hot. Right: heuristic gap loss converging. The heuristic is admissible at every frame.</em>
+</p>
+
+## How AAC Works
+
+<p align="center">
+  <img src="assets/method_diagram.png" alt="AAC method diagram" width="800">
+</p>
+
+AAC learns *which* landmarks matter by parameterizing a row-stochastic compression matrix **A** over a pool of K teacher landmarks (selected by farthest-point sampling). Each of the m output dimensions is a convex combination of teacher distances. Since a convex combination of admissible lower bounds is itself admissible (Proposition 1 in the paper), the compressed heuristic is admissible for every value of **A** -- not just at convergence, but at initialization and every intermediate checkpoint.
+
+During training, Gumbel-softmax annealing sharpens each row of **A** from a diffuse mixture toward a one-hot selection, so the final model selects a discrete landmark subset. The training objective minimizes the gap between the learned heuristic and the teacher, driving the selected landmarks toward those that most reduce A\* node expansions.
+
+### What Makes AAC Landmarks Different from FPS Landmarks
+
+Standard [farthest-point sampling](https://en.wikipedia.org/wiki/Farthest-first_traversal) (FPS) places landmarks to maximize geometric spread -- a reasonable spatial heuristic, but one that is entirely query-agnostic and cannot adapt to graph structure. AAC landmarks are selected by gradient descent to minimize search cost, which means they concentrate on structurally important locations (corridor junctions, bottleneck edges) rather than simply maximizing pairwise distance.
+
+| | FPS Landmarks | AAC Landmarks |
+|---|---|---|
+| **How selected** | Greedy farthest-point sampling | Gradient-based differentiable selection |
+| **Optimizes for** | Spatial coverage (max-min distance) | Search efficiency (min A\* expansions) |
+| **Adapts to graph** | No -- fixed once computed | Yes -- learns bottleneck structure |
+| **Memory** | Full K landmarks | Compressed subset m ≪ K |
+| **Admissibility** | By triangle inequality | By construction (convex combination) |
+
+### Why This Matters in Practice
+
+- **Memory-constrained deployment:** Compress a large landmark table (e.g., K=48 → m=10) for onboard robot planning. On the maze above this yields 4.8× memory reduction while retaining 88% expansion savings over uninformed search.
+- **End-to-end differentiability:** Gradients flow through the heuristic, enabling joint optimization with upstream modules such as graph construction or edge-weight learning.
+- **Anytime admissibility:** Every intermediate checkpoint produces a valid admissible heuristic. A partially-trained model can be deployed immediately -- no waiting for convergence, no post-hoc verification.
+
 <p align="center">
   <img src="assets/expansion_comparison.gif" alt="Dijkstra vs ALT vs AAC search expansion comparison" width="800">
   <br>
-  <em>A* search expansions on a 2D grid: Dijkstra (no heuristic) vs ALT (K=16 landmarks) vs AAC (m=16 from a K₀=32 pool). At matched memory AAC achieves competitive search focus through learned landmark selection.</em>
+  <em>A* search expansions: Dijkstra (no heuristic) vs ALT (K=16 landmarks) vs AAC (m=16 from K₀=32). At matched memory, AAC achieves competitive search focus through learned landmark selection.</em>
 </p>
-
-**AAC** is a differentiable landmark-selection module for [ALT](https://en.wikipedia.org/wiki/A*_search_algorithm#Landmarks_and_triangle_inequality) (A\*, Landmarks, and Triangle inequality) shortest-path heuristics whose outputs are **admissible by construction**: each forward pass is a row-stochastic mixture of triangle-inequality lower bounds, so the heuristic is admissible for *every* parameter setting -- no convergence assumption, no calibration step, no projection.
-
-At deployment the module reduces to classical ALT on a learned landmark subset, so the classical toolchain (BPMX, bound substitution, bidirectional search) remains available.
-
-> **Paper:** *"AAC: An Admissible-by-Architecture Differentiable Compressor for Learned ALT Landmark Selection"* -- An T. Le and Vien Ngo ([arXiv:2604.20744](https://arxiv.org/abs/2604.20744)).
 
 ## Key Results
 
@@ -49,17 +83,17 @@ uv sync
 Three self-contained demos -- no dataset downloads needed:
 
 ```bash
-# Demo 1: Grid navigation with obstacles
+# Grid navigation with obstacles
 python examples/demo_grid_navigation.py
 
-# Demo 2: Road routing with memory-accuracy tradeoff
+# Road routing with memory-accuracy tradeoff
 python examples/demo_road_routing.py
 
-# Demo 3: End-to-end differentiable terrain routing
+# End-to-end differentiable terrain routing
 python examples/demo_terrain_routing.py
 ```
 
-**Demo 1 output (matched memory, K=16 vs m=16):**
+**Grid navigation output (matched memory, K=16 vs m=16):**
 ```
 [Dijkstra]  Cost: 28.04  Expansions: 253
 [ALT K=16]  Cost: 28.04  Expansions: 36   (85.8% reduction)
@@ -68,14 +102,6 @@ python examples/demo_terrain_routing.py
 Memory: ALT = 16 values/vertex, AAC = 16 values/vertex (matched)
 All paths optimal (cost = 28.04)
 ```
-
-## How AAC Works
-
-<p align="center">
-  <img src="assets/method_diagram.png" alt="AAC method diagram" width="800">
-</p>
-
-**Key insight:** The row-stochastic constraint on the compression matrix *A* means each compressed dimension is a convex combination of teacher distances. A convex combination of admissible lower bounds is itself an admissible lower bound -- this holds for **every** parameter setting, at **every** training epoch, by construction (Proposition 1 in the paper).
 
 ## Reproduction
 
