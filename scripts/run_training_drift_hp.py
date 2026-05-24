@@ -1,22 +1,10 @@
 #!/usr/bin/env python
-"""Hyperparameter and initialization ablation for the training-drift cell.
+"""Hyperparameter and initialization ablation for training drift (Table 20).
 
-Sweeps learning rate x batch size x K0 (and an extra "identity-on-first-m"
-initialization arm) on the SBM B=32 cell where the training-drift diagnostic
-is largest. The point of the sweep is to verify that the gap-to-teacher-
-gradient drift documented in Section 5.10 is *not* an artifact of the
-default training schedule:
+Sweeps lr, batch size, K0, and init on the SBM B=32 cell to verify
+the drift gap is not an artifact of the default training schedule.
 
-  - lr        in {3e-4, 1e-3, 3e-3}
-  - batch     in {128, 256, 512}
-  - K0        in {32, 64}
-  - init      in {"block_sparse" (default), "identity_first_m"}
-
-For each combination we train for 200 epochs and report the test-set expansion
-reduction; we always also report the forced-first-m baseline (the architectural
-ceiling that the trained run is supposed to hit).
-
-Output: results/training_drift_hp/sbm_b32_<combo>.csv (rolled up into one CSV).
+Output: results/training_drift_hp/sbm_b32_results.csv
 """
 
 from __future__ import annotations

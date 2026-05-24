@@ -125,9 +125,7 @@ STRIP_PATTERNS = [
 ]
 # Skip parameter assignments like K_0{=}64, $m{=}16$, B{=}32, $\alpha_c{=}1$
 PARAM_ASSIGN_RE = re.compile(r"[A-Za-z_\\][A-Za-z_0-9\\{}\\^]*\s*[{=]?=[}=]?\s*-?\d+(?:\.\d+)?")
-# Skip braces around digits used purely for thousands separators: 169{,}343 -> 169343
-# The braces must be escaped (literal `{` and `}`); unescaped `{,}` would be
-# interpreted as the regex quantifier `{m,n}` and silently match zero characters.
+# Skip braces around digits used as thousands separators: 169{,}343 -> 169343
 THOUSANDS_BRACE_RE = re.compile(r"(\d)\{,\}(\d)")
 THOUSANDS_COMMA_RE = re.compile(r"(\d),(\d)")
 
@@ -337,15 +335,11 @@ def check_table(tex_path: Path, max_warn_samples: int = 5) -> TableResult:
 
 
 # ---------------------------------------------------------------------------
-# Unescaped-% guard for matplotlib label/title strings
+# Unescaped-% guard for matplotlib label strings
 # ---------------------------------------------------------------------------
 #
-# ``setup_style()`` enables ``text.usetex=True`` globally. With LaTeX rendering
-# active, a literal ``%`` in a label or title string is interpreted as the
-# start of a comment and silently truncates the rest of the string. This guard
-# greps the plotting code for that footgun and fails CI if any bare ``%``
-# appears inside a label / title / annotation string. The fix is always to
-# escape it as ``\%``.
+# With text.usetex=True, a bare ``%`` in a label silently truncates the
+# rest of the string.  This guard greps plotting code for that footgun.
 
 _LABEL_CALL_RE = re.compile(
     r"\b(?:set_xlabel|set_ylabel|set_title|suptitle|annotate|"
@@ -366,18 +360,8 @@ _PLOT_SCAN_DIRS = (
 def _scan_unescaped_percent(py_path: Path) -> list[tuple[int, str, str]]:
     """Return list of (line_number, raw_line, offending_string) hits.
 
-    Catches both single-line and multi-line label-call patterns.  A
-    multi-line call like::
-
-        ax.text(
-            0.5, 0.5,
-            f"value = {x:.2f}%",   # offending unescaped '%'
-        )
-
-    is detected by tracking the parenthesis depth across lines: once a
-    matching ``\\b(set_xlabel|...)\\s*\\(`` opens, every string literal
-    encountered before the closing parenthesis is scanned for unescaped
-    ``%``.
+    Tracks parenthesis depth across lines after a label-call match,
+    scanning every string literal for unescaped ``%``.
     """
     hits: list[tuple[int, str, str]] = []
     try:

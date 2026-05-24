@@ -119,5 +119,62 @@ def medium_random_graph() -> Graph:
 
 @pytest.fixture
 def device() -> torch.device:
-    """Return available device: CUDA if available, else CPU."""
+    """Return available device."""
     return torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+
+# ---------------------------------------------------------------------------
+# 8-node graph fixtures
+# ---------------------------------------------------------------------------
+
+
+@pytest.fixture
+def directed_8() -> Graph:
+    """8-node strongly connected directed graph."""
+    from aac.graphs.convert import edges_to_graph
+
+    s = torch.tensor([0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 5, 6], dtype=torch.int64)
+    t = torch.tensor([1, 2, 3, 4, 5, 6, 7, 0, 3, 4, 5, 6, 0, 1], dtype=torch.int64)
+    w = torch.tensor(
+        [2.0, 3.0, 1.0, 4.0, 2.0, 5.0, 1.0, 3.0, 7.0, 6.0, 4.0, 8.0, 9.0, 2.0],
+        dtype=torch.float64,
+    )
+    return edges_to_graph(s, t, w, 8, is_directed=True)
+
+
+@pytest.fixture
+def strongly_connected_directed(directed_8) -> Graph:
+    """Same graph as ``directed_8``."""
+    return directed_8
+
+
+@pytest.fixture
+def undirected_8() -> Graph:
+    """8-node undirected graph with varied edge weights."""
+    from aac.graphs.convert import edges_to_graph
+
+    s = torch.tensor([0, 0, 1, 1, 2, 3, 3, 4, 5, 6], dtype=torch.int64)
+    t = torch.tensor([1, 3, 2, 4, 3, 4, 5, 5, 6, 7], dtype=torch.int64)
+    w = torch.tensor(
+        [2.0, 7.0, 3.0, 6.0, 1.0, 4.0, 2.0, 5.0, 1.0, 3.0],
+        dtype=torch.float64,
+    )
+    return edges_to_graph(s, t, w, 8, is_directed=False)
+
+
+@pytest.fixture
+def weakly_connected_directed() -> Graph:
+    """Directed graph that is weakly but NOT strongly connected.
+
+    Nodes 0-4 form a chain: 0->1->2->3->4
+    Node 5 connects back: 5->0
+    But 4 cannot reach any node (dead end), and 0 cannot be reached from 1.
+    Landmarks at 0 and 4 create varying finite-landmark sets.
+    """
+    from aac.graphs.convert import edges_to_graph
+
+    s = torch.tensor([0, 1, 2, 3, 5, 0, 2], dtype=torch.int64)
+    t = torch.tensor([1, 2, 3, 4, 0, 3, 5], dtype=torch.int64)
+    w = torch.tensor([1.0, 1.0, 1.0, 1.0, 2.0, 5.0, 3.0], dtype=torch.float64)
+    return edges_to_graph(s, t, w, 6, is_directed=True)
+

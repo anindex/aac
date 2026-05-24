@@ -1,26 +1,11 @@
 #!/usr/bin/env python
-"""TOST equivalence test for the matched-memory non-road comparisons.
+"""TOST equivalence test for matched-memory non-road comparisons (§5.9, Appendix E).
 
-Reads ``results/hybrid_nonroad/matched_budget_hybrid.csv`` (per-seed paired
-AAC vs. ALT reduction-pct rows for SBM, BA, and OGB-arXiv) and computes the
-two one-sided tests (TOST) at equivalence margin delta=1 pp, alpha=0.05,
-following Lakens (2017). Writes a tidy summary CSV that backs the paper's
-TOST claims (e.g., "TOST accepts equivalence within delta at B=128 only" on
-SBM/BA in Section 5.9; "no cell achieves TOST equivalence at delta=1 pp" on
-OGB-arXiv in Section 5.9.3).
+Reads results/hybrid_nonroad/matched_budget_hybrid.csv and computes
+two one-sided tests (TOST) at equivalence margin delta=1 pp, alpha=0.05
+(Lakens 2017). Produces per-(graph, budget) TOST results.
 
-For each (graph_type, total_budget_B) cell the script computes:
-    n_seeds          - number of paired observations.
-    mean_diff        - mean of (AAC - ALT) reduction-pct across seeds.
-    sd_diff          - sample standard deviation of the paired differences.
-    se_diff          - standard error.
-    delta            - equivalence margin (1 pp).
-    t_lower / p_lower - one-sided test that mean_diff > -delta.
-    t_upper / p_upper - one-sided test that mean_diff < +delta.
-    p_tost           - max(p_lower, p_upper).
-    tost_accepts     - True iff p_tost < alpha (=0.05).
-
-Output: ``results/synthetic/tost_equivalence.csv``
+Output: results/synthetic/tost_equivalence.csv
 """
 
 from __future__ import annotations

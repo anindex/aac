@@ -20,8 +20,8 @@ For PositiveCompressor, the temperature is the logsumexp scale parameter
 
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass
-from typing import Optional
 
 import torch
 import torch.optim as optim
@@ -126,8 +126,8 @@ def train_compressor(
     phi: torch.Tensor,
     teacher_labels: TeacherLabels,
     config: TrainConfig = TrainConfig(),
-    val_pairs: Optional[tuple[torch.Tensor, torch.Tensor]] = None,
-    valid_vertices: Optional[torch.Tensor] = None,
+    val_pairs: tuple[torch.Tensor, torch.Tensor] | None = None,
+    valid_vertices: torch.Tensor | None = None,
 ) -> dict:
     """Train compressor via gap-closing loss with temperature annealing.
 
@@ -149,7 +149,11 @@ def train_compressor(
         'final_epoch' (int), 'final_T' (float), 'final_cond' (float).
     """
     torch.manual_seed(config.seed)
-    optimizer = optim.Adam(compressor.parameters(), lr=config.lr)
+    params = list(compressor.parameters())
+    _use_fused = len(params) > 0 and params[0].is_cuda
+    optimizer = optim.AdamW(
+        compressor.parameters(), lr=config.lr, fused=_use_fused,
+    )
     V = phi.shape[0]
 
     train_losses: list[float] = []
@@ -169,9 +173,6 @@ def train_compressor(
         vertex_pool = None
         N = V
 
-    # Pre-allocate index map (reused every epoch)
-    idx_map = torch.empty(V, dtype=torch.long)
-
     for epoch in range(config.num_epochs):
         T = config.T_init * (config.gamma ** epoch)
         compressor.train()
@@ -190,14 +191,11 @@ def train_compressor(
         with torch.no_grad():
             h_teacher = compute_teacher_heuristic(teacher_labels, sources, targets)
 
-        # Forward pass -- only compute for sampled vertices (not all V)
-        unique_verts = torch.unique(torch.cat([sources, targets]))
-        phi_batch = phi[unique_verts]  # (U, 2K)
-        y_batch = compressor(phi_batch)  # (U, m)
-        # Map original indices to batch indices
-        idx_map[unique_verts] = torch.arange(unique_verts.shape[0])
-        y_s = y_batch[idx_map[sources]]
-        y_t = y_batch[idx_map[targets]]
+        # Forward pass -- index directly (avoids torch.unique + scatter overhead)
+        phi_s = phi[sources]  # (B, 2K)
+        phi_t = phi[targets]  # (B, 2K)
+        y_s = compressor(phi_s)  # (B, m)
+        y_t = compressor(phi_t)  # (B, m)
 
         # Smooth heuristic
         h_smooth = heuristic_fn(y_s, y_t, T)
@@ -217,11 +215,8 @@ def train_compressor(
             compressor.eval()
             with torch.no_grad():
                 vs, vt = val_pairs
-                val_unique = torch.unique(torch.cat([vs, vt]))
-                y_val_batch = compressor(phi[val_unique])
-                val_map = torch.empty(V, dtype=torch.long)
-                val_map[val_unique] = torch.arange(val_unique.shape[0])
-                y_vs, y_vt = y_val_batch[val_map[vs]], y_val_batch[val_map[vt]]
+                y_vs = compressor(phi[vs])  # (B_val, m)
+                y_vt = compressor(phi[vt])  # (B_val, m)
                 h_val = heuristic_fn(y_vs, y_vt, T)
                 h_teacher_val = compute_teacher_heuristic(teacher_labels, vs, vt)
                 val_loss = (h_teacher_val - h_val).clamp(min=0).mean().item()
@@ -268,10 +263,11 @@ def train_dual_compressor(
     Returns:
         Dict with training metrics.
     """
-    import math
-
     torch.manual_seed(config.seed)
-    optimizer = torch.optim.Adam(compressor.parameters(), lr=config.lr)
+    _use_fused = any(p.is_cuda for p in compressor.parameters())
+    optimizer = torch.optim.AdamW(
+        compressor.parameters(), lr=config.lr, fused=_use_fused,
+    )
 
     d_out_t = teacher_labels.d_out.t()  # (V, K) -- d(landmark, v)
     d_in_t = teacher_labels.d_in.t()    # (V, K) -- d(v, landmark)
@@ -287,9 +283,6 @@ def train_dual_compressor(
     final_epoch = 0
     best_loss = float("inf")
     patience_counter = 0
-
-    # Pre-allocate index map (reused every epoch)
-    idx_map = torch.empty(V, dtype=torch.long)
 
     for epoch in range(config.num_epochs):
         T = config.T_init * (config.gamma ** epoch)
@@ -309,18 +302,13 @@ def train_dual_compressor(
         with torch.no_grad():
             h_teacher = compute_teacher_heuristic(teacher_labels, sources, targets)
 
-        # Forward pass -- only sampled vertices
-        unique_verts = torch.unique(torch.cat([sources, targets]))
-        d_out_batch = d_out_t[unique_verts]  # (U, K)
-        d_in_batch = d_in_t[unique_verts]    # (U, K)
-        y_fwd_batch, y_bwd_batch = compressor(d_out_batch, d_in_batch, hard=False)
-
-        idx_map[unique_verts] = torch.arange(unique_verts.shape[0])
-
-        y_fwd_s = y_fwd_batch[idx_map[sources]]
-        y_fwd_t = y_fwd_batch[idx_map[targets]]
-        y_bwd_s = y_bwd_batch[idx_map[sources]]
-        y_bwd_t = y_bwd_batch[idx_map[targets]]
+        # Forward pass -- index directly
+        d_out_s = d_out_t[sources]   # (B, K)
+        d_out_t_b = d_out_t[targets]  # (B, K)
+        d_in_s = d_in_t[sources]     # (B, K)
+        d_in_t_b = d_in_t[targets]   # (B, K)
+        y_fwd_s, y_bwd_s = compressor(d_out_s, d_in_s, hard=False)
+        y_fwd_t, y_bwd_t = compressor(d_out_t_b, d_in_t_b, hard=False)
 
         # Smooth heuristic via logsumexp
         if is_directed:
@@ -390,7 +378,10 @@ def train_linear_compressor(
         Dict with training metrics.
     """
     torch.manual_seed(config.seed)
-    optimizer = torch.optim.Adam(compressor.parameters(), lr=config.lr)
+    _use_fused = any(p.is_cuda for p in compressor.parameters())
+    optimizer = torch.optim.AdamW(
+        compressor.parameters(), lr=config.lr, fused=_use_fused,
+    )
 
     d_out_t = teacher_labels.d_out.t()  # (V, K)
     d_in_t = teacher_labels.d_in.t()    # (V, K)

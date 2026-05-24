@@ -1,22 +1,10 @@
 #!/usr/bin/env python
-"""P2.1: Multi-graph, multi-budget, multi-seed forced-first-m drift experiment.
+"""Multi-graph training-drift experiment (Figure 6, §5.10).
 
-For each (graph, budget, seed) we:
-  - Build the FPS pool of K0 landmarks (deterministic given seed).
-  - Compute teacher labels for that pool.
-  - Establish two reference lines:
-      * forced-first-m baseline (FPS-from-pool reference, no training).
-      * pure-ALT matched-memory baseline (independent FPS at K=m landmarks).
-  - For each epoch checkpoint c in CHECKPOINTS, train a fresh compressor for
-    c epochs and record A* expansion reduction over a fixed query set.
+For each (graph, budget, seed), trains AAC for increasing epoch counts and
+records expansion reduction vs forced-first-m and ALT baselines.
 
-Outputs a tidy CSV per (graph, budget) at
-  results/training_drift_multi/drift_<graph>_B<budget>.csv
-with columns: graph, budget, seed, K0, m, epochs, mean_expansions,
-  expansion_reduction_pct, dijkstra_mean, alt_ref_pct, forced_first_m_pct.
-
-Scoping: per a 2 h wall-clock guard, only SBM and BA are included here. An
-OGB-arXiv extension is documented as future work.
+Output: results/training_drift_multi/drift_<graph>_B<budget>.csv
 """
 from __future__ import annotations
 

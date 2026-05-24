@@ -1,27 +1,11 @@
 #!/usr/bin/env python
-"""Multi-seed ablation with full 10K training maps.
+"""Multi-seed Warcraft contextual ablation (Table tab:contextual-ablation).
 
-Runs the Warcraft contextual ablation (full_e2e, frozen_compressor,
-frozen_encoder) using ALL available training maps with 3 seeds. Two
-encoder families are supported via ``--encoder``:
-- ``cnn``    (default): the small 3-layer CNN; backs the inline
-  ``tab:ablation`` (cost regret) and the CNN row of
-  ``tab:contextual-ablation`` in the paper.
-- ``resnet``: the 5x5-stem + 3-residual-block ResNet (Appendix B); backs
-  the ResNet row of ``tab:contextual-ablation``.
+Runs full_e2e / frozen_compressor / frozen_encoder ablations with 3 seeds.
+Encoder family via --encoder {cnn, resnet}; cost weight via --alpha-cost.
+Paper rows: CNN (--encoder cnn --alpha-cost 1), ResNet (--encoder resnet --alpha-cost 10).
 
-The cost-supervision weight ``alpha_cost`` is exposed via ``--alpha-cost``
-(default ``1.0``); the paper's ResNet row uses ``alpha_cost=10``.
-
-Outputs (filenames carry the encoder + alpha tag so different runs
-do not collide):
-    results/warcraft/ablation_results_<tag>_multiseed.csv
-    results/warcraft/ablation_results_<tag>_perseed.csv
-where ``<tag>`` is e.g. ``cnn_a1`` or ``resnet_a10``.
-
-For backward compatibility, the canonical ``cnn_a1`` run also writes
-``ablation_results_multiseed.csv``, ``ablation_results.csv``, and
-``ablation_results_perseed.csv`` (the same names the original script used).
+Output: results/warcraft/ablation_results_<tag>_{multiseed,perseed}.csv
 """
 
 from __future__ import annotations

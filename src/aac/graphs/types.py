@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
+import warnings
 from dataclasses import dataclass
-from typing import Optional
 
 import torch
 
@@ -28,7 +28,7 @@ class Graph:
     num_nodes: int
     num_edges: int
     is_directed: bool
-    coordinates: Optional[torch.Tensor] = None
+    coordinates: torch.Tensor | None = None
 
     @property
     def device(self) -> torch.device:
@@ -62,6 +62,12 @@ class Graph:
         Note: self-loop edge weights, if present, are overwritten by 0.
         """
         V = self.num_nodes
+        if V > 10_000:
+            mem_gb = V * V * 8 / (1024 ** 3)
+            warnings.warn(
+                f"to_dense() on graph with V={V:,} will allocate ~{mem_gb:.1f} GB",
+                stacklevel=2,
+            )
         dense = torch.full((V, V), sentinel, dtype=self.values.dtype, device=self.device)
         row_indices, col_indices, values = self.to_coo()
         dense[row_indices, col_indices] = values
@@ -76,7 +82,7 @@ class SSSPResult:
     """Result of single-source shortest path computation."""
 
     distances: torch.Tensor
-    predecessors: Optional[torch.Tensor] = None
+    predecessors: torch.Tensor | None = None
     source: int = 0
     num_iterations: int = 0
 

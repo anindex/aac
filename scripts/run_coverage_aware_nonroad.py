@@ -1,23 +1,8 @@
 #!/usr/bin/env python
-"""Coverage-aware regularizer sweep on non-road graphs (SBM, BA, OGB-arXiv).
+"""Coverage-aware regularizer sweep on non-road graphs (Table 18).
 
-Companion to ``scripts/run_coverage_aware.py`` (which targets Modena/Manhattan).
-This script runs the same coverage-aware training (adding a differentiable
-covering-radius regularizer to the AAC loss) on the three non-road graphs used
-throughout Section 7 of the paper, so that the appendix can document whether the
-regularizer helps on clustered, power-law, or citation topologies.
-
-Loss::
-
-    L = gap_loss + lambda_uniq * R_uniq + lambda_cov * R_cov
-
-where ``R_cov = (1/B) sum_v soft_min_k d(v, l_k)`` over a mini-batch of vertices
-and ``soft_min`` uses log-sum-exp with negative temperature ``alpha``.
-
-At each ``lambda_cov`` we report:
-    * AAC expansion reduction vs Dijkstra
-    * ALT(K=m) reduction as a reference (matched deployed labels)
-    * Wilcoxon test vs the baseline (lambda_cov=0) AAC run.
+Companion to run_coverage_aware.py targeting SBM, BA, and OGB-arXiv
+instead of road graphs. Same coverage-aware loss with lambda_cov sweep.
 
 Output: results/coverage_aware/coverage_aware_nonroad_results.csv
 """

@@ -1,28 +1,15 @@
 #!/usr/bin/env python
-"""Matched-TOTAL-budget hybrid comparison on non-road graphs (matched-budget evaluation).
+"""Matched-total-budget hybrid comparison on non-road graphs (Table 9).
 
-The existing ``run_synthetic_experiments.py`` / ``run_nonroad_real.py`` pipelines
-report AAC, ALT, and Hybrid at each nominal ``budget_bpv`` but the hybrid column
-consumes *both* AAC(m) and ALT(K) memory simultaneously (i.e. roughly 2x the
-nominal single-method budget). Reviewers asked for a strict matched-TOTAL
-budget comparison: at a fixed per-vertex memory B, which arm wins?
+At a fixed per-vertex budget B (bytes), compares three arms:
+    Pure AAC  : m = B/4     (all budget for AAC)
+    Pure ALT  : K = B/8     (all budget for ALT)
+    Hybrid 1/2: m = B/8, K = B/16  (50/50 split)
 
-Three arms are compared at each total budget B in bytes per vertex (assuming
-fp32 labels and the paper's ALT=2*K floats / AAC=m floats accounting):
+Graphs: SBM(10k), BA(10k), OGB-arXiv(~170k LCC).
+Budgets: 32, 64, 128 B/v.  Seeds: 5.  Queries: 100.
 
-    Pure AAC   : m = B / 4                           (all B for AAC)
-    Pure ALT   : K = B / 8                           (all B for ALT)
-    Hybrid 1/2 : m = B / 8,  K = B / 16              (B/2 for each)
-
-Graphs:
-    * SBM  (5 x 2000 nodes, p_in=0.05, p_out=0.001)
-    * BA   (10k nodes, m=5 preferential attachment)
-    * OGB-arXiv  (~170k node citation LCC, symmetrized, uniform[1,10] weights)
-
-Budgets: 32, 64, 128 B/v. Seeds: 5. Queries: 100 uniform-random per graph.
-
-Output:
-    results/hybrid_nonroad/matched_budget_hybrid.csv
+Output: results/hybrid_nonroad/matched_budget_hybrid.csv
 """
 
 from __future__ import annotations

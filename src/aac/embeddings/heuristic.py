@@ -19,12 +19,7 @@ from __future__ import annotations
 import torch
 
 from aac.graphs.types import Embedding
-from aac.utils.numerics import SENTINEL
-
-
-def _is_sentinel_vec(x: torch.Tensor) -> torch.Tensor:
-    """Check for sentinel values (abs(x) > 0.99 * SENTINEL)."""
-    return torch.abs(x) > 0.99 * SENTINEL
+from aac.utils.numerics import is_sentinel_abs
 
 
 def evaluate_heuristic(
@@ -46,7 +41,7 @@ def evaluate_heuristic(
         Scalar tensor with heuristic value h(source, target).
     """
     delta = phi_source - phi_target
-    valid = ~(_is_sentinel_vec(phi_source) | _is_sentinel_vec(phi_target))
+    valid = ~(is_sentinel_abs(phi_source) | is_sentinel_abs(phi_target))
 
     if not valid.any():
         return torch.tensor(0.0, dtype=delta.dtype, device=delta.device)
@@ -78,7 +73,7 @@ def evaluate_heuristic_batch(
         (B,) tensor of heuristic values.
     """
     delta = phi_sources - phi_targets  # (B, 2K)
-    valid = ~(_is_sentinel_vec(phi_sources) | _is_sentinel_vec(phi_targets))  # (B, 2K)
+    valid = ~(is_sentinel_abs(phi_sources) | is_sentinel_abs(phi_targets))  # (B, 2K)
 
     # Replace invalid entries with 0 (neutral for max-min)
     # For directed max: use -inf so invalid entries don't affect max

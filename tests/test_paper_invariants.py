@@ -10,7 +10,6 @@ via Row-Stochastic Label Compression"
 
 from __future__ import annotations
 
-import pytest
 import torch
 
 from aac.baselines.alt import alt_preprocess, make_alt_heuristic
@@ -21,32 +20,8 @@ from aac.graphs.convert import edges_to_graph
 from aac.search.astar import astar
 
 # ---------------------------------------------------------------------------
-# Test graphs
+# Helpers
 # ---------------------------------------------------------------------------
-
-
-@pytest.fixture
-def directed_8():
-    """8-node strongly connected directed graph with varied edge weights."""
-    s = torch.tensor([0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 5, 6], dtype=torch.int64)
-    t = torch.tensor([1, 2, 3, 4, 5, 6, 7, 0, 3, 4, 5, 6, 0, 1], dtype=torch.int64)
-    w = torch.tensor(
-        [2.0, 3.0, 1.0, 4.0, 2.0, 5.0, 1.0, 3.0, 7.0, 6.0, 4.0, 8.0, 9.0, 2.0],
-        dtype=torch.float64,
-    )
-    return edges_to_graph(s, t, w, 8, is_directed=True)
-
-
-@pytest.fixture
-def undirected_8():
-    """8-node undirected graph with varied edge weights."""
-    s = torch.tensor([0, 0, 1, 1, 2, 3, 3, 4, 5, 6], dtype=torch.int64)
-    t = torch.tensor([1, 3, 2, 4, 3, 4, 5, 5, 6, 7], dtype=torch.int64)
-    w = torch.tensor(
-        [2.0, 7.0, 3.0, 6.0, 1.0, 4.0, 2.0, 5.0, 1.0, 3.0],
-        dtype=torch.float64,
-    )
-    return edges_to_graph(s, t, w, 8, is_directed=False)
 
 
 def _all_pairs_distances(graph):
@@ -58,7 +33,7 @@ def _all_pairs_distances(graph):
 
 
 # ---------------------------------------------------------------------------
-# T-INV-01: Row-stochastic property
+# Row-stochastic property
 # Theorem 2: Selection matrix A has non-negative entries, each row sums to 1
 # ---------------------------------------------------------------------------
 
@@ -144,7 +119,7 @@ class TestRowStochasticProperty:
 
 
 # ---------------------------------------------------------------------------
-# T-INV-02: Hard-argmax equals ALT on selected subset
+# Hard-argmax equals ALT on selected subset
 # Proposition 1: Deployed heuristic = ALT restricted to selected landmarks
 # ---------------------------------------------------------------------------
 
@@ -234,7 +209,7 @@ class TestHardArgmaxEqualsALTSubset:
 
 
 # ---------------------------------------------------------------------------
-# T-INV-03: Identity case recovery
+# Identity case recovery
 # Proposition 1 corollary: m=K0 with identity-like W recovers exact ALT
 # ---------------------------------------------------------------------------
 
@@ -307,7 +282,7 @@ class TestIdentityCaseRecovery:
 
 
 # ---------------------------------------------------------------------------
-# T-INV-04: Float32 storage safety
+# Float32 storage safety
 # Section 5.1: No admissibility violations with float32 storage
 # ---------------------------------------------------------------------------
 
@@ -379,7 +354,7 @@ class TestFloat32StorageSafety:
 
 
 # ---------------------------------------------------------------------------
-# T-INV-05: Consistency in all-finite regime
+# Consistency in all-finite regime
 # Section 2.1: h(u,t) <= w(u,v) + h(v,t) for all edges (u,v)
 # ---------------------------------------------------------------------------
 
@@ -455,7 +430,7 @@ class TestConsistencyAllFinite:
 
 
 # ---------------------------------------------------------------------------
-# T-INV-06: Admissibility preserved under directed masking
+# Admissibility preserved under directed masking
 # Section 2.1: Masking unreachable landmarks preserves admissibility
 # ---------------------------------------------------------------------------
 
@@ -499,7 +474,7 @@ class TestDirectedMaskingAdmissibility:
 
 
 # ---------------------------------------------------------------------------
-# T-INV-07: Covering radius bounds the gap
+# Covering radius bounds the gap
 # Theorem 3: d(u,t) - h_ALT^S(u,t) <= 2 * r_m
 # ---------------------------------------------------------------------------
 
@@ -583,7 +558,7 @@ class TestCoveringRadiusBound:
 
 
 # ---------------------------------------------------------------------------
-# T-INV-08: A* with admissible+consistent heuristic finds optimal paths
+# A* optimality with admissible+consistent heuristic
 # Section 2.1: Graph-search A* without reopenings is optimal
 # ---------------------------------------------------------------------------
 

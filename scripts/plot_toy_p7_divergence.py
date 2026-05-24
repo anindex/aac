@@ -1,31 +1,12 @@
 #!/usr/bin/env python
-"""Two-panel figure: gap-to-teacher vs covering radius on the toy P_7.
+"""Two-panel figure: gap-to-teacher vs covering radius on P_7 (§3.5).
 
-Reads ``results/toy_p7/highlight.csv`` produced by
-``scripts/run_toy_p7_gap_vs_covering.py`` and renders a TMLR full-width
-2-panel figure to ``paper/figures/toy_p7_divergence.pdf``:
+Reads results/toy_p7/highlight.csv and renders a TMLR full-width 2-panel
+figure:
+  Panel A "Covering view" — landmark coverage balls; S_cov wins (smaller r_2).
+  Panel B "Gap view"      — query arcs showing ALT gap; S_gap wins (E[gap]=0).
 
-  Panel A "Covering view" -- Two stacked copies of the path P_7. Selected
-          landmark vertices are filled in their set color; the union of
-          per-landmark coverage balls of radius r_2 is shaded as a
-          single rectangle per row (avoids alpha-stacking artifacts
-          where balls overlap). Row label and r_2 carry white bboxes
-          so they remain readable when the band extends past the path
-          range (S_gap's union spans [-3, 9]). S_cov wins (smaller r_2).
-  Panel B "Gap view"      -- Same two stacked path copies. For S_cov, the
-          single failing query class (1,5)/(5,1) is drawn as an arc
-          floating above the path, with thin connector ticks down to
-          the (s,t) vertices to anchor the arc visually. For S_gap, no
-          arc appears; a short italic caption between the rows reports
-          "every interior query is exact" (any l outside [s,t] gives
-          the ALT bound exactly d(s,t) on a 1D path -- the geometric
-          reason is given in the figure caption in paper/main.tex).
-          E[gap] is annotated on the right. S_gap wins (smaller E[gap]).
-
-Color mapping mirrors the canonical Okabe-Ito palette
-(``src/aac/viz/style.py``): S_cov uses AAC-blue (#0072B2), S_gap uses
-ALT-vermillion (#D55E00). These hues are perceptually aligned with the
-``s1`` slate-blue and ``s2`` terracotta of ``paper/method_diagram.tex``.
+Output: paper/figures/toy_p7_divergence.pdf
 """
 
 from __future__ import annotations

@@ -41,6 +41,8 @@ def shifted_softmin(
     Returns:
         Softmin values. Guaranteed to be <= min(v, dim) for all inputs.
     """
+    if beta <= 0:
+        raise ValueError(f"beta must be positive, got {beta}")
     v_min = torch.min(v, dim=dim, keepdim=True).values
     shifted = -beta * (v - v_min)
     log_sum = torch.logsumexp(shifted, dim=dim, keepdim=True)
@@ -90,3 +92,19 @@ def is_sentinel(x: torch.Tensor, sentinel: float = SENTINEL) -> torch.Tensor:
         Boolean tensor: True where x >= sentinel * 0.99.
     """
     return x >= sentinel * 0.99
+
+
+def is_sentinel_abs(x: torch.Tensor, sentinel: float = SENTINEL) -> torch.Tensor:
+    """Detect sentinel values by absolute magnitude.
+
+    Unlike :func:`is_sentinel`, this catches negative sentinels from
+    embedding differences (e.g., phi(u) - phi(t) with unreachable vertex).
+
+    Args:
+        x: Input tensor.
+        sentinel: The sentinel magnitude to detect.
+
+    Returns:
+        Boolean tensor: True where ``abs(x) > sentinel * 0.99``.
+    """
+    return torch.abs(x) > sentinel * 0.99

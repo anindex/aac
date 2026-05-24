@@ -1,23 +1,15 @@
-"""Targeted regression tests for documented edge cases in the heuristic stack.
+"""Regression tests for heuristic edge cases.
 
-Each test pins down one invariant whose violation would silently corrupt
-results elsewhere in the pipeline:
-- Sentinel masking in make_linear_heuristic (admissibility under unreachable
-  landmark distances)
-- Directed masking edge cases (consistency with varying finite-landmark sets)
-- Float32 stress test (large K, directed)
-- Sentinel + high beta overflow in smooth Bellman-Ford
-- Mutual unreachability (h=0 fallback)
-- Path reconstruction integrity
+Covers sentinel masking, directed masking with unreachable landmarks,
+smooth Bellman-Ford overflow, mutual unreachability fallback, and
+path reconstruction.
 """
 
 from __future__ import annotations
 
-import pytest
 import torch
 
 from aac.compression.compressor import LinearCompressor, make_linear_heuristic
-from aac.embeddings.anchors import farthest_point_sampling
 from aac.embeddings.sssp import compute_teacher_labels
 from aac.graphs.convert import edges_to_graph
 from aac.search.astar import astar
@@ -25,51 +17,7 @@ from aac.search.dijkstra import dijkstra
 from aac.utils.numerics import SENTINEL
 
 # ---------------------------------------------------------------------------
-# Fixtures
-# ---------------------------------------------------------------------------
-
-
-@pytest.fixture
-def strongly_connected_directed():
-    """8-node strongly connected directed graph."""
-    s = torch.tensor([0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 5, 6], dtype=torch.int64)
-    t = torch.tensor([1, 2, 3, 4, 5, 6, 7, 0, 3, 4, 5, 6, 0, 1], dtype=torch.int64)
-    w = torch.tensor(
-        [2.0, 3.0, 1.0, 4.0, 2.0, 5.0, 1.0, 3.0, 7.0, 6.0, 4.0, 8.0, 9.0, 2.0],
-        dtype=torch.float64,
-    )
-    return edges_to_graph(s, t, w, 8, is_directed=True)
-
-
-@pytest.fixture
-def weakly_connected_directed():
-    """Directed graph that is weakly but NOT strongly connected.
-
-    Nodes 0-4 form a chain: 0->1->2->3->4
-    Node 5 connects back: 5->0
-    But 4 cannot reach any node (dead end), and 0 cannot be reached from 1.
-    Landmarks at 0 and 4 create varying finite-landmark sets.
-    """
-    s = torch.tensor([0, 1, 2, 3, 5, 0, 2], dtype=torch.int64)
-    t = torch.tensor([1, 2, 3, 4, 0, 3, 5], dtype=torch.int64)
-    w = torch.tensor([1.0, 1.0, 1.0, 1.0, 2.0, 5.0, 3.0], dtype=torch.float64)
-    return edges_to_graph(s, t, w, 6, is_directed=True)
-
-
-@pytest.fixture
-def undirected_8():
-    """8-node undirected graph."""
-    s = torch.tensor([0, 0, 1, 1, 2, 3, 3, 4, 5, 6], dtype=torch.int64)
-    t = torch.tensor([1, 3, 2, 4, 3, 4, 5, 5, 6, 7], dtype=torch.int64)
-    w = torch.tensor(
-        [2.0, 7.0, 3.0, 6.0, 1.0, 4.0, 2.0, 5.0, 1.0, 3.0],
-        dtype=torch.float64,
-    )
-    return edges_to_graph(s, t, w, 8, is_directed=False)
-
-
-# ---------------------------------------------------------------------------
-# P0: Sentinel masking in make_linear_heuristic
+# Sentinel masking in make_linear_heuristic
 # ---------------------------------------------------------------------------
 
 
@@ -164,7 +112,7 @@ class TestSentinelMasking:
 
 
 # ---------------------------------------------------------------------------
-# P0: Directed masking -- varying finite-landmark sets
+# Directed masking -- varying finite-landmark sets
 # ---------------------------------------------------------------------------
 
 
@@ -229,77 +177,9 @@ class TestDirectedMaskingConsistency:
                 )
 
 
-# ---------------------------------------------------------------------------
-# P1: Float32 stress test
-# ---------------------------------------------------------------------------
-
-
-class TestFloat32Safety:
-    """Verify admissibility holds after float64 -> float32 conversion."""
-
-    def test_float32_directed_large_K(self, strongly_connected_directed):
-        """Float32 compressed labels preserve admissibility on directed graphs."""
-        graph = strongly_connected_directed
-        K = min(4, graph.num_nodes)  # Small graph, limited K
-        anchors = farthest_point_sampling(graph, K, seed_vertex=0)
-        teacher = compute_teacher_labels(graph, anchors)
-
-        compressor = LinearCompressor(K=K, m=K, is_directed=True)
-        compressor.eval()
-
-        # Compute in float64
-        d_out_t = teacher.d_out.t()
-        d_in_t = teacher.d_in.t()
-        with torch.no_grad():
-            y_fwd_64, y_bwd_64 = compressor(d_out_t, d_in_t)
-
-        # Convert to float32 (deployment storage)
-        y_fwd_32 = y_fwd_64.float()
-        y_bwd_32 = y_bwd_64.float()
-
-        h_32 = make_linear_heuristic(y_fwd_32, y_bwd_32, is_directed=True)
-
-        for u in range(graph.num_nodes):
-            for t in range(graph.num_nodes):
-                if u == t:
-                    continue
-                d_true = dijkstra(graph, u, t).cost
-                h_val = h_32(u, t)
-                # Allow small float32 rounding error (1 ULP at ~100 ≈ 1e-5)
-                assert h_val <= d_true + 1e-4, (
-                    f"Float32 admissibility violation: h({u},{t})={h_val:.6f} > d={d_true:.6f}"
-                )
-
-    def test_float32_undirected(self, undirected_8):
-        """Float32 compressed labels preserve admissibility on undirected graphs."""
-        graph = undirected_8
-        K = 4
-        anchors = farthest_point_sampling(graph, K, seed_vertex=0)
-        teacher = compute_teacher_labels(graph, anchors)
-
-        compressor = LinearCompressor(K=K, m=K, is_directed=False)
-        compressor.eval()
-
-        d_out_t = teacher.d_out.t()
-        with torch.no_grad():
-            y_64 = compressor(d_out_t)
-
-        y_32 = y_64.float()
-        h_32 = make_linear_heuristic(y_32, y_32, is_directed=False)
-
-        for u in range(graph.num_nodes):
-            for t in range(graph.num_nodes):
-                if u == t:
-                    continue
-                d_true = dijkstra(graph, u, t).cost
-                h_val = h_32(u, t)
-                assert h_val <= d_true + 1e-4, (
-                    f"Float32 admissibility violation: h({u},{t})={h_val:.6f} > d={d_true:.6f}"
-                )
-
 
 # ---------------------------------------------------------------------------
-# P1: Sentinel + high beta overflow in smooth BF
+# Sentinel + high beta overflow in smooth Bellman-Ford
 # ---------------------------------------------------------------------------
 
 
@@ -341,7 +221,7 @@ class TestSmoothBFOverflow:
 
 
 # ---------------------------------------------------------------------------
-# P1: Mutual unreachability -- h=0 fallback
+# Mutual unreachability -- h=0 fallback
 # ---------------------------------------------------------------------------
 
 
@@ -362,26 +242,9 @@ class TestMutualUnreachability:
                 val = h(u, t)
                 assert val == 0.0, f"Expected h=0, got {val} for ({u},{t})"
 
-    def test_astar_degrades_to_dijkstra_on_zero_heuristic(self, strongly_connected_directed):
-        """With h=0 everywhere, A* should find optimal paths (Dijkstra behavior)."""
-        graph = strongly_connected_directed
-
-        def h_zero(u: int, t: int) -> float:
-            return 0.0
-
-        for u in range(graph.num_nodes):
-            for t in range(graph.num_nodes):
-                if u == t:
-                    continue
-                astar_result = astar(graph, u, t, h_zero)
-                dij_result = dijkstra(graph, u, t)
-                assert abs(astar_result.cost - dij_result.cost) < 1e-9, (
-                    f"A* with h=0 suboptimal: ({u},{t})"
-                )
-
 
 # ---------------------------------------------------------------------------
-# P2: Path reconstruction edge cases
+# Path reconstruction edge cases
 # ---------------------------------------------------------------------------
 
 

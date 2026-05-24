@@ -214,29 +214,13 @@ STEPS: list[tuple[str, list[str], str, bool]] = [
      ["scripts/check_paper_consistency.py", "--quiet"],
      "verify", False),
 
-    # The following supplementary-figure generators have been moved under
-    # scripts/legacy/ and are not invoked from this pipeline:
-    #   * scripts/legacy/generate_method_diagram.py    (the AAC pipeline
-    #     diagram is now drawn inline as TikZ in paper/main.tex; the
-    #     legacy paper/figures/method_overview.pdf was also retired)
-    #   * scripts/legacy/generate_expansion_heatmap.py (replaced by tab:hybrid)
-    #   * scripts/legacy/generate_heuristic_contour.py
-    #   * scripts/legacy/generate_search_comparison.py
-    # See scripts/legacy/README.md.  The pipeline above is sufficient to
-    # reproduce every figure cited in main.tex.
+    # Legacy figure generators have been moved to scripts/legacy/.
+    # The pipeline above reproduces every figure cited in main.tex.
 ]
 
 ALL_TRACKS = sorted({t for _, _, t, _ in STEPS})
 
 # Expected outputs for verification.
-#
-# TABLES: every paper/table_*.tex \input by paper/main.tex.  All 20 tables are
-# tracked in git.  Some are written directly by generators (table_osmnx*.tex);
-# the rest are hand-edited LaTeX whose data comes from CSVs and the
-# verification step only checks that the file exists and is non-empty.  The
-# two "results/paper/*.tex" entries below are the output of
-# generate_paper_figures.py, which writes to results/paper/ rather than
-# paper/ (the paper/ versions are hand-edited).
 EXPECTED_TEX = [
     # Headline matched-memory comparison (Table 2; \input by main.tex)
     "paper/table_main_matched_memory.tex",
@@ -321,13 +305,9 @@ EXPECTED_CSV = [
     "results/synthetic/community_results.csv",
     "results/synthetic/powerlaw_results.csv",
     "results/synthetic/ogbn_arxiv_results.csv",
-    # TOST equivalence outputs (computed from matched_budget_hybrid.csv via
-    # scripts/compute_tost_equivalence.py); back the paper's "TOST accepts at
-    # B=128 only" / "no cell achieves equivalence" claims (Sections 5.9, E).
+    # TOST equivalence (Sections 5.9, Appendix E)
     "results/synthetic/tost_equivalence.csv",
-    # Per-cell admissibility audit on OGB-arXiv (5 seeds x 3 budgets);
-    # backs the paper's "15/15 cells, zero admissibility violations" claim
-    # (Section 5.9.3 / Appendix E.3).
+    # OGB-arXiv admissibility audit (5 seeds x 3 budgets).
     "results/synthetic/ogbn_arxiv_admissibility.csv",
     # CDH reference benchmark (Table tab:cdh-reference: SBM / Modena / NY)
     "results/cdh_baseline/sbm_cdh.csv",
@@ -348,23 +328,15 @@ EXPECTED_CSV = [
     "results/training_drift_multi/drift_sbm_B64.csv",
     "results/training_drift_multi/drift_ba_B32.csv",
     "results/training_drift_multi/drift_ba_B64.csv",
-    # Warcraft contextual (Table tab:contextual-ablation + Appendix B claims)
-    # Warcraft canonical CNN ablation: the canonical CNN+alpha=1 run writes
-    # the three legacy aliases below; tagged duplicates (cnn_a1_*.csv) would
-    # also be written by a fresh canonical run but are not preflighted here
-    # because the on-disk historical record only retains the legacy aliases.
-    "results/warcraft/ablation_results_multiseed.csv",            # CNN alpha_c=1 aggregate (canonical alias; consumed by paper/table_contextual_ablation.tex)
-    "results/warcraft/ablation_results.csv",                       # CNN alpha_c=1 backward-compat alias
-    "results/warcraft/ablation_results_perseed.csv",               # CNN alpha_c=1 per-seed
-    # Warcraft ResNet ablation (Appendix B ResNet row): tagged outputs
-    # are the canonical record (no legacy aliases for non-canonical runs).
-    "results/warcraft/ablation_results_resnet_a10_multiseed.csv",  # ResNet alpha_c=10 aggregate (consumed by paper/table_contextual_ablation.tex)
-    "results/warcraft/ablation_results_resnet_a10_perseed.csv",    # ResNet alpha_c=10 per-seed
-    "results/warcraft/ablation_results_resnet_a10.csv",            # ResNet alpha_c=10 flat summary
-    "results/warcraft/gradient_flow.csv",                          # backs "compressor gradient
-                                                                    # norms are 2--4 orders of
-                                                                    # magnitude smaller than
-                                                                    # encoder norms" (Appendix B)
+    # Warcraft CNN ablation: legacy aliases.
+    "results/warcraft/ablation_results_multiseed.csv",
+    "results/warcraft/ablation_results.csv",
+    "results/warcraft/ablation_results_perseed.csv",
+    # Warcraft ResNet ablation (Appendix B)
+    "results/warcraft/ablation_results_resnet_a10_multiseed.csv",
+    "results/warcraft/ablation_results_resnet_a10_perseed.csv",
+    "results/warcraft/ablation_results_resnet_a10.csv",
+    "results/warcraft/gradient_flow.csv",
     # Covering-radius computation
     "results/covering_radius.csv",
     # Toy P_7 closed-form (Section 3.5, Figure ref:toy-p7)
@@ -382,10 +354,6 @@ EXPECTED_JSON = [
     "results/warcraft/datasp_fair_eval.json",
 ]
 
-# Figures \includegraphics-d by main.tex (must live in paper/figures/).
-# All are git-tracked. EXPECTED_PDF_GENERATED are produced by the figure
-# scripts under scripts/ (see the "figures" track in STEPS); the verification
-# step regenerates and re-checks them when --tables-only is used.
 EXPECTED_PDF_GENERATED = [
     "paper/figures/pareto_frontier.pdf",
     "paper/figures/training_drift.pdf",
@@ -394,10 +362,6 @@ EXPECTED_PDF_GENERATED = [
     "paper/figures/landmark_selection.pdf",
     "paper/figures/toy_p7_divergence.pdf",
 ]
-# Note: the legacy paper/figures/method_overview.pdf was retired in the
-# The AAC pipeline diagram is now drawn inline
-# as a TikZ picture in paper/main.tex (Figure~\ref{fig:pipeline}), so it is
-# font-matched to the body text and version-controlled.
 EXPECTED_PDF_CURATED: list[str] = []
 EXPECTED_PDF = EXPECTED_PDF_GENERATED + EXPECTED_PDF_CURATED
 
@@ -616,10 +580,6 @@ def main() -> int:
         print("  Mode: full reproduction (all tracks)")
     print("=" * 60)
 
-    # ---- CSV preflight (only when --tables-only) ----
-    # --tables-only regenerates plots and tables from existing CSVs only;
-    # if any prerequisite CSV is missing we abort fast with an actionable
-    # per-track diagnostic so users don't see opaque downstream failures.
     if args.tables_only and not preflight_tables_only():
         return 1
 

@@ -96,7 +96,7 @@ def synthetic_pbf(tmp_path: Path) -> str:
 
 
 def test_load_produces_directed_graph(synthetic_pbf: str) -> None:
-    """Test 1: load_pbf_road_graph produces a directed Graph."""
+    """load_pbf_road_graph produces a directed Graph."""
     from aac.graphs.loaders.pbf import load_pbf_road_graph
     from aac.graphs.types import Graph
 
@@ -108,7 +108,7 @@ def test_load_produces_directed_graph(synthetic_pbf: str) -> None:
 
 
 def test_all_edge_weights_positive(synthetic_pbf: str) -> None:
-    """Test 2: All edge weights are positive (no zero-length edges)."""
+    """All edge weights are positive (no zero-length edges)."""
     from aac.graphs.loaders.pbf import load_pbf_road_graph
 
     graph = load_pbf_road_graph(synthetic_pbf)
@@ -116,7 +116,7 @@ def test_all_edge_weights_positive(synthetic_pbf: str) -> None:
 
 
 def test_node_ids_contiguous(synthetic_pbf: str) -> None:
-    """Test 3: Node IDs are contiguous 0-indexed (no gaps)."""
+    """Node IDs are contiguous 0-indexed (no gaps)."""
     from aac.graphs.loaders.pbf import load_pbf_road_graph
 
     graph = load_pbf_road_graph(synthetic_pbf)
@@ -128,7 +128,7 @@ def test_node_ids_contiguous(synthetic_pbf: str) -> None:
 
 
 def test_coordinates_shape_and_finite(synthetic_pbf: str) -> None:
-    """Test 4: Coordinates tensor has shape (V, 2) and values are finite."""
+    """Coordinates tensor has shape (V, 2) and values are finite."""
     from aac.graphs.loaders.pbf import load_pbf_road_graph
 
     graph = load_pbf_road_graph(synthetic_pbf)
@@ -138,7 +138,7 @@ def test_coordinates_shape_and_finite(synthetic_pbf: str) -> None:
 
 
 def test_oneway_asymmetric_edges(synthetic_pbf: str) -> None:
-    """Test 5: Oneway roads produce asymmetric edge sets; bidirectional produce both."""
+    """Oneway roads produce asymmetric edge sets; bidirectional produce both."""
     from aac.graphs.loaders.pbf import load_pbf_road_graph
 
     graph = load_pbf_road_graph(synthetic_pbf)
@@ -157,7 +157,7 @@ def test_oneway_asymmetric_edges(synthetic_pbf: str) -> None:
 
 
 def test_non_driving_excluded(synthetic_pbf: str) -> None:
-    """Test 6: Non-driving highway types (footway, cycleway) are excluded."""
+    """Non-driving highway types (footway, cycleway) are excluded."""
     from aac.graphs.loaders.pbf import load_pbf_road_graph
 
     graph = load_pbf_road_graph(synthetic_pbf)

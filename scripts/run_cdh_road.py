@@ -1,23 +1,11 @@
 #!/usr/bin/env python
-r"""CDH vs ALT matched-memory head-to-head on road networks.
+r"""CDH vs ALT matched-memory head-to-head on road networks (Table 4).
 
-Extends scripts/run_cdh_baseline.py to four directed road graphs (OSMnx Modena,
-OSMnx Manhattan, DIMACS NY, DIMACS FLA). Same protocol as the SBM benchmark:
-matched bytes/vertex with P=64 fixed CDH pivot pool, 5 seeds, 100 queries, and
-*three* CDH variants --- the closed-set "intersection" heuristic, the
-closed-set "+sub" bound-substitution heuristic that uses the ``P*P`` pivot-
-pivot side-table, and "+sub+BPMX" which additionally enables Felner-style
-one-step Bidirectional Pathmax during A* expansion (sound under closed-set A*
-without reopenings; see ``aac.search.astar(use_bpmx=True)``). The BPMX arm
-brings CDH to the "original protocol" CDH baseline as evaluated by Goldenberg
-et al.\ (2017, AI Communications).
+Extends run_cdh_baseline.py to directed road graphs (Modena, Manhattan, NY, FLA).
+Three CDH variants: intersection, +sub (bound substitution), +sub+BPMX.
 
-Matched-memory rule (directed graphs, float32):
-  ALT:  K = B / 8   (2K floats, since both forward and backward stored)
-  CDH:  bytes = r*(2*4 + ceil(log2(P)/8)) = r*(8+1) = 9r at P=64
-        => r = floor(B / 9)
-  The ``P*P`` pivot-pivot side-table is fixed off-heap preprocessing and is
-  NOT charged to the per-vertex budget (see cdh.py docstring).
+Matched-memory rule (directed, fp32):
+  ALT: K = B/8  (2K floats fwd+bwd).  CDH: r = floor(B / 9) at P=64.
 
 Output: results/cdh_baseline/<graph>_cdh.csv
 """

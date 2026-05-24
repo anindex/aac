@@ -1,26 +1,12 @@
 #!/usr/bin/env python
-"""Three ablation experiments to strengthen AAC claims.
+"""Three ablation experiments (Tables 21, 22, 11).
 
-Experiment 1: Selection strategy ablation (learned vs random vs FPS-subset)
-  - At fixed K0=64, m=16 on Modena and Manhattan (where AAC wins),
-    compare: (a) AAC learned selection, (b) random m-subset of K0 teachers,
-    (c) FPS m-subset (select m landmarks via FPS directly).
-  - This isolates the value of learned selection.
+Exp 1: Selection strategy (learned vs random vs FPS-subset).
+Exp 2: Admissibility under early stopping (checkpoints at epochs 1..200).
+Exp 3: Compression curve m/K0 (m in {4,8,16,32,64} at K0=64).
 
-Experiment 2: Admissibility under early stopping
-  - Train AAC on Modena (K0=64, m=16) and checkpoint at epochs {1,5,10,50,200}.
-  - At each checkpoint, verify admissibility on 100 queries and report
-    expansion reduction. Shows admissibility holds regardless of training quality.
-
-Experiment 3: Compression efficiency curve (m/K0)
-  - Fix K0=64 on Modena and Manhattan, sweep m in {4,8,16,32,64}.
-  - Plot expansion reduction vs compression ratio m/K0.
-  - Compare against ALT at matched memory.
-
-All experiments use 3 seeds {42, 123, 456}, 100 queries, same protocol as
-the main OSMnx experiments.
-
-Output: results/ablation_selection/ with CSV files for each experiment.
+All on Modena and Manhattan, 3 seeds, 100 queries.
+Output: results/ablation_selection/
 """
 
 from __future__ import annotations

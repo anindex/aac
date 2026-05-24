@@ -1,19 +1,11 @@
 #!/usr/bin/env python
-"""Gradient flow analysis: verify differentiable backpropagation through encoder and compressor.
+"""Gradient-flow analysis for the contextual pipeline (Appendix B).
 
-Trains AAC Contextual for 30 epochs on a subset of Warcraft maps
-with cost supervision (alpha_cost=1.0), logging per-epoch gradient norms for
-encoder (WarcraftCNN) and compressor (LinearCompressor) parameter groups.
+Trains AAC Contextual for 30 epochs, logging per-epoch gradient norms
+for encoder and compressor parameter groups. Verifies that both groups
+receive non-zero gradients through smooth Bellman-Ford.
 
-Produces: results/warcraft/gradient_flow.csv
-
-This provides evidence for Contribution 4 (differentiable label compression):
-if both parameter groups receive non-zero gradients during training, the
-pipeline truly backpropagates through the smooth Bellman-Ford and
-Gumbel-softmax compressor.
-
-Usage:
-    python scripts/run_gradient_analysis.py
+Output: results/warcraft/gradient_flow.csv
 """
 
 from __future__ import annotations

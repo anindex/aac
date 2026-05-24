@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 from collections.abc import Callable
-from typing import Optional
 
 from aac.graphs.types import Graph
 from aac.search.astar import astar
@@ -14,7 +13,7 @@ def batch_search(
     graph: Graph,
     queries: list[tuple[int, int]],
     heuristic: Callable[[int, int], float],
-    search_fn: Optional[Callable] = None,
+    search_fn: Callable | None = None,
 ) -> list[SearchResult]:
     """Run search for multiple source-target pairs.
 

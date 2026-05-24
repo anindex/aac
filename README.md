@@ -1,8 +1,9 @@
 # AAC: Admissible-by-Architecture Differentiable Landmark Compression for ALT
 
 [![arXiv](https://img.shields.io/badge/arXiv-2604.20744-b31b1b.svg)](https://arxiv.org/abs/2604.20744)
+[![CI](https://github.com/anindex/aac/actions/workflows/ci.yml/badge.svg)](https://github.com/anindex/aac/actions/workflows/ci.yml)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
-[![PyTorch](https://img.shields.io/badge/PyTorch-2.11+-red.svg)](https://pytorch.org/)
+[![PyTorch](https://img.shields.io/badge/PyTorch-2.12+-red.svg)](https://pytorch.org/)
 
 **AAC** is a differentiable landmark-selection module for [ALT](https://en.wikipedia.org/wiki/A*_search_algorithm#Landmarks_and_triangle_inequality) (A\*, Landmarks, and Triangle inequality) shortest-path heuristics. It compresses a large set of teacher landmarks into a small, search-efficient subset via gradient descent -- and its outputs are **admissible by construction**: a row-stochastic compression matrix produces convex combinations of triangle-inequality lower bounds, so the heuristic is admissible for *every* parameter setting, at *every* training epoch, without convergence assumptions or post-hoc calibration.
 
@@ -25,6 +26,16 @@ At deployment the module reduces to classical ALT on the learned subset, preserv
 AAC learns *which* landmarks matter by parameterizing a row-stochastic compression matrix **A** over a pool of K teacher landmarks (selected by farthest-point sampling). Each of the m output dimensions is a convex combination of teacher distances. Since a convex combination of admissible lower bounds is itself admissible (Proposition 1 in the paper), the compressed heuristic is admissible for every value of **A** -- not just at convergence, but at initialization and every intermediate checkpoint.
 
 During training, Gumbel-softmax annealing sharpens each row of **A** from a diffuse mixture toward a one-hot selection, so the final model selects a discrete landmark subset. The training objective minimizes the gap between the learned heuristic and the teacher, driving the selected landmarks toward those that most reduce A\* node expansions.
+
+### Compression Architectures
+
+AAC provides three compression architectures, all with provable admissibility guarantees:
+
+| Architecture | Mechanism | Guarantee | Use Case |
+|---|---|---|---|
+| **LinearCompressor** (primary) | Row-stochastic Gumbel-softmax selection | Convex combination ≤ max (Prop. 1) | Standard landmark selection |
+| **LipschitzCompressor** | 1-Lipschitz neural network (GroupSort + spectral norm) | L∞ contraction (Theorem) | Nonlinear compression |
+| **PositiveCompressor** | Log-domain max-plus contraction | Max-plus contraction | Tropical embedding compression |
 
 ### What Makes AAC Landmarks Different from FPS Landmarks
 
@@ -65,14 +76,14 @@ Under a matched per-vertex memory protocol on 9 road networks + 3 synthetic grap
 ## Installation
 
 ```bash
-# From source (Python 3.11+)
+# From source (Python 3.11+, PyTorch 2.12+)
 pip install -e ".[dev,experiments]"
 
 # Or with conda:
 conda env create -f environment.yml
 conda activate aac
 
-# Or with uv:
+# Or with uv (recommended):
 uv sync
 ```
 
@@ -130,25 +141,57 @@ python scripts/download_all_data.py --warcraft  # Warcraft terrain maps only
 
 ```
 src/
-  aac/                 -- core library
-    compression/       -- LinearCompressor, smooth heuristic construction
-    search/            -- A*, Dijkstra, bidirectional search
-    baselines/         -- ALT, CDH, FastMap reference implementations
-    embeddings/        -- FPS anchor selection, SSSP teacher labels, Hilbert/tropical embeddings
-    contextual/        -- end-to-end differentiable pipeline (encoder -> BF -> compress -> heuristic)
-    train/             -- training loop, loss functions, data utilities
-    viz/               -- publication-quality visualization (Okabe-Ito palette)
-    graphs/            -- graph I/O, loaders (DIMACS, OSMnx, Warcraft, PBF)
-    semirings/         -- tropical and smooth semiring operations
-    utils/             -- numerics, memory accounting, compilation helpers
-  experiments/         -- Hydra-configured experiment runners (DIMACS, OSMnx, Warcraft)
-scripts/               -- experiment scripts, figure/table generators
-tests/                 -- pytest suite (35 test modules)
-results/               -- experiment outputs (CSVs, logs); see results/README.md
-examples/              -- three self-contained demos (no dataset downloads)
+  aac/                   -- core library
+    compression/         -- LinearCompressor, LipschitzCompressor, PositiveCompressor,
+                            DualCompressor, smooth heuristic construction
+    search/              -- A* (with BPMX), Dijkstra, bidirectional A*, batch search
+    baselines/           -- ALT, CDH, FastMap reference implementations
+    embeddings/          -- FPS anchor selection, SSSP teacher labels,
+                            Hilbert and tropical embeddings
+    contextual/          -- end-to-end differentiable pipeline
+                            (encoder -> Bellman-Ford -> compress -> heuristic)
+    train/               -- training loop (gap-closing loss, Gumbel-softmax annealing),
+                            data utilities, fused AdamW optimizer
+    viz/                 -- publication-quality visualization (Okabe-Ito palette)
+    graphs/              -- graph types (CSR), I/O (NPZ), loaders
+                            (DIMACS, OSMnx, Warcraft, PBF, MovingAI)
+    semirings/           -- tropical and smooth semiring operations with autograd
+    utils/               -- numerics (sentinel handling, safe log/exp),
+                            memory accounting, compilation helpers
+  experiments/           -- Hydra-configured experiment runners
+                            (DIMACS, OSMnx, Warcraft, Cabspotting)
+scripts/                 -- experiment scripts, figure/table generators
+                            (50+ scripts, see scripts/README.md)
+tests/                   -- pytest suite (25 modules, 360+ tests)
+results/                 -- experiment outputs (CSVs, logs); see results/README.md
+examples/                -- three self-contained demos (no dataset downloads)
 ```
 
 For the per-experiment file index and provenance chain, see [`results/README.md`](results/README.md).
+
+## Performance & Optimizations
+
+AAC incorporates several optimizations for efficient training and inference:
+
+- **Fused AdamW optimizer:** Training uses `torch.optim.AdamW(fused=True)` on CUDA for single-kernel parameter updates (~20% training speedup).
+- **CSR graph representation:** All graphs use sparse CSR format with pre-converted Python lists in the A\* and bidirectional A\* inner loops, avoiding `Tensor.item()` overhead (~10x per-expansion speedup).
+- **Direct index selection at inference:** Eval-mode compression uses array indexing instead of matmul with one-hot matrix, eliminating float32 rounding errors that could violate admissibility.
+- **Sentinel-aware fast paths:** Heuristic evaluation detects sentinel-free graphs at construction time and skips per-query masking (~2x speedup on well-connected graphs).
+- **Streamlined training loop:** Direct tensor indexing replaces `torch.unique` + scatter mapping for training batch construction.
+- **Numerical stability:** All log-domain operations use `torch.logsumexp` with shift-stabilization; sentinel values (1e18) prevent inf-inf NaN propagation.
+
+## Citation
+
+If you find this work useful, please consider citing:
+
+```bibtex
+@article{le2026aac,
+  title={AAC: An Admissible-by-Architecture Differentiable Compressor for Learned ALT Landmark Selection},
+  author={Le, An T. and Ngo, Vien A.},
+  journal={arXiv preprint arXiv:2604.20744},
+  year={2026}
+}
+```
 
 ## License
 

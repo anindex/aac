@@ -22,10 +22,10 @@ class QueryPairDataset(Dataset):
     """
 
     def __init__(self, num_vertices: int, num_pairs: int, seed: int = 42) -> None:
-        rng = np.random.RandomState(seed)
+        rng = np.random.default_rng(seed)
         # Explicit int64 for CUDA index compatibility (numpy may produce int32 on some platforms)
-        self.sources = torch.from_numpy(rng.randint(0, num_vertices, size=num_pairs).astype(np.int64))
-        self.targets = torch.from_numpy(rng.randint(0, num_vertices, size=num_pairs).astype(np.int64))
+        self.sources = torch.from_numpy(rng.integers(0, num_vertices, size=num_pairs).astype(np.int64))
+        self.targets = torch.from_numpy(rng.integers(0, num_vertices, size=num_pairs).astype(np.int64))
 
     def __len__(self) -> int:
         return len(self.sources)
@@ -53,7 +53,7 @@ def make_splits(
     Returns:
         (train_indices, val_indices, test_indices) as int64 tensors.
     """
-    rng = np.random.RandomState(seed)
+    rng = np.random.default_rng(seed)
     perm = rng.permutation(num_vertices)
     n_train = int(num_vertices * train_frac)
     n_val = int(num_vertices * val_frac)

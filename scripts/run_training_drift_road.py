@@ -1,16 +1,7 @@
 #!/usr/bin/env python
-"""Training-drift diagnostic on road graphs (DIMACS NY by default).
+"""Training-drift diagnostic on road graphs (Table 19).
 
-Mirrors :mod:`run_training_drift_multi` but supports directed road networks.
-For each (graph, B/v, seed) we:
-  - Build the FPS pool of K0 anchors (K0 = 4*K_alt, deterministic given LCC seed).
-  - Compute teacher labels (forward + backward SSSPs).
-  - Forced-first-m baseline: AAC compressor with one-hot rows on the *first*
-    K_alt forward pool indices and the *first* K_alt backward pool indices.
-    For directed graphs at matched memory B = 8*K_alt, m_fwd = m_bwd = K_alt.
-  - Pure-ALT matched-memory reference: independent FPS-ALT at K = K_alt.
-  - For each epoch checkpoint, train a fresh LinearCompressor and evaluate on
-    a fixed query set.
+Same protocol as run_training_drift_multi but for directed road networks.
 
 Output: results/training_drift_road/drift_<graph>_B<budget>.csv
 """

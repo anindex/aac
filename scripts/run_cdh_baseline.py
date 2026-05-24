@@ -1,28 +1,14 @@
 #!/usr/bin/env python
-"""CDH vs ALT matched-memory head-to-head (matched-memory head-to-head).
+"""CDH vs ALT matched-memory head-to-head (Table 4, §5.9.4).
 
-Runs ALT and CDH at matched bytes/vertex on one synthetic SBM instance and
-emits a CSV consumable by the paper's CDH table. Keeps the protocol identical
-to ``run_synthetic_experiments.py``:
-- LCC restriction via ``compute_strong_lcc``
-- FPS anchors seeded from the LCC
-- Closed-set A* without node reopenings
-- 5 seeds, 100 queries
-- Dijkstra reference computed once per graph
+Runs ALT and CDH at matched bytes/vertex on synthetic SBM graphs.
+Protocol matches run_synthetic_experiments.py (LCC, FPS anchors,
+closed-set A*, 5 seeds, 100 queries).
 
-CDH memory at P pivots, r stored, float32, undirected:
-    bytes/vertex = r * (4 + ceil(log2(P)/8))
-At P = 64 the index is 1 byte, so the matched rule is r = floor(B / 5). We
-use P = 64 as the fixed pivot-pool size (Goldenberg et al. 2011 report
-diminishing returns beyond ~64 pivots on road networks).
+CDH memory: P=64 pivots, bytes/vertex = r * (4 + ceil(log2(P)/8)).
+At P=64 the index is 1 byte, so matched rule is r = floor(B / 5).
 
 Output: results/cdh_baseline/sbm_cdh.csv
-
-To extend to Modena / Manhattan / DIMACS graphs, import the respective loader
-from ``aac.graphs.loaders`` and reuse the ``run_comparison`` function below.
-The full paper sweep is documented in paper/main.tex (Section 5.9.4 / Table
-``tab:cdh-reference``); for project context see AGENTS.md and for revision
-archaeology run ``git log paper/main.tex``.
 """
 
 from __future__ import annotations

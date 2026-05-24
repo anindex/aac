@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import heapq
-from collections import defaultdict
 from collections.abc import Callable
 
 from aac.graphs.types import Graph
@@ -45,19 +44,20 @@ def bidirectional_astar(
 
     V = graph.num_nodes
 
-    # Build forward adjacency from CSR
-    crow = graph.crow_indices
-    col = graph.col_indices
-    vals = graph.values
+    # Pre-convert CSR tensors to lists.
+    crow_list = graph.crow_indices.tolist()
+    col_list = graph.col_indices.tolist()
+    val_list = graph.values.tolist()
 
-    # Build reverse adjacency dict from COO
-    rev_adj: dict[int, list[tuple[int, float]]] = defaultdict(list)
-    rows, cols, weights = graph.to_coo()
-    for i in range(rows.shape[0]):
-        u = rows[i].item()
-        v = cols[i].item()
-        w = weights[i].item()
-        rev_adj[v].append((u, w))
+    # Build reverse adjacency from forward CSR.
+    rev_adj: list[list[tuple[int, float]]] = [[] for _ in range(V)]
+    for u in range(V):
+        start = crow_list[u]
+        end = crow_list[u + 1]
+        for idx in range(start, end):
+            v = col_list[idx]
+            w = val_list[idx]
+            rev_adj[v].append((u, w))
 
     # Forward search state
     g_fwd = [float("inf")] * V
@@ -118,12 +118,12 @@ def bidirectional_astar(
                     mu = candidate
                     meeting_node = u
 
-            # Expand forward neighbors via CSR
-            start = crow[u].item()
-            end = crow[u + 1].item()
+            # Expand forward neighbors
+            start = crow_list[u]
+            end = crow_list[u + 1]
             for idx in range(start, end):
-                v = col[idx].item()
-                w = vals[idx].item()
+                v = col_list[idx]
+                w = val_list[idx]
                 new_g = g_fwd[u] + w
                 if new_g < g_fwd[v]:
                     g_fwd[v] = new_g
@@ -153,7 +153,7 @@ def bidirectional_astar(
                     meeting_node = u
 
             # Expand backward neighbors (reverse adjacency)
-            for v, w in rev_adj.get(u, []):
+            for v, w in rev_adj[u]:
                 new_g = g_bwd[u] + w
                 if new_g < g_bwd[v]:
                     g_bwd[v] = new_g

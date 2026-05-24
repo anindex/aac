@@ -85,11 +85,9 @@ def generate_queries(
     - ``powerlaw``: endpoints are sampled from a degree-weighted
       power-law-like distribution, emphasizing high-degree traffic hubs.
 
-    The ``hotspot`` and ``powerlaw`` modes are required by
-    ``scripts/run_query_distribution_experiments.py`` (Section 5.6 of the
-    paper, Table~\\ref{tab:query-distribution}); they were previously
-    served from a duplicate ``experiments/utils.py`` at the repo root,
-    which is now consolidated here.
+    The ``hotspot`` and ``powerlaw`` modes are used by
+    ``scripts/run_query_distribution_experiments.py`` (Section 5.6,
+    Table~\\ref{tab:query-distribution}).
 
     Args:
         graph: Graph in CSR format.

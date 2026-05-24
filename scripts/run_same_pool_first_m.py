@@ -1,28 +1,11 @@
 #!/usr/bin/env python
-"""Same-pool first-m wrapper diagnostic.
+"""Same-pool first-m diagnostic (Table 17, §5.10).
 
-For each (graph, K0, m, seed) cell used by the AAC experiments, build
-the teacher FPS pool of K0 landmarks, take the *first m* of those landmarks
-(farthest-first ordering), and evaluate plain ALT on that m-subset. This is
-the "ALT-pool (first m)" diagnostic that isolates *pool access* from
-*training signal*:
-
-    AAC learns m landmarks out of K0 from the same pool via a Gumbel-softmax
-    selector; forcing the selector to the first m of the pool is the
-    no-training baseline drawn from exactly the same candidate set. The gap
-    between "ALT-pool (first m)" and "plain ALT with K=m" isolates whether a
-    larger pool *by itself* helps ALT, independent of any learning; the gap
-    between "AAC" and "ALT-pool (first m)" isolates the learning signal.
-
-We sweep the same (graph, K0, m) configurations that Tables 3 (DIMACS main),
-6 (OSMnx), and 14 (matched hybrid non-road) report. The per-seed query set is
-generated with the same seed=42 convention as the rest of the paper, so the
-numbers plug into those tables by seed and (K0, m) key.
+For each (graph, K0, m, seed), builds an FPS pool of K0 landmarks and
+evaluates plain ALT on the first m (farthest-first order). This "ALT-pool
+(first m)" baseline isolates pool access from training signal.
 
 Output: results/same_pool_first_m/<graph>.csv
-
-Columns: graph, K0, m, budget_bpv, seed, mean_expansions, median_expansions,
-    expansion_reduction_pct, dijkstra_mean.
 """
 from __future__ import annotations
 

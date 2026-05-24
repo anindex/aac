@@ -1,6 +1,6 @@
 """Reporting pipeline: CSV aggregation, LaTeX tables, publication-quality figures."""
 
-# Re-export consolidated style module for convenience
+# Re-export style module for convenience
 from aac.viz.style import setup_style  # noqa: F401
 from experiments.reporting.csv_writer import (
     aggregate_results,

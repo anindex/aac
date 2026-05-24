@@ -73,7 +73,7 @@ class TestSmoothBF:
     """Tests for smooth_bellman_ford_batched."""
 
     def test_high_beta_matches_hard_bf(self) -> None:
-        """Test 1: With high beta, smooth BF should approximate hard BF on a chain graph."""
+        """With high beta, smooth BF should approximate hard BF on a chain graph."""
         graph = _make_chain_graph(n=4, weight=1.0)
         source_indices = torch.tensor([0], dtype=torch.int64)
         expected = torch.tensor([[0.0, 1.0, 2.0, 3.0]], dtype=torch.float64)
@@ -83,7 +83,7 @@ class TestSmoothBF:
         assert torch.allclose(dist, expected, atol=0.1), f"Got {dist}, expected close to {expected}"
 
     def test_low_beta_undershoots(self) -> None:
-        """Test 2: With low beta, smooth-min should undershoot (return values <= hard min)."""
+        """With low beta, smooth-min should undershoot (return values <= hard min)."""
         graph = _make_5node_graph()
         source_indices = torch.tensor([0], dtype=torch.int64)
 
@@ -100,7 +100,7 @@ class TestSmoothBF:
         )
 
     def test_gradcheck(self) -> None:
-        """Test 3: Gradients flow through smooth BF back to edge weights."""
+        """Gradients flow through smooth BF back to edge weights."""
         # Build a small chain graph with differentiable weights
         n = 4
         sources = torch.arange(n - 1, dtype=torch.int64)
@@ -117,7 +117,7 @@ class TestSmoothBF:
         assert gradcheck(fn, (weights,), eps=1e-5, atol=1e-3), "Gradient check failed"
 
     def test_convergence_to_hard_bf(self) -> None:
-        """Test 4: As beta increases, smooth BF output approaches hard BF output."""
+        """As beta increases, smooth BF output approaches hard BF output."""
         graph = _make_5node_graph()
         source_indices = torch.tensor([0], dtype=torch.int64)
 
@@ -142,7 +142,7 @@ class TestSmoothBF:
         assert prev_error < 0.1, f"At beta=100, error should be <0.1 but got {prev_error}"
 
     def test_multiple_sources(self) -> None:
-        """Test 5: Multiple sources produce correct shape and values."""
+        """Multiple sources produce correct shape and values."""
         graph = _make_5node_graph()
         source_indices = torch.tensor([0, 3], dtype=torch.int64)
 
@@ -156,7 +156,7 @@ class TestSmoothBF:
         assert abs(dist[1, 4].item() - 1.0) < 0.1, f"Distance from 3 to 4 should be ~1.0, got {dist[1, 4]}"
 
     def test_12x12_grid(self) -> None:
-        """Test 6: 12x12 grid graph completes without error and produces finite distances."""
+        """12x12 grid graph completes without error and produces finite distances."""
         graph = _make_grid_graph(12, 12)
         source_indices = torch.tensor([0], dtype=torch.int64)
 
@@ -173,7 +173,7 @@ class TestEncoders:
     """Tests for WarcraftCNN, CabspottingMLP, and cell_costs_to_edge_weights."""
 
     def test_warcraft_cnn_output_shape_and_positivity(self) -> None:
-        """Test 1: WarcraftCNN produces strictly positive (B, H*W) output."""
+        """WarcraftCNN produces strictly positive (B, H*W) output."""
         from aac.contextual.encoders import WarcraftCNN
 
         model = WarcraftCNN(grid_size=12, img_size=96)
@@ -184,7 +184,7 @@ class TestEncoders:
         assert (out > 0).all(), f"All outputs should be strictly positive, min={out.min()}"
 
     def test_warcraft_cnn_backward(self) -> None:
-        """Test 2: Gradients flow back from WarcraftCNN output to input image."""
+        """Gradients flow back from WarcraftCNN output to input image."""
         from aac.contextual.encoders import WarcraftCNN
 
         model = WarcraftCNN(grid_size=12, img_size=96)
@@ -197,7 +197,7 @@ class TestEncoders:
         assert x.grad.shape == (2, 3, 96, 96)
 
     def test_cabspotting_mlp_output_shape_and_positivity(self) -> None:
-        """Test 3: CabspottingMLP produces strictly positive (B, E) output."""
+        """CabspottingMLP produces strictly positive (B, E) output."""
         from aac.contextual.encoders import CabspottingMLP
 
         model = CabspottingMLP(input_dim=6, hidden_dim=64)
@@ -208,7 +208,7 @@ class TestEncoders:
         assert (out > 0).all(), f"All outputs should be strictly positive, min={out.min()}"
 
     def test_cabspotting_mlp_backward(self) -> None:
-        """Test 4: Gradients flow back from CabspottingMLP output to input features."""
+        """Gradients flow back from CabspottingMLP output to input features."""
         from aac.contextual.encoders import CabspottingMLP
 
         model = CabspottingMLP(input_dim=6, hidden_dim=64)
@@ -221,7 +221,7 @@ class TestEncoders:
         assert features.grad.shape == (4, 100, 6)
 
     def test_cell_costs_to_edge_weights_shape_and_convention(self) -> None:
-        """Test 5: cell_costs_to_edge_weights matches warcraft averaging convention."""
+        """cell_costs_to_edge_weights matches warcraft averaging convention."""
         from aac.contextual.encoders import build_grid_edge_index, cell_costs_to_edge_weights
 
         grid_size = 3
@@ -240,7 +240,7 @@ class TestEncoders:
         )
 
     def test_cell_costs_to_edge_weights_differentiable(self) -> None:
-        """Test 6: cell_costs_to_edge_weights is differentiable."""
+        """cell_costs_to_edge_weights is differentiable."""
         from aac.contextual.encoders import cell_costs_to_edge_weights
 
         grid_size = 3
@@ -257,7 +257,7 @@ class TestLoss:
     """Tests for path_kl_loss, cost_regret_loss, and contextual_loss."""
 
     def test_path_kl_loss_positive_scalar_with_gradients(self) -> None:
-        """Test 1: path_kl_loss with uniform predicted and one-hot target returns positive scalar with gradients."""
+        """path_kl_loss with uniform predicted and one-hot target returns positive scalar with gradients."""
         from aac.contextual.loss import path_kl_loss
 
         E = 10
@@ -279,7 +279,7 @@ class TestLoss:
         assert predicted_logprobs.grad is not None, "Gradients should flow to predicted_logprobs"
 
     def test_cost_regret_loss(self) -> None:
-        """Test 2: cost_regret_loss with predicted_costs=1.1, optimal_costs=1.0 returns ~0.1."""
+        """cost_regret_loss with predicted_costs=1.1, optimal_costs=1.0 returns ~0.1."""
         from aac.contextual.loss import cost_regret_loss
 
         predicted = torch.tensor([1.1, 1.2, 1.05], dtype=torch.float64)
@@ -295,7 +295,7 @@ class TestPipeline:
     """Tests for contextual_forward end-to-end pipeline."""
 
     def test_forward_shapes_3x3_grid(self) -> None:
-        """Test 3: contextual_forward on 3x3 grid produces correct output shapes."""
+        """contextual_forward on 3x3 grid produces correct output shapes."""
         from aac.compression.compressor import LinearCompressor
         from aac.contextual.encoders import WarcraftCNN, build_grid_edge_index
         from aac.contextual.pipeline import ContextualOutput, contextual_forward
@@ -344,7 +344,7 @@ class TestPipeline:
         )
 
     def test_end_to_end_gradient_flow(self) -> None:
-        """Test 4: Gradients from compressed_labels flow back to CNN parameters."""
+        """Gradients from compressed_labels flow back to CNN parameters."""
         from aac.compression.compressor import LinearCompressor
         from aac.contextual.encoders import WarcraftCNN, build_grid_edge_index
         from aac.contextual.pipeline import contextual_forward
@@ -391,7 +391,7 @@ class TestPipeline:
         assert has_grad, "Gradients should flow from compressed_labels back to encoder parameters"
 
     def test_forward_stores_raw_distances(self) -> None:
-        """Test 5: contextual_forward with is_directed=False stores raw distances (V, K) in phi."""
+        """contextual_forward with is_directed=False stores raw distances (V, K) in phi."""
         from aac.compression.compressor import LinearCompressor
         from aac.contextual.encoders import WarcraftCNN, build_grid_edge_index
         from aac.contextual.pipeline import contextual_forward
@@ -489,7 +489,7 @@ class TestContextualTraining:
         }
 
     def test_config_has_expected_fields(self) -> None:
-        """Test 1: ContextualConfig has all expected fields."""
+        """ContextualConfig has all expected fields."""
         from aac.contextual.trainer import ContextualConfig
 
         config = ContextualConfig()
@@ -508,14 +508,7 @@ class TestContextualTraining:
         assert hasattr(config, "m")
 
     def test_training_decreases_loss(self) -> None:
-        """Test 2: Training on 3x3 grid with random CNN decreases loss over 80 epochs.
-
-        Uses a single fixed training sample to eliminate inter-sample noise.
-        Keeps beta and T constant to isolate gradient descent effect.
-        Uses a fixed evaluation batch to avoid resampling noise dominating the
-        per-epoch loss signal, and a wider window (first/last 20 epochs) to
-        smooth Gumbel-softmax noise from LinearCompressor.
-        """
+        """Training on 3x3 grid with random CNN decreases loss over 120 epochs."""
         from aac.contextual.trainer import ContextualConfig, ContextualTrainer
 
         fixtures = self._make_training_fixtures()
@@ -524,9 +517,9 @@ class TestContextualTraining:
         fixed_data = [fixtures["train_data"][0]]
 
         config = ContextualConfig(
-            num_epochs=80,
+            num_epochs=120,
             batch_size=1,
-            lr=1e-2,
+            lr=5e-3,
             beta_init=1.0,
             beta_max=1.0,  # keep constant
             beta_gamma=1.0,  # no annealing
@@ -551,16 +544,16 @@ class TestContextualTraining:
         )
 
         losses = metrics.per_epoch_loss
-        assert len(losses) >= 60, f"Expected at least 60 epochs, got {len(losses)}"
-        # Compare first 20 vs last 20 average loss (wider window for Gumbel noise)
-        first_avg = sum(losses[:20]) / 20
-        last_avg = sum(losses[-20:]) / 20
+        assert len(losses) >= 80, f"Expected at least 80 epochs, got {len(losses)}"
+        # Wide windows to absorb Gumbel-softmax noise
+        first_avg = sum(losses[:30]) / 30
+        last_avg = sum(losses[-30:]) / 30
         assert last_avg < first_avg, (
-            f"Loss should decrease: first 20 avg={first_avg:.6f}, last 20 avg={last_avg:.6f}"
+            f"Loss should decrease: first 30 avg={first_avg:.6f}, last 30 avg={last_avg:.6f}"
         )
 
     def test_metrics_fields(self) -> None:
-        """Test 3: ContextualMetrics contains expected fields."""
+        """ContextualMetrics contains expected fields."""
         from aac.contextual.trainer import ContextualConfig, ContextualMetrics, ContextualTrainer
 
         fixtures = self._make_training_fixtures()
@@ -596,7 +589,7 @@ class TestContextualTraining:
         assert isinstance(metrics.peak_memory_bytes, int), "peak_memory_bytes should be int"
 
     def test_training_result_structure(self) -> None:
-        """Test 4: Training returns metrics with 'per_epoch_loss' (list), 'total_time_sec' (float), 'peak_memory_bytes' (int)."""
+        """Training returns metrics with 'per_epoch_loss' (list), 'total_time_sec' (float), 'peak_memory_bytes' (int)."""
         from aac.contextual.trainer import ContextualConfig, ContextualTrainer
 
         fixtures = self._make_training_fixtures()
@@ -626,7 +619,7 @@ class TestContextualTraining:
         assert isinstance(metrics.peak_memory_bytes, int)
 
     def test_beta_annealing(self) -> None:
-        """Test 5: Beta increases from beta_init toward beta_max over training epochs."""
+        """Beta increases from beta_init toward beta_max over training epochs."""
         from aac.contextual.trainer import ContextualConfig, ContextualTrainer
 
         fixtures = self._make_training_fixtures()

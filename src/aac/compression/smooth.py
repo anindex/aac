@@ -23,16 +23,11 @@ contribute exp(-1e30) ~ 0 to the sum.
 from __future__ import annotations
 
 import math
-from typing import Callable
+from collections.abc import Callable
 
 import torch
 
-from aac.utils.numerics import SENTINEL
-
-
-def _is_sentinel_vec(x: torch.Tensor) -> torch.Tensor:
-    """Check for sentinel values (abs(x) > 0.99 * SENTINEL)."""
-    return torch.abs(x) > 0.99 * SENTINEL
+from aac.utils.numerics import is_sentinel_abs
 
 
 def smoothed_heuristic_directed(
@@ -60,11 +55,13 @@ def smoothed_heuristic_directed(
     Returns:
         (...,) smoothed heuristic values.
     """
+    if temperature <= 0:
+        raise ValueError(f"temperature must be positive, got {temperature}")
     delta = y_source - y_target
     m = delta.shape[-1]
 
     # Mask sentinel coordinates
-    sentinel_mask = _is_sentinel_vec(y_source) | _is_sentinel_vec(y_target)
+    sentinel_mask = is_sentinel_abs(y_source) | is_sentinel_abs(y_target)
     if sentinel_mask.any():
         delta = torch.where(sentinel_mask, torch.tensor(-1e30, dtype=delta.dtype, device=delta.device), delta)
 
@@ -100,13 +97,15 @@ def smoothed_heuristic_undirected(
     Returns:
         (...,) smoothed heuristic values.
     """
+    if temperature <= 0:
+        raise ValueError(f"temperature must be positive, got {temperature}")
     delta = y_source - y_target
     m = delta.shape[-1]
 
     abs_delta = torch.abs(delta)
 
     # Mask sentinel coordinates (set |delta| to 0 so they don't contribute)
-    sentinel_mask = _is_sentinel_vec(y_source) | _is_sentinel_vec(y_target)
+    sentinel_mask = is_sentinel_abs(y_source) | is_sentinel_abs(y_target)
     if sentinel_mask.any():
         abs_delta = torch.where(
             sentinel_mask,
@@ -152,7 +151,7 @@ def make_aac_heuristic(
         y_node = y[node]
         y_target = y[target]
         delta = y_node - y_target
-        valid = ~(_is_sentinel_vec(y_node) | _is_sentinel_vec(y_target))
+        valid = ~(is_sentinel_abs(y_node) | is_sentinel_abs(y_target))
 
         if not valid.any():
             return 0.0

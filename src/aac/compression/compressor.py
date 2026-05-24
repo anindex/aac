@@ -26,7 +26,9 @@ compressor used in all AAC experiments.
 from __future__ import annotations
 
 import math
+from collections.abc import Callable
 
+import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -220,7 +222,8 @@ class LinearCompressor(nn.Module):
         Encourages each row to pick a different landmark by penalizing
         the squared overlap in softmax distributions between rows.
         """
-        penalty = torch.tensor(0.0, dtype=torch.float64)
+        W_ref = self.W_fwd if self.is_directed else self.W
+        penalty = torch.tensor(0.0, dtype=torch.float64, device=W_ref.device)
         Ws = [self.W_fwd, self.W_bwd] if self.is_directed else [self.W]
         for W in Ws:
             A = torch.softmax(W.to(torch.float64), dim=-1)  # (m, K)
@@ -297,7 +300,7 @@ def make_linear_heuristic(
     y_fwd: torch.Tensor,
     y_bwd: torch.Tensor,
     is_directed: bool,
-) -> "Callable[[int, int], float]":
+) -> Callable[[int, int], float]:
     """Create A*-compatible heuristic from linear-compressed labels.
 
     For directed:  h(u,t) = max(0, max(y_bwd[u]-y_bwd[t]), max(y_fwd[t]-y_fwd[u]))
@@ -324,8 +327,6 @@ def make_linear_heuristic(
     Returns:
         Callable h(node, target) -> float.
     """
-
-    import numpy as np
 
     from aac.utils.numerics import SENTINEL
 

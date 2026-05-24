@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-from typing import Optional
-
 import scipy.sparse
 import torch
 
@@ -16,7 +14,7 @@ def edges_to_graph(
     weights: torch.Tensor,
     num_nodes: int,
     is_directed: bool,
-    coordinates: Optional[torch.Tensor] = None,
+    coordinates: torch.Tensor | None = None,
 ) -> Graph:
     """Build a Graph in CSR format from edge lists.
 

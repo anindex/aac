@@ -4,7 +4,7 @@ Projects compressed label vectors into 2D using t-SNE or PCA, and plots
 scatter colored by graph distance to show that nearby nodes in the graph
 cluster in embedding space.
 
-All functions use the consolidated style from ``aac.viz.style``.
+All functions use the style from ``aac.viz.style``.
 """
 
 from __future__ import annotations

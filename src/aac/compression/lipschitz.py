@@ -21,6 +21,8 @@ while being a universal approximator in the 1-Lipschitz function class.
 
 from __future__ import annotations
 
+from collections.abc import Callable
+
 import numpy as np
 import torch
 import torch.nn as nn
@@ -58,7 +60,7 @@ class GroupSort(nn.Module):
         return x
 
 
-def _spectral_norm_inf(W: torch.Tensor, n_iters: int = 3) -> torch.Tensor:
+def _spectral_norm_inf(W: torch.Tensor) -> torch.Tensor:
     """Compute the infinity-norm of a matrix: max row absolute sum.
 
     ||W||_inf = max_i sum_j |W_ij|
@@ -67,7 +69,6 @@ def _spectral_norm_inf(W: torch.Tensor, n_iters: int = 3) -> torch.Tensor:
 
     Args:
         W: (out_features, in_features) weight matrix.
-        n_iters: Unused (closed-form for inf-norm). Kept for API compat.
 
     Returns:
         Scalar tensor: the infinity-norm of W.
@@ -199,7 +200,7 @@ class LipschitzCompressor(nn.Module):
 
     def condition_regularization(self) -> torch.Tensor:
         """Return 0 -- Lipschitz constraint replaces condition regularization."""
-        return torch.tensor(0.0)
+        return torch.tensor(0.0, device=next(self.parameters()).device)
 
     def condition_number(self) -> float:
         """Return the product of layer norms (effective Lipschitz constant)."""
@@ -215,7 +216,7 @@ class LipschitzCompressor(nn.Module):
 
     def uniqueness_penalty(self) -> torch.Tensor:
         """Return 0 -- not applicable for neural compression."""
-        return torch.tensor(0.0)
+        return torch.tensor(0.0, device=next(self.parameters()).device)
 
     def lipschitz_penalty(self) -> torch.Tensor:
         """Penalize layers whose weight norm exceeds 1.
@@ -225,7 +226,7 @@ class LipschitzCompressor(nn.Module):
         above 1 between forward passes. This penalty provides an additional
         signal to keep norms small.
         """
-        penalty = torch.tensor(0.0)
+        penalty = torch.tensor(0.0, device=next(self.parameters()).device)
         nets = [self.net_fwd, self.net_bwd] if self.is_directed else [self.net]
         for net in nets:
             for module in net:
@@ -242,7 +243,7 @@ def make_lipschitz_heuristic(
     d_out_np: np.ndarray,
     d_in_np: np.ndarray | None,
     is_directed: bool,
-) -> "Callable[[int, int], float]":
+) -> Callable[[int, int], float]:
     """Create A*-compatible heuristic from 1-Lipschitz compressed labels.
 
     Precomputes all compressed labels y = f(d) for fast per-query evaluation.

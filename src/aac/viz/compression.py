@@ -5,7 +5,7 @@ Visualizes what the LinearCompressor learned:
 - Landmark overlay: FPS teacher vs learned selected landmarks
 - Gumbel-softmax selection matrix evolution animation (GIF)
 
-All functions use the consolidated style from ``aac.viz.style``.
+All functions use the style from ``aac.viz.style``.
 """
 
 from __future__ import annotations

@@ -1,4 +1,4 @@
-"""Consolidated publication style for all AAC figures.
+"""Publication style for all AAC figures.
 
 Single source of truth for matplotlib rcParams, the colorblind-safe palette,
 method colors / markers, and TMLR figure sizing.  Every visualization script

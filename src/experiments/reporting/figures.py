@@ -38,7 +38,7 @@ __all__ = [
 def setup_plot_style() -> None:
     """Configure matplotlib for publication-quality plots.
 
-    Delegates to the consolidated :func:`aac.viz.style.setup_style`.
+    Delegates to :func:`aac.viz.style.setup_style`.
     Kept as a thin wrapper for backward compatibility.
     """
     setup_style()
