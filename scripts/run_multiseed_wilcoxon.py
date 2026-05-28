@@ -42,7 +42,6 @@ ALT_K = 16
 NUM_QUERIES = 100
 SEEDS = [42, 123, 456, 789, 1024]
 
-
 def main():
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     all_results = []
@@ -136,7 +135,6 @@ def main():
         print(f"  {graph_name}: {'ALL SIG' if all_sig else 'NOT ALL SIG'} p∈[{p_range}] aac_wins∈[{wins_range}]")
 
     print(f"\nResults: {csv_path}")
-
 
 if __name__ == "__main__":
     main()

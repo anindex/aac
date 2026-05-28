@@ -1,6 +1,9 @@
-"""Tests for experiment metrics: collector, timing, admissibility, memory."""
+"""Tests for experiment metrics: collector, timing, admissibility, memory, runners."""
 
 from __future__ import annotations
+
+import pytest
+from omegaconf import DictConfig, OmegaConf
 
 from aac.search.types import SearchResult
 from experiments.metrics.admissibility import check_admissibility
@@ -11,6 +14,8 @@ from experiments.metrics.collector import (
     batch_throughput,
 )
 from experiments.metrics.timing import TimingResult, time_query
+from experiments.runners import DIMACSRunner, OSMnxRunner, get_runner
+from experiments.runners.base import BaseRunner
 from experiments.utils import memory_bytes_per_vertex
 
 # ---------------------------------------------------------------------------
@@ -269,3 +274,92 @@ class TestBatchThroughput:
         # Default batch sizes
         assert 1 in result
         assert 1024 in result
+
+
+# ---------------------------------------------------------------------------
+# Runners (formerly tests/test_runners.py)
+# ---------------------------------------------------------------------------
+
+
+def _make_runner_cfg(
+    track_name: str = "dimacs",
+    method_name: str = "aac",
+    log_dir: str = "/tmp/test_tb_logs",
+) -> DictConfig:
+    """Create a minimal DictConfig for runner construction."""
+    return OmegaConf.create(
+        {
+            "track": {"name": track_name},
+            "method": {"name": method_name, "m": 16, "K0": 64},
+            "log_dir": log_dir,
+            "seed": 42,
+        }
+    )
+
+
+class TestRunners:
+    """Behavior tests for BaseRunner method validation, dispatch, and integration."""
+
+    def test_osmnx_supported_methods(self) -> None:
+        """OSMnxRunner supports aac/dijkstra and rejects other methods."""
+        assert OSMnxRunner.SUPPORTED_METHODS == ["aac", "dijkstra"]
+        with pytest.raises(ValueError, match="not supported"):
+            OSMnxRunner(_make_runner_cfg(track_name="osmnx", method_name="alt"))
+
+    def test_base_runner_validate_method(self) -> None:
+        """BaseRunner accepts any method when SUPPORTED_METHODS is None, otherwise enforces the list."""
+
+        class AnyRunner(BaseRunner):
+            SUPPORTED_METHODS = None
+
+        runner = AnyRunner(_make_runner_cfg(method_name="anything_goes"))
+        runner.close()
+
+        class RestrictedRunner(BaseRunner):
+            SUPPORTED_METHODS = ["a", "b"]
+
+        with pytest.raises(ValueError, match="not supported"):
+            RestrictedRunner(_make_runner_cfg(method_name="c"))
+
+        runner = RestrictedRunner(_make_runner_cfg(method_name="a"))
+        runner.close()
+
+    def test_get_runner_dispatch(self) -> None:
+        """get_runner maps track names to the correct runner classes."""
+        assert get_runner("dimacs") is DIMACSRunner
+        assert get_runner("osmnx") is OSMnxRunner
+
+    def test_get_runner_invalid(self) -> None:
+        """get_runner raises ValueError for unknown tracks."""
+        with pytest.raises(ValueError, match="Unknown track"):
+            get_runner("invalid")
+
+    def test_metrics_collector_integration(self) -> None:
+        """End-to-end: feed mock query results into MetricsCollector and check summary."""
+        collector = MetricsCollector()
+        for i in range(5):
+            result = SearchResult(
+                path=[0, 1, 2],
+                cost=10.0 + i,
+                expansions=100 + i * 10,
+                optimal=True,
+                h_source=5.0,
+            )
+            collector.add_query(i, 0, 2, result, latency_ms=1.0 + i * 0.1)
+
+        summary = collector.summary()
+        assert "expansions_mean" in summary
+        assert "p50_ms" in summary
+        assert "num_violations" in summary
+        assert "num_queries" in summary
+        assert summary["num_queries"] == 5
+        assert summary["num_violations"] == 0  # all optimal=True
+
+    def test_tensorboard_logging_exists(self) -> None:
+        """BaseRunner.__init__ creates a SummaryWriter on the runner instance."""
+        from torch.utils.tensorboard import SummaryWriter
+
+        runner = DIMACSRunner(_make_runner_cfg())
+        assert hasattr(runner, "writer")
+        assert isinstance(runner.writer, SummaryWriter)
+        runner.close()

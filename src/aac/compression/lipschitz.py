@@ -279,7 +279,9 @@ def make_lipschitz_heuristic(
         d_in_safe = d_out_safe
         any_sentinel_in = any_sentinel_out
 
-    # Precompute compressed labels for all vertices
+    # Precompute compressed labels for all vertices.
+    # Inference dtype is fp32 to match the trained LipschitzLinear forward;
+    # changing this here would create a train/eval dtype mismatch.
     with torch.no_grad():
         d_out_t = torch.from_numpy(d_out_safe.T).float()  # (V, K)
         y_fwd_t = net_fwd(d_out_t)

@@ -13,16 +13,13 @@ Tests several hypotheses:
 """
 from __future__ import annotations
 
-import sys
 import time
-from pathlib import Path
-
-_ROOT = Path(__file__).resolve().parent.parent
-sys.path.insert(0, str(_ROOT / "src"))
-sys.path.insert(0, str(_ROOT))
 
 import numpy as np
 import torch
+
+# Import synthetic graph generators
+from run_synthetic_experiments import generate_community_graph, nx_to_graph
 
 from aac.baselines.alt import alt_preprocess, make_alt_heuristic
 from aac.compression.compressor import LinearCompressor, make_linear_heuristic
@@ -32,10 +29,6 @@ from aac.search.astar import astar
 from aac.search.dijkstra import dijkstra
 from aac.train.trainer import TrainConfig, train_linear_compressor
 from experiments.utils import compute_strong_lcc, generate_queries
-
-# Import synthetic graph generators
-sys.path.insert(0, str(_ROOT / "scripts"))
-from run_synthetic_experiments import generate_community_graph, nx_to_graph
 
 
 def main() -> None:
@@ -205,7 +198,6 @@ def main() -> None:
         print(f"  [OK] Trained AAC beats forced-first-8 by {aac_red-id_red:.2f} pp -- pool access helps.")
     else:
         print(f"  [ok] Trained AAC ~= forced-first-8 ({aac_red-id_red:+.2f} pp) -- minor.")
-
 
 if __name__ == "__main__":
     main()

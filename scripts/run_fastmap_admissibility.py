@@ -32,7 +32,6 @@ FASTMAP_DIMS = [8, 16, 32, 64]
 SEED = 42
 ATOL = 1e-6
 
-
 def main():
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     all_rows = []
@@ -130,7 +129,6 @@ def main():
               f"mean cost ratio={row['mean_cost_ratio']:.4f}")
 
     print(f"\nResults: {csv_path}, {summary_path}")
-
 
 if __name__ == "__main__":
     main()

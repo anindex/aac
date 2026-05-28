@@ -81,11 +81,9 @@ def smoothed_heuristic_undirected(
     M_T(|delta|) = (1/T) * logsumexp(T * |delta|) - log(m) / T
 
     Approximates max_i |y_source_i - y_target_i| which is admissible because
-    |d(k,u) - d(k,t)| <= d(u,t) by triangle inequality.
-
-    NOTE: The variation norm max(delta)-min(delta) is NOT admissible on raw
-    distance labels (can reach 2*d(u,t)). L-inf is the correct admissible
-    heuristic for compressed distance labels.
+    |d(k,u) - d(k,t)| <= d(u,t) by triangle inequality. The variation norm
+    max(delta)-min(delta) is NOT admissible on raw distance labels (it can
+    reach 2*d(u,t)).
 
     Sentinel coordinates are masked by setting |delta| to 0 before logsumexp.
 

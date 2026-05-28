@@ -16,7 +16,6 @@ Output:
 from __future__ import annotations
 
 import csv
-import sys
 import time
 from pathlib import Path
 
@@ -24,8 +23,6 @@ import numpy as np
 import torch
 
 _PROJECT_ROOT = Path(__file__).resolve().parent.parent
-sys.path.insert(0, str(_PROJECT_ROOT))
-sys.path.insert(0, str(_PROJECT_ROOT / "src"))
 
 from aac.compression.compressor import LinearCompressor, make_linear_heuristic
 from aac.embeddings.anchors import farthest_point_sampling
@@ -45,7 +42,6 @@ SEEDS = [42, 123, 456, 789, 1024]
 NUM_QUERIES = 100
 QUERY_SEED = 42
 LAMBDAS = [0.0, 0.01, 0.1]
-
 
 def run_one(graph, lcc_tensor, lcc_seed, queries, dij_mean: float,
             seed: int, uniq_lambda: float) -> dict:
@@ -125,7 +121,6 @@ def run_one(graph, lcc_tensor, lcc_seed, queries, dij_mean: float,
         "prep_time_s": f"{prep_time:.2f}",
     }
 
-
 CSV_COLUMNS = [
     "graph", "K0", "m", "uniq_lambda", "seed",
     "mean_exp", "reduction_pct",
@@ -133,7 +128,6 @@ CSV_COLUMNS = [
     "effective_unique_ratio",
     "admissibility_violations", "all_optimal", "prep_time_s",
 ]
-
 
 def main() -> None:
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
@@ -166,7 +160,6 @@ def main() -> None:
         w.writeheader()
         w.writerows(rows)
     print(f"\nWritten: {out_path}")
-
 
 if __name__ == "__main__":
     main()

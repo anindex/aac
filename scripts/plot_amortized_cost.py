@@ -24,7 +24,6 @@ from __future__ import annotations
 
 import argparse
 import csv
-import sys
 from pathlib import Path
 
 import matplotlib
@@ -34,9 +33,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 
-_PROJECT_ROOT = Path(__file__).resolve().parent.parent
-sys.path.insert(0, str(_PROJECT_ROOT / "src"))
-from aac.viz.style import (  # noqa: E402
+from aac.viz.style import (
     METHOD_COLORS,
     TMLR_FULL_WIDTH,
     setup_style,
@@ -49,7 +46,6 @@ GRAPH_LABELS = {
     "COL": "(c) COL (436K nodes)",
     "FLA": "(d) FLA (1.07M nodes)",
 }
-
 
 def _load_timing(csv_path: Path, graph: str) -> dict[str, dict[str, float]]:
     """Return {'aac': {...}, 'alt': {...}} for the named graph."""
@@ -70,10 +66,8 @@ def _load_timing(csv_path: Path, graph: str) -> dict[str, dict[str, float]]:
         )
     return out
 
-
 def _amortized(N: np.ndarray, offline_s: float, per_query_ms: float) -> np.ndarray:
     return offline_s + N * (per_query_ms / 1000.0)
-
 
 def _plot_panel(ax, csv_path: Path, graph: str, title: str) -> tuple[float, float]:
     """Plot one panel; return (breakeven_N, ylim_top) for the panel."""
@@ -131,7 +125,6 @@ def _plot_panel(ax, csv_path: Path, graph: str, title: str) -> tuple[float, floa
             color="gray",
         )
     return N_break, max(aac_cost.max(), alt.max())
-
 
 def main() -> None:
     ap = argparse.ArgumentParser()
@@ -196,7 +189,6 @@ def main() -> None:
             print(f"  {graph}: breakeven N = {N_b:,.0f} queries")
         else:
             print(f"  {graph}: no finite breakeven (ALT is at least as fast)")
-
 
 if __name__ == "__main__":
     main()

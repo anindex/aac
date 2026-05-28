@@ -10,7 +10,6 @@ from __future__ import annotations
 
 import argparse
 import csv
-import sys
 import time
 from pathlib import Path
 from typing import Iterable
@@ -19,9 +18,6 @@ import numpy as np
 import torch
 
 _ROOT = Path(__file__).resolve().parent.parent
-sys.path.insert(0, str(_ROOT / "src"))
-sys.path.insert(0, str(_ROOT))
-sys.path.insert(0, str(_ROOT / "scripts"))
 
 from aac.baselines.alt import alt_preprocess, make_alt_heuristic
 from aac.compression.compressor import LinearCompressor, make_linear_heuristic
@@ -51,20 +47,17 @@ GRAPHS = {
     "manhattan": {"loader": "osmnx", "path": "data/osmnx/manhattan.npz"},
 }
 
-
 def _load(key: str) -> Graph:
     spec = GRAPHS[key]
     if spec["loader"] == "osmnx":
         return load_graph_npz(_ROOT / spec["path"])
     return load_dimacs(_ROOT / spec["gr"], _ROOT / spec["co"])
 
-
 def _eval(graph, queries, h, dij_mean: float) -> tuple[float, float]:
     exps = np.array([astar(graph, s, t, heuristic=h).expansions for s, t in queries])
     mean = float(exps.mean())
     red = 100.0 * (1.0 - mean / dij_mean)
     return mean, red
-
 
 def _forced_first_m_directed(teacher, m_fwd: int, m_bwd: int):
     """AAC identity selection on first m_fwd fwd and m_bwd bwd pool indices.
@@ -93,7 +86,6 @@ def _forced_first_m_directed(teacher, m_fwd: int, m_bwd: int):
         y_fwd, y_bwd = comp(d_out_t, d_in_t)
     return make_linear_heuristic(y_fwd, y_bwd, is_directed=True)
 
-
 def _trained_directed(teacher, m_fwd: int, m_bwd: int,
                       epochs: int, seed: int, lcc_tensor):
     K = teacher.d_out.shape[0]
@@ -109,7 +101,6 @@ def _trained_directed(teacher, m_fwd: int, m_bwd: int,
     with torch.no_grad():
         y_fwd, y_bwd = comp(d_out_t, d_in_t)
     return make_linear_heuristic(y_fwd, y_bwd, is_directed=True)
-
 
 def run_cell(graph_name: str, budget_bpv: int,
              seeds: Iterable[int], checkpoints: Iterable[int],
@@ -186,7 +177,6 @@ def run_cell(graph_name: str, budget_bpv: int,
     print(f"\n  Wrote {out_path} ({len(rows)} rows) in {elapsed/60:.1f} min.",
           flush=True)
 
-
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--graphs", nargs="+", default=["ny"],
@@ -204,7 +194,6 @@ def main() -> None:
             out = args.out_dir / f"drift_{g}_B{b}.csv"
             run_cell(g, b, args.seeds, args.checkpoints, args.num_queries, out)
     print(f"\n\nALL DONE in {(time.perf_counter()-t0)/60:.1f} min.", flush=True)
-
 
 if __name__ == "__main__":
     main()

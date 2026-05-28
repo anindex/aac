@@ -50,7 +50,7 @@ def aggregate_results(results_dir: str, track: str) -> pd.DataFrame:
 
     Scans ``results_dir/track/*.csv`` for per-query result files produced by
     :class:`experiments.metrics.collector.MetricsCollector`. Each file is
-    summarised into one row with aggregate statistics.
+    summarized into one row with aggregate statistics.
 
     File naming convention expected:
         ``{method}_{graph}[_m{m}][_K{K0}].csv``

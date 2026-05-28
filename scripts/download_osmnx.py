@@ -10,7 +10,6 @@ CITIES = {
     "new_york": {"place": "Manhattan, New York, USA", "network_type": "drive"},
 }
 
-
 def download_city(
     name: str, place: str, network_type: str, data_dir: str = "data/osmnx"
 ) -> None:
@@ -38,14 +37,12 @@ def download_city(
         pickle.dump(G, f)
     print(f"  Saved to {cache_path}")
 
-
 def main() -> None:
     """Download all configured city graphs."""
     for name, cfg in CITIES.items():
         print(f"Downloading {name} ...")
         download_city(name, **cfg)
     print("Done.")
-
 
 if __name__ == "__main__":
     main()

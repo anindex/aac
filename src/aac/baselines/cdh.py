@@ -42,10 +42,10 @@ ALT at B bytes/vertex is therefore r = floor(B / (dtype_size + index_size)).
 
 References
 ----------
-Goldenberg, Sturtevant, Felner, Schaeffer. "Compressed Differential Heuristics
-for Faster Optimal Pathfinding." AAAI 2011.
-Goldenberg, Felner, Sturtevant, Schaeffer. "Compressed Pattern Databases."
-AI Communications 30(2), 2017.
+Goldenberg, Sturtevant, Felner, Schaeffer. "The Compressed Differential
+Heuristic." AAAI 2011, pp. 24-29.
+Goldenberg, Felner, Palombo, Sturtevant, Schaeffer. "The Compressed Differential
+Heuristic." AI Communications 30(6):393-418, 2017. doi:10.3233/AIC-170743.
 """
 
 from __future__ import annotations

@@ -28,7 +28,6 @@ from pathlib import Path
 
 _PROJECT_ROOT = Path(__file__).resolve().parent.parent
 
-
 def download_dimacs() -> None:
     """Download DIMACS 9th Challenge USA road graphs."""
     print("=" * 60)
@@ -37,7 +36,6 @@ def download_dimacs() -> None:
     script = _PROJECT_ROOT / "scripts" / "download_dimacs.py"
     subprocess.run([sys.executable, str(script)], check=True)
     print()
-
 
 def download_osmnx() -> None:
     """Download OSMnx city and country graph extracts."""
@@ -48,7 +46,6 @@ def download_osmnx() -> None:
     subprocess.run([sys.executable, str(script)], check=True)
     print()
 
-
 def generate_warcraft() -> None:
     """Generate synthetic Warcraft terrain maps."""
     print("=" * 60)
@@ -57,7 +54,6 @@ def generate_warcraft() -> None:
     script = _PROJECT_ROOT / "scripts" / "generate_warcraft_data.py"
     subprocess.run([sys.executable, str(script)], check=True)
     print()
-
 
 def main() -> None:
     parser = argparse.ArgumentParser(
@@ -93,7 +89,6 @@ def main() -> None:
     print("=" * 60)
     print()
     print("Next step: python scripts/reproduce_paper.py")
-
 
 if __name__ == "__main__":
     main()

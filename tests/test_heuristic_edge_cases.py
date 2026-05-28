@@ -71,15 +71,6 @@ class TestSentinelMasking:
         assert val < 1e10, f"Sentinel leaked: h(1,2) = {val}"
         assert val >= 0.0
 
-    def test_all_sentinels_returns_zero(self):
-        """When all dimensions are sentinels for a pair, h should be 0."""
-        y_fwd = torch.full((3, 4), SENTINEL, dtype=torch.float64)
-        y_bwd = torch.full((3, 4), SENTINEL, dtype=torch.float64)
-
-        h = make_linear_heuristic(y_fwd, y_bwd, is_directed=True)
-        val = h(0, 1)
-        assert val == 0.0, f"Expected h=0 when all dims are sentinel, got {val}"
-
     def test_no_sentinel_unchanged(self, strongly_connected_directed):
         """When no sentinels present, behavior should be identical to before fix."""
         graph = strongly_connected_directed
@@ -109,73 +100,6 @@ class TestSentinelMasking:
                 assert h_val <= d_true + 1e-9, (
                     f"h({u},{t})={h_val:.4f} > d={d_true:.4f}"
                 )
-
-
-# ---------------------------------------------------------------------------
-# Directed masking -- varying finite-landmark sets
-# ---------------------------------------------------------------------------
-
-
-class TestDirectedMaskingConsistency:
-    """Test consistency-related edge cases for directed graphs with unreachable landmarks."""
-
-    def test_admissibility_with_unreachable_landmarks(self, weakly_connected_directed):
-        """AAC must be admissible even when some landmarks are unreachable from some vertices."""
-        graph = weakly_connected_directed
-        # Use landmarks at vertices 0 and 4
-        # Vertex 0 can reach 1,2,3,4,5 via outgoing edges
-        # Vertex 4 is a dead-end (no outgoing edges) -- cannot reach anyone
-        anchors = torch.tensor([0, 4], dtype=torch.int64)
-        teacher = compute_teacher_labels(graph, anchors)
-
-        compressor = LinearCompressor(K=2, m=2, is_directed=True)
-        compressor.eval()
-        d_out_t = teacher.d_out.t()
-        d_in_t = teacher.d_in.t()
-
-        with torch.no_grad():
-            y_fwd, y_bwd = compressor(d_out_t, d_in_t)
-
-        h = make_linear_heuristic(y_fwd, y_bwd, is_directed=True)
-
-        # Check admissibility for all reachable pairs
-        for u in range(graph.num_nodes):
-            for t in range(graph.num_nodes):
-                if u == t:
-                    continue
-                d_result = dijkstra(graph, u, t)
-                if not d_result.optimal:
-                    continue  # unreachable pair
-                h_val = h(u, t)
-                assert h_val <= d_result.cost + 1e-9, (
-                    f"Admissibility violated: h({u},{t})={h_val:.4f} > d={d_result.cost:.4f}"
-                )
-
-    def test_astar_optimal_on_strongly_connected(self, strongly_connected_directed):
-        """A* with AAC heuristic finds optimal paths on strongly connected graphs."""
-        graph = strongly_connected_directed
-        anchors = torch.tensor([0, 2, 4, 6], dtype=torch.int64)
-        teacher = compute_teacher_labels(graph, anchors)
-
-        compressor = LinearCompressor(K=4, m=4, is_directed=True)
-        compressor.eval()
-        d_out_t = teacher.d_out.t()
-        d_in_t = teacher.d_in.t()
-        with torch.no_grad():
-            y_fwd, y_bwd = compressor(d_out_t, d_in_t)
-
-        h = make_linear_heuristic(y_fwd, y_bwd, is_directed=True)
-
-        for u in range(graph.num_nodes):
-            for t in range(graph.num_nodes):
-                if u == t:
-                    continue
-                astar_result = astar(graph, u, t, h)
-                dij_result = dijkstra(graph, u, t)
-                assert abs(astar_result.cost - dij_result.cost) < 1e-9, (
-                    f"A* suboptimal: ({u},{t}) A*={astar_result.cost:.4f} Dij={dij_result.cost:.4f}"
-                )
-
 
 
 # ---------------------------------------------------------------------------

@@ -58,10 +58,10 @@ STEPS: list[tuple[str, list[str], str, bool]] = [
     ("DIMACS validation-split Pareto (Table 6)",
      ["scripts/run_validation_pareto.py"],
      "dimacs", True),
-    ("DIMACS per-query path-optimality audit",
+    ("DIMACS per-query path-optimality check",
      ["scripts/verify_path_optimality.py"],
      "dimacs", False),
-    ("DIMACS SCC reachability audit (\u00a72.1)",
+    ("DIMACS SCC reachability check (\u00a72.1)",
      ["scripts/check_scc_reachability.py"],
      "dimacs", False),
 
@@ -102,7 +102,7 @@ STEPS: list[tuple[str, list[str], str, bool]] = [
     ("OGB-arXiv non-road experiment (pre-registered, Appendix E)",
      ["scripts/run_nonroad_real.py"],
      "synthetic", True),
-    ("OGB-arXiv per-cell admissibility audit (Appendix E.3, 15/15 cells)",
+    ("OGB-arXiv per-cell admissibility check (Appendix E.3, 15/15 cells)",
      ["scripts/verify_ogbn_admissibility.py"],
      "synthetic", True),
     ("TOST equivalence p-values from matched-budget paired data (\u00a75.9, Appendix E)",
@@ -254,7 +254,7 @@ EXPECTED_TEX = [
 ]
 
 EXPECTED_CSV = [
-    # DIMACS core (timing + significance + Pareto + paired audit)
+    # DIMACS core (timing + significance + Pareto + paired check)
     "results/dimacs/timing_p50_p95.csv",
     "results/dimacs/preprocessing_breakdown.csv",
     "results/dimacs/per_query_paired.csv",
@@ -307,7 +307,7 @@ EXPECTED_CSV = [
     "results/synthetic/ogbn_arxiv_results.csv",
     # TOST equivalence (Sections 5.9, Appendix E)
     "results/synthetic/tost_equivalence.csv",
-    # OGB-arXiv admissibility audit (5 seeds x 3 budgets).
+    # OGB-arXiv admissibility check (5 seeds x 3 budgets).
     "results/synthetic/ogbn_arxiv_admissibility.csv",
     # CDH reference benchmark (Table tab:cdh-reference: SBM / Modena / NY)
     "results/cdh_baseline/sbm_cdh.csv",
@@ -342,7 +342,7 @@ EXPECTED_CSV = [
     # Toy P_7 closed-form (Section 3.5, Figure ref:toy-p7)
     "results/toy_p7/all_subsets.csv",
     "results/toy_p7/highlight.csv",
-    # SCC reachability audit (Section 2.1)
+    # SCC reachability check (Section 2.1)
     "results/scc_reachability.csv",
 ]
 
@@ -365,11 +365,9 @@ EXPECTED_PDF_GENERATED = [
 EXPECTED_PDF_CURATED: list[str] = []
 EXPECTED_PDF = EXPECTED_PDF_GENERATED + EXPECTED_PDF_CURATED
 
-
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
-
 
 def run_step(cmd: list[str], description: str, env: dict) -> bool:
     """Run a subprocess command with status banner. Returns True on success."""
@@ -385,7 +383,6 @@ def run_step(cmd: list[str], description: str, env: dict) -> bool:
     print(f"  [FAIL] exit code {result.returncode}")
     return False
 
-
 def check_file(path: str) -> tuple[bool, str]:
     """Check that a file exists with non-zero size."""
     if not os.path.exists(path):
@@ -394,7 +391,6 @@ def check_file(path: str) -> tuple[bool, str]:
     if size == 0:
         return False, "EMPTY (0 bytes)"
     return True, f"OK ({size:,} bytes)"
-
 
 # Per-CSV -> producing track. Used by the --tables-only preflight to print
 # actionable "Run: python scripts/reproduce_paper.py --track <T>" messages
@@ -487,7 +483,6 @@ CSV_TO_TRACK: dict[str, str] = {
     "results/toy_p7/highlight.csv": "figures",
 }
 
-
 def preflight_tables_only() -> bool:
     """Verify every input CSV/JSON exists before running --tables-only.
 
@@ -526,11 +521,9 @@ def preflight_tables_only() -> bool:
     )
     return False
 
-
 # ---------------------------------------------------------------------------
 # Main
 # ---------------------------------------------------------------------------
-
 
 def main() -> int:
     parser = argparse.ArgumentParser(
@@ -640,7 +633,6 @@ def main() -> int:
         print("  Result: ALL CHECKS PASSED")
     print(f"{'=' * 60}")
     return 1 if any_failure else 0
-
 
 if __name__ == "__main__":
     sys.exit(main())

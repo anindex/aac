@@ -22,16 +22,12 @@ from __future__ import annotations
 
 import argparse
 import csv
-import sys
 from pathlib import Path
 
 import numpy as np
 import torch
 
 _ROOT = Path(__file__).resolve().parent.parent
-sys.path.insert(0, str(_ROOT / "src"))
-sys.path.insert(0, str(_ROOT))
-sys.path.insert(0, str(_ROOT / "scripts"))
 
 from aac.baselines.alt import alt_preprocess, make_alt_heuristic
 from aac.graphs.io import load_graph_npz
@@ -47,7 +43,6 @@ GRAPHS = {
     "modena":    "data/osmnx/modena.npz",
     "manhattan": "data/osmnx/manhattan.npz",
 }
-
 
 def run_graph(graph_key: str, K: int, R: int, seeds: list[int],
               num_val: int, num_test: int) -> list[dict]:
@@ -102,7 +97,6 @@ def run_graph(graph_key: str, K: int, R: int, seeds: list[int],
               flush=True)
     return rows
 
-
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--graphs", nargs="+", default=list(GRAPHS.keys()))
@@ -126,7 +120,6 @@ def main() -> None:
             w.writeheader()
             w.writerows(rows)
         print(f"[{g}] wrote {len(rows)} rows to {out}", flush=True)
-
 
 if __name__ == "__main__":
     main()

@@ -17,7 +17,6 @@ Usage:
 from __future__ import annotations
 
 import argparse
-import sys
 from pathlib import Path
 
 import matplotlib
@@ -28,9 +27,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 # Publication style (Computer Modern Roman + real LaTeX where available).
-_PROJECT_ROOT = Path(__file__).resolve().parent.parent
-sys.path.insert(0, str(_PROJECT_ROOT / "src"))
-from aac.viz.style import (  # noqa: E402
+from aac.viz.style import (
     METHOD_COLORS,
     METHOD_MARKERS,
     TMLR_FULL_WIDTH,
@@ -38,7 +35,6 @@ from aac.viz.style import (  # noqa: E402
 )
 
 setup_style()
-
 
 def _best_K0_per_budget(df: pd.DataFrame) -> pd.DataFrame:
     """For each (method, bytes) cell, pick the K_0 with the highest mean expansion
@@ -66,7 +62,6 @@ def _best_K0_per_budget(df: pd.DataFrame) -> pd.DataFrame:
             method_dfs.append(sub)
     return pd.concat(method_dfs, ignore_index=True)
 
-
 def _summarize(df: pd.DataFrame) -> pd.DataFrame:
     g = (
         df.groupby(["method", "bytes_per_vertex"])["expansion_reduction_pct"]
@@ -77,13 +72,11 @@ def _summarize(df: pd.DataFrame) -> pd.DataFrame:
     g["red_std"] = g["red_std"].fillna(0.0)
     return g
 
-
 _METHOD_KEY = {"AAC": "aac", "ALT": "alt"}
 _METHOD_LABEL = {
     "AAC": r"AAC (best $K_0$, val-split)",
     "ALT": r"FPS-ALT",
 }
-
 
 def _plot_panel(ax, df_perseed: pd.DataFrame, title: str) -> None:
     df_best = _best_K0_per_budget(df_perseed)
@@ -117,7 +110,6 @@ def _plot_panel(ax, df_perseed: pd.DataFrame, title: str) -> None:
     ax.set_xscale("log", base=2)
     ax.set_xticks([32, 64, 128, 256])
     ax.set_xticklabels([32, 64, 128, 256])
-
 
 def main() -> None:
     p = argparse.ArgumentParser()
@@ -165,7 +157,6 @@ def main() -> None:
     )
     fig.savefig(args.output)
     print(f"Wrote {args.output} ({args.output.stat().st_size:,} bytes)")
-
 
 if __name__ == "__main__":
     main()

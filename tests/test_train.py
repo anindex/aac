@@ -299,17 +299,6 @@ class TestTrainingLoop:
             f"Expected convergence: initial={initial_loss:.4f}, final={final_loss:.4f}"
         )
 
-    def test_temperature_annealing(self) -> None:
-        """Temperature at epoch 0 is T_init=1.0, at epoch 100 with gamma=1.05 is ~131.5."""
-        config = TrainConfig(T_init=1.0, gamma=1.05)
-        T_0 = config.T_init * (config.gamma ** 0)
-        T_100 = config.T_init * (config.gamma ** 100)
-        assert abs(T_0 - 1.0) < 1e-10, f"T at epoch 0 should be 1.0, got {T_0}"
-        assert abs(T_100 - 1.05**100) < 0.1, f"T at epoch 100 should be ~131.5, got {T_100}"
-        # 1.05^100 ~ 131.5
-        assert 130.0 < T_100 < 133.0, f"T at epoch 100 = {T_100:.1f}, expected ~131.5"
-
-
 # ===========================================================================
 # End-to-end integration tests
 # ===========================================================================

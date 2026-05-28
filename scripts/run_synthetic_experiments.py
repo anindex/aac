@@ -12,7 +12,6 @@ Output:
 from __future__ import annotations
 
 import csv
-import sys
 import time
 from pathlib import Path
 
@@ -21,8 +20,6 @@ from pathlib import Path
 # ---------------------------------------------------------------------------
 _SCRIPT_DIR = Path(__file__).resolve().parent
 _PROJECT_ROOT = _SCRIPT_DIR.parent
-sys.path.insert(0, str(_PROJECT_ROOT / "src"))
-sys.path.insert(0, str(_PROJECT_ROOT))
 
 import networkx as nx
 import numpy as np
@@ -70,7 +67,6 @@ BUDGET_LEVELS = [
 # Query distribution modes for sensitivity analysis
 QUERY_MODES = ["uniform"]  # hotspot/powerlaw less meaningful on synthetic without spatial structure
 
-
 # ---------------------------------------------------------------------------
 # Graph generation
 # ---------------------------------------------------------------------------
@@ -87,12 +83,10 @@ def generate_community_graph(seed: int) -> nx.Graph:
     G = nx.stochastic_block_model(sizes, p_matrix, seed=seed)
     return G
 
-
 def generate_powerlaw_graph(seed: int) -> nx.Graph:
     """Generate a Barabasi-Albert preferential attachment graph (10K nodes)."""
     G = nx.barabasi_albert_graph(10000, 5, seed=seed)
     return G
-
 
 def nx_to_graph(G: nx.Graph, weight_seed: int = 42) -> "Graph":
     """Convert a networkx graph to AAC Graph format with random weights.
@@ -125,7 +119,6 @@ def nx_to_graph(G: nx.Graph, weight_seed: int = 42) -> "Graph":
         is_directed=False,
     )
     return graph
-
 
 # ---------------------------------------------------------------------------
 # Experiment runner
@@ -267,7 +260,6 @@ def run_experiment(
 
     return all_rows
 
-
 # ---------------------------------------------------------------------------
 # CSV output
 # ---------------------------------------------------------------------------
@@ -289,7 +281,6 @@ CSV_COLUMNS = [
     "p_value_twosided",
 ]
 
-
 def write_csv(rows: list[dict], path: Path) -> None:
     """Write results to CSV."""
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -298,7 +289,6 @@ def write_csv(rows: list[dict], path: Path) -> None:
         writer.writeheader()
         writer.writerows(rows)
     print(f"  Written: {path}")
-
 
 # ---------------------------------------------------------------------------
 # Main
@@ -390,7 +380,6 @@ def main() -> None:
     print("\nOutput files:")
     print(f"  {OUTPUT_DIR / 'community_results.csv'}")
     print(f"  {OUTPUT_DIR / 'powerlaw_results.csv'}")
-
 
 if __name__ == "__main__":
     main()

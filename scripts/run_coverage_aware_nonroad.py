@@ -10,19 +10,16 @@ Output: results/coverage_aware/coverage_aware_nonroad_results.csv
 from __future__ import annotations
 
 import csv
-import sys
 import time
 from pathlib import Path
 
 _SCRIPT_DIR = Path(__file__).resolve().parent
 _PROJECT_ROOT = _SCRIPT_DIR.parent
-sys.path.insert(0, str(_PROJECT_ROOT / "src"))
-sys.path.insert(0, str(_PROJECT_ROOT))
 
 import numpy as np
 import scipy.stats
 import torch
-from scripts.run_synthetic_experiments import (
+from run_synthetic_experiments import (
     GRAPH_SEED,
     NUM_QUERIES,
     QUERY_SEED,
@@ -54,7 +51,6 @@ BATCH_SIZE = 256
 LR = 1e-3
 
 LAMBDA_COV_VALUES = [0.0, 0.001, 0.01, 0.1]
-
 
 def train_with_coverage(
     compressor: LinearCompressor,
@@ -165,7 +161,6 @@ def train_with_coverage(
         loss.backward()
         optimizer.step()
 
-
 def build_aac(graph, lcc_tensor, lcc_seed, seed: int, lambda_cov: float):
     torch.manual_seed(seed)
     np.random.seed(seed)
@@ -190,7 +185,6 @@ def build_aac(graph, lcc_tensor, lcc_seed, seed: int, lambda_cov: float):
             y_fwd = y_bwd = y.detach()
     h = make_linear_heuristic(y_fwd, y_bwd, graph.is_directed)
     return h, compressor.selection_stats()
-
 
 def run_graph(graph_type: str, graph) -> list[dict]:
     lcc_nodes, lcc_seed = compute_strong_lcc(graph)
@@ -266,7 +260,6 @@ def run_graph(graph_type: str, graph) -> list[dict]:
 
     return rows
 
-
 CSV_COLUMNS = [
     "graph_type", "seed", "lambda_cov", "K0", "m",
     "dij_mean_exp", "alt_mean_exp", "aac_mean_exp",
@@ -276,7 +269,6 @@ CSV_COLUMNS = [
     "prep_time_s",
 ]
 
-
 def write_csv(rows: list[dict], path: Path) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     with open(path, "w", newline="") as f:
@@ -284,7 +276,6 @@ def write_csv(rows: list[dict], path: Path) -> None:
         w.writeheader()
         w.writerows(rows)
     print(f"  Written: {path}")
-
 
 def main() -> None:
     import argparse
@@ -324,7 +315,7 @@ def main() -> None:
 
     if "ogbn" in which:
         print(f"\n{'='*70}\n  OGB-ARXIV (~170k nodes, symmetrized LCC)\n{'='*70}")
-        from scripts.run_nonroad_real import load_ogbn_arxiv
+        from run_nonroad_real import load_ogbn_arxiv
         G_arx = load_ogbn_arxiv()
         graph_arx = nx_to_graph(G_arx, weight_seed=GRAPH_SEED)
         print(f"  AAC: {graph_arx.num_nodes:,} nodes, {graph_arx.num_edges:,} edges")
@@ -333,7 +324,6 @@ def main() -> None:
 
     _flush()
     print("\nDone.")
-
 
 if __name__ == "__main__":
     main()

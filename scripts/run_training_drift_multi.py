@@ -10,19 +10,12 @@ from __future__ import annotations
 
 import argparse
 import csv
-import sys
 import time
 from pathlib import Path
 from typing import Iterable
 
 import numpy as np
 import torch
-
-_ROOT = Path(__file__).resolve().parent.parent
-sys.path.insert(0, str(_ROOT / "src"))
-sys.path.insert(0, str(_ROOT))
-sys.path.insert(0, str(_ROOT / "scripts"))
-
 from run_synthetic_experiments import (
     generate_community_graph,
     generate_powerlaw_graph,
@@ -43,11 +36,9 @@ GRAPH_GENERATORS = {
     "ba": generate_powerlaw_graph,
 }
 
-
 def make_graph(name: str, seed: int):
     G_nx = GRAPH_GENERATORS[name](seed=seed)
     return nx_to_graph(G_nx, weight_seed=seed)
-
 
 def eval_heuristic(graph, queries, h, dij_mean: float) -> tuple[float, float]:
     exps = np.array(
@@ -56,7 +47,6 @@ def eval_heuristic(graph, queries, h, dij_mean: float) -> tuple[float, float]:
     mean = float(exps.mean())
     red = 100.0 * (1.0 - mean / dij_mean)
     return mean, red
-
 
 def forced_first_m_heuristic(teacher, m: int, is_directed: bool):
     """Build a AAC heuristic whose hard argmax selects the first m pool indices."""
@@ -73,7 +63,6 @@ def forced_first_m_heuristic(teacher, m: int, is_directed: bool):
         y = comp(d_out_t)
     return make_linear_heuristic(y, y, is_directed)
 
-
 def trained_heuristic(teacher, m: int, is_directed: bool, epochs: int,
                       seed: int, lcc_tensor):
     K = teacher.d_out.shape[0]
@@ -87,7 +76,6 @@ def trained_heuristic(teacher, m: int, is_directed: bool, epochs: int,
     with torch.no_grad():
         y = comp(d_out_t)
     return make_linear_heuristic(y, y, is_directed)
-
 
 def run_cell(graph_name: str, graph_seed: int, budget: int, K0: int, m: int,
              seeds: Iterable[int], checkpoints: Iterable[int],
@@ -160,7 +148,6 @@ def run_cell(graph_name: str, graph_seed: int, budget: int, K0: int, m: int,
     elapsed = time.perf_counter() - t_start
     print(f"\n  Wrote {out_path} ({len(rows)} rows) in {elapsed:.1f}s.")
 
-
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--graphs", nargs="+",
@@ -200,7 +187,6 @@ def main() -> None:
     total = time.perf_counter() - t_start
     print(f"\n\nALL DONE in {total/60:.1f} min "
           f"({len(args.graphs)*len(args.budgets)} cells).")
-
 
 if __name__ == "__main__":
     main()

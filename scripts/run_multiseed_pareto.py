@@ -52,14 +52,12 @@ T_INIT = 1.0
 GAMMA = 1.05
 NUM_QUERIES = 50
 
-
 def run_queries(graph, queries, heuristic):
     expansions = []
     for s, t in queries:
         result = astar(graph, s, t, heuristic=heuristic)
         expansions.append(result.expansions)
     return expansions
-
 
 def run_queries_with_admissibility(graph, queries, heuristic):
     """Run queries and return (expansions, costs) for admissibility checking."""
@@ -69,7 +67,6 @@ def run_queries_with_admissibility(graph, queries, heuristic):
         expansions.append(result.expansions)
         costs.append(result.cost)
     return expansions, costs
-
 
 def run_aac_config(graph, K0, m, queries, lcc_nodes, lcc_seed, seed):
     torch.manual_seed(seed)
@@ -96,7 +93,6 @@ def run_aac_config(graph, K0, m, queries, lcc_nodes, lcc_seed, seed):
             y_fwd = y_bwd = y.detach()
     heuristic = make_linear_heuristic(y_fwd, y_bwd, graph.is_directed)
     return heuristic, time.perf_counter() - t0
-
 
 def run_single_seed(graph_name, graph, queries, lcc_nodes, lcc_seed, dij_mean, seed):
     """Run full sweep for one seed, return list of result dicts."""
@@ -172,7 +168,6 @@ def run_single_seed(graph_name, graph, queries, lcc_nodes, lcc_seed, dij_mean, s
             print(f"    [seed={seed}] FastMap d={d}: FAILED ({e})")
 
     return results
-
 
 def main():
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
@@ -267,7 +262,6 @@ def main():
                 })
 
     print("\nDone!")
-
 
 if __name__ == "__main__":
     main()

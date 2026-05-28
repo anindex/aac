@@ -6,7 +6,7 @@ the standard 100-query sample (`generate_queries(graph, 100, seed=42)`)
 whose endpoints lie in a common strongly connected component. By
 construction (`generate_queries` already restricts to the strong LCC for
 directed graphs), this fraction is 100% on every graph in the paper --
-this script makes that guarantee auditable rather than implicit.
+this script makes that guarantee verifiable rather than implicit.
 
 Output: results/scc_reachability.csv
 
@@ -16,13 +16,10 @@ Used in Sec.2.1 to back the one-sentence reachability statement.
 from __future__ import annotations
 
 import csv
-import sys
 from pathlib import Path
 
 _SCRIPT_DIR = Path(__file__).resolve().parent
 _PROJECT_ROOT = _SCRIPT_DIR.parent
-sys.path.insert(0, str(_PROJECT_ROOT / "src"))
-sys.path.insert(0, str(_PROJECT_ROOT))
 
 import scipy.sparse.csgraph
 
@@ -49,7 +46,6 @@ OSMNX = [
     ("los_angeles", DATA / "osmnx" / "los_angeles.npz"),
 ]
 
-
 def fraction_in_common_scc(graph) -> tuple[float, int, int, int]:
     sp = graph_to_scipy(graph)
     is_directed = getattr(graph, "is_directed", False)
@@ -62,7 +58,6 @@ def fraction_in_common_scc(graph) -> tuple[float, int, int, int]:
     queries = generate_queries(graph, NUM_QUERIES, seed=QUERY_SEED)
     common = sum(1 for s, t in queries if labels[s] == labels[t])
     return common / len(queries), common, len(queries), n_components
-
 
 def main() -> int:
     rows = []
@@ -115,7 +110,6 @@ def main() -> int:
     print(f"Min common-SCC fraction across graphs: {min(fracs)*100:.1f}%")
     print(f"Max common-SCC fraction across graphs: {max(fracs)*100:.1f}%")
     return 0
-
 
 if __name__ == "__main__":
     raise SystemExit(main())

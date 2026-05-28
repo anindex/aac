@@ -1,4 +1,4 @@
-"""Query generation correctness audit.
+"""Query generation correctness tests.
 
 Verifies that generate_queries() and compute_strong_lcc() correctly restrict
 queries to the largest strongly connected component for directed graphs,
@@ -10,10 +10,11 @@ from __future__ import annotations
 import numpy as np
 import scipy.sparse
 import scipy.sparse.csgraph
+import torch
 from scipy.stats import chisquare
 
 from aac.graphs.convert import edges_to_graph, graph_to_scipy
-from experiments.utils import compute_strong_lcc, generate_queries
+from experiments.utils import compute_strong_lcc, generate_queries, seed_everything
 from tests.fixtures.adversarial_graphs import (
     scc_boundary_graph,
     strongly_connected_directed_10,
@@ -163,8 +164,6 @@ class TestComputeStrongLCC:
     def test_compute_strong_lcc_undirected(self):
         """On an undirected connected graph, compute_strong_lcc should return
         all nodes (since weak CC = the entire connected graph)."""
-        import torch
-
         # Build a simple 5-node undirected connected path graph: 0-1-2-3-4
         s = torch.tensor([0, 1, 2, 3], dtype=torch.int64)
         t = torch.tensor([1, 2, 3, 4], dtype=torch.int64)
@@ -178,3 +177,72 @@ class TestComputeStrongLCC:
         )
         assert set(lcc_nodes.tolist()) == {0, 1, 2, 3, 4}
         assert seed_vertex == int(lcc_nodes[0])
+
+
+# ---------------------------------------------------------------------------
+# Seeding (formerly tests/test_reproducibility.py::TestSeedEverything)
+# ---------------------------------------------------------------------------
+
+
+class TestSeedEverything:
+    """seed_everything reproducibility."""
+
+    def test_same_seed_same_output(self) -> None:
+        seed_everything(42)
+        a = torch.randn(10)
+        seed_everything(42)
+        b = torch.randn(10)
+        assert torch.allclose(a, b), "Same seed should produce identical torch.randn output"
+
+    def test_different_seed_different_output(self) -> None:
+        seed_everything(42)
+        a = torch.randn(10)
+        seed_everything(99)
+        b = torch.randn(10)
+        assert not torch.allclose(a, b), "Different seeds should produce different output"
+
+
+# ---------------------------------------------------------------------------
+# Basic generate_queries sanity (formerly tests/test_reproducibility.py)
+# ---------------------------------------------------------------------------
+
+
+class TestGenerateQueriesBasics:
+    """Basic correctness of generate_queries on a small undirected chain."""
+
+    def _make_chain(self):
+        """5-node undirected chain: 0-1-2-3-4."""
+        s = torch.tensor([0, 1, 2, 3], dtype=torch.int64)
+        t = torch.tensor([1, 2, 3, 4], dtype=torch.int64)
+        w = torch.tensor([1.0, 1.0, 1.0, 1.0], dtype=torch.float64)
+        return edges_to_graph(s, t, w, num_nodes=5, is_directed=False)
+
+    def test_no_self_loops(self) -> None:
+        graph = self._make_chain()
+        queries = generate_queries(graph, 50, seed=42)
+        for s, t in queries:
+            assert s != t, f"Query ({s}, {t}) has source == target"
+
+    def test_correct_count(self) -> None:
+        graph = self._make_chain()
+        queries = generate_queries(graph, 15, seed=42)
+        assert len(queries) == 15
+
+    def test_queries_in_largest_undirected_component(self) -> None:
+        """Queries on an undirected graph stay within the largest connected component."""
+        # Two components: {0, 1, 2} (connected) and {3, 4}
+        sources = torch.tensor([0, 1, 3], dtype=torch.int64)
+        targets = torch.tensor([1, 2, 4], dtype=torch.int64)
+        weights = torch.tensor([1.0, 1.0, 1.0], dtype=torch.float64)
+        graph = edges_to_graph(sources, targets, weights, num_nodes=5, is_directed=False)
+
+        sp = graph_to_scipy(graph)
+        _, labels = scipy.sparse.csgraph.connected_components(sp, directed=False)
+        sizes = np.bincount(labels)
+        largest = int(np.argmax(sizes))
+        largest_nodes = set(np.where(labels == largest)[0])
+
+        queries = generate_queries(graph, 20, seed=42)
+        for s, t in queries:
+            assert s in largest_nodes, f"Source {s} not in largest component"
+            assert t in largest_nodes, f"Target {t} not in largest component"

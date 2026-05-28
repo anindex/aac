@@ -10,13 +10,10 @@ Usage:
 from __future__ import annotations
 
 import argparse
-import sys
 from pathlib import Path
 
 # Make src/ importable so `experiments` resolves to src/experiments/.
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
-sys.path.insert(0, str(PROJECT_ROOT / "src"))
-sys.path.insert(0, str(PROJECT_ROOT))
 
 import matplotlib
 
@@ -112,7 +109,6 @@ def main() -> None:
         size = Path(f).stat().st_size
         print(f"  {f} ({size:,} bytes)")
     print(f"{'=' * 50}")
-
 
 if __name__ == "__main__":
     main()

@@ -40,12 +40,12 @@ the convention stated in Section 5.2 and Appendix E.2 of the paper.
 ## Result files
 
 - `results/synthetic/ogbn_arxiv_results.csv` -- per-seed expansion counts
-- `results/synthetic/ogbn_arxiv_admissibility.csv` -- per-cell admissibility audit
+- `results/synthetic/ogbn_arxiv_admissibility.csv` -- per-cell admissibility check
 - `results/synthetic/ogbn_arxiv_log.txt` -- raw run log
 
 ## Reproduction
 
 ```bash
 python scripts/run_nonroad_real.py        # Main OGB-arXiv experiment
-python scripts/verify_ogbn_admissibility.py  # 15-cell admissibility audit
+python scripts/verify_ogbn_admissibility.py  # 15-cell admissibility check
 ```

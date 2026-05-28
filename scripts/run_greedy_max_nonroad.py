@@ -23,19 +23,16 @@ matched-budget hybrid CSV for easy cross-table joining.
 from __future__ import annotations
 
 import csv
-import sys
 import time
 from pathlib import Path
 
 _SCRIPT_DIR = Path(__file__).resolve().parent
 _PROJECT_ROOT = _SCRIPT_DIR.parent
-sys.path.insert(0, str(_PROJECT_ROOT / "src"))
-sys.path.insert(0, str(_PROJECT_ROOT))
 
 import numpy as np
 import torch
-from scripts.run_ablation_selection import greedy_maximize_heuristic
-from scripts.run_synthetic_experiments import (
+from run_ablation_selection import greedy_maximize_heuristic
+from run_synthetic_experiments import (
     GRAPH_SEED,
     NUM_QUERIES,
     QUERY_SEED,
@@ -55,13 +52,11 @@ OUTPUT_DIR = _PROJECT_ROOT / "results" / "greedy_max_nonroad"
 TOTAL_BUDGETS_BYTES = [32, 64, 128]
 K0_FACTOR = 4
 
-
 class TeacherSubset:
     """Lightweight wrapper holding a subset of teacher labels."""
     def __init__(self, d_out: torch.Tensor, d_in: torch.Tensor):
         self.d_out = d_out
         self.d_in = d_in
-
 
 def run_graph(graph_type: str, graph) -> list[dict]:
     lcc_nodes, lcc_seed = compute_strong_lcc(graph)
@@ -144,7 +139,6 @@ def run_graph(graph_type: str, graph) -> list[dict]:
         })
     return rows
 
-
 CSV_COLUMNS = [
     "graph_type", "total_budget_B", "K0_teacher_pool", "m_selected",
     "alt_K_reference", "dij_mean_exp",
@@ -152,7 +146,6 @@ CSV_COLUMNS = [
     "pure_alt_mean_exp", "pure_alt_reduction_pct",
     "greedy_max_prep_s", "notes",
 ]
-
 
 def main() -> None:
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
@@ -171,7 +164,7 @@ def main() -> None:
     all_rows.extend(run_graph("powerlaw_ba", graph_ba))
 
     print(f"\n{'='*70}\n  OGB-ARXIV (~170k nodes, symmetrized LCC)\n{'='*70}")
-    from scripts.run_nonroad_real import load_ogbn_arxiv
+    from run_nonroad_real import load_ogbn_arxiv
     G_arx = load_ogbn_arxiv()
     graph_arx = nx_to_graph(G_arx, weight_seed=GRAPH_SEED)
     print(f"  AAC: {graph_arx.num_nodes:,} nodes, {graph_arx.num_edges:,} edges")
@@ -183,7 +176,6 @@ def main() -> None:
         w.writeheader()
         w.writerows(all_rows)
     print(f"\nWritten: {out}")
-
 
 if __name__ == "__main__":
     main()

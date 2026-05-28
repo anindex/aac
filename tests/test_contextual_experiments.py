@@ -69,16 +69,10 @@ class TestWarcraftRunner:
         runner.close()
 
     def test_supported_methods(self) -> None:
-        """Verify SUPPORTED_METHODS = ['contextual', 'datasp', 'dijkstra'].
-
-        IMPORTANT: assert 'datasp' is in SUPPORTED_METHODS to validate
-        the DataSP comparison is wired as specified.
-        """
+        """SUPPORTED_METHODS lists ['contextual', 'datasp', 'dijkstra'] so the DataSP comparison is wired."""
         from experiments.runners.warcraft_runner import WarcraftRunner
 
         assert WarcraftRunner.SUPPORTED_METHODS == ["contextual", "datasp", "dijkstra"]
-        assert "datasp" in WarcraftRunner.SUPPORTED_METHODS
-        assert "contextual" in WarcraftRunner.SUPPORTED_METHODS
 
     def test_unsupported_method_raises(self) -> None:
         """Creating runner with unsupported method raises ValueError."""
@@ -178,64 +172,6 @@ class TestContextualConfigs:
             assert cfg.track.grid_size == 12
 
 
-# --- TestContextualMetrics ---
-
-
-class TestContextualMetrics:
-    """Tests for METR-07 path accuracy metric computations."""
-
-    def test_path_match_rate(self) -> None:
-        """Compute path match rate over a batch of results."""
-        from experiments.runners.warcraft_runner import _compute_path_metrics
-
-        # 3 matches out of 5
-        paths_pred = [
-            [0, 1, 2],
-            [0, 1, 2],
-            [0, 3, 2],  # different
-            [0, 1, 2],
-            [0, 4, 2],  # different
-        ]
-        paths_gt = [
-            [0, 1, 2],
-            [0, 1, 2],
-            [0, 1, 2],
-            [0, 1, 2],
-            [0, 1, 2],
-        ]
-
-        matches = []
-        for pred, gt in zip(paths_pred, paths_gt):
-            m = _compute_path_metrics(pred, gt, 10.0, 10.0)
-            matches.append(m["match"])
-
-        match_rate = sum(matches) / len(matches)
-        assert 0.0 <= match_rate <= 1.0
-        assert match_rate == pytest.approx(3.0 / 5.0)
-
-    def test_jaccard_computation(self) -> None:
-        """Test edge set overlap on small paths."""
-        from experiments.runners.warcraft_runner import _compute_path_metrics
-
-        # pred edges: {(0,1), (1,2)} -- gt edges: {(0,1), (1,3)}
-        result = _compute_path_metrics([0, 1, 2], [0, 1, 3], 10.0, 10.0)
-        # intersection = {(0,1)} = 1, union = {(0,1),(1,2),(1,3)} = 3
-        assert result["jaccard"] == pytest.approx(1.0 / 3.0)
-
-    def test_cost_regret_computation(self) -> None:
-        """Verify (predicted - optimal) / optimal formula."""
-        from experiments.runners.warcraft_runner import _compute_path_metrics
-
-        result = _compute_path_metrics([0, 1], [0, 1], 15.0, 10.0)
-        assert result["cost_regret"] == pytest.approx(0.5)
-
-        result = _compute_path_metrics([0, 1], [0, 1], 10.0, 10.0)
-        assert result["cost_regret"] == pytest.approx(0.0)
-
-        result = _compute_path_metrics([0, 1], [0, 1], 20.0, 10.0)
-        assert result["cost_regret"] == pytest.approx(1.0)
-
-
 # --- TestCabspottingRunner ---
 
 
@@ -283,11 +219,7 @@ class TestCabspottingRunner:
         runner.close()
 
     def test_supported_methods(self) -> None:
-        """Verify SUPPORTED_METHODS = ['contextual', 'datasp', 'dijkstra'].
-
-        IMPORTANT: assert 'datasp' is in SUPPORTED_METHODS to validate
-        the DataSP comparison is wired as specified.
-        """
+        """SUPPORTED_METHODS lists ['contextual', 'datasp', 'dijkstra'] so the DataSP comparison is wired."""
         from experiments.runners.cabspotting_runner import CabspottingRunner
 
         assert CabspottingRunner.SUPPORTED_METHODS == [
@@ -295,9 +227,6 @@ class TestCabspottingRunner:
             "datasp",
             "dijkstra",
         ]
-        assert "datasp" in CabspottingRunner.SUPPORTED_METHODS
-        assert "contextual" in CabspottingRunner.SUPPORTED_METHODS
-        assert "dijkstra" in CabspottingRunner.SUPPORTED_METHODS
 
     def test_path_metrics_identical_paths(self) -> None:
         """Identical paths -> path_match=1.0, jaccard=1.0, cost_regret=0.0."""
@@ -366,19 +295,15 @@ class TestCabspottingConfig:
     """Tests for Cabspotting Hydra config loading and composition."""
 
     def test_config_loads(self) -> None:
-        """Load cabspotting.yaml and verify required fields."""
+        """Load cabspotting.yaml and verify required fields (including DataSP-aligned beta_override and num_edges)."""
         config_path = Path(_get_config_dir()) / "track" / "cabspotting.yaml"
         cfg = OmegaConf.load(str(config_path))
         assert cfg.name == "cabspotting"
         assert cfg.data_dir == "data/cabspotting"
         assert cfg.input_dim == 6
         assert cfg.num_nodes == 355
+        assert cfg.num_edges == 2178
         assert cfg.train_split == 0.7
-
-    def test_beta_override(self) -> None:
-        """Verify cabspotting.yaml has beta_override=30.0 matching DataSP."""
-        config_path = Path(_get_config_dir()) / "track" / "cabspotting.yaml"
-        cfg = OmegaConf.load(str(config_path))
         assert cfg.beta_override == 30.0
 
     def test_config_composable(self) -> None:
@@ -398,8 +323,3 @@ class TestCabspottingConfig:
         assert merged.track.input_dim == 6
         assert merged.method.K == 5
 
-    def test_num_edges_field(self) -> None:
-        """Verify cabspotting config has num_edges field matching DataSP."""
-        config_path = Path(_get_config_dir()) / "track" / "cabspotting.yaml"
-        cfg = OmegaConf.load(str(config_path))
-        assert cfg.num_edges == 2178

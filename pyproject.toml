@@ -6,7 +6,10 @@ readme = "README.md"
 requires-python = ">=3.11"
 authors = [
     {name = "An T. Le", email = "an@robot-learning.de"},
+    {name = "Vien A. Ngo"},
 ]
+license = "Apache-2.0"
+license-files = ["LICENSE"]
 dependencies = [
     "torch>=2.12.0",
     "scipy>=1.14",
@@ -21,6 +24,7 @@ Repository = "https://github.com/anindex/aac"
 [project.optional-dependencies]
 dev = [
     "pytest>=9.0",
+    "pytest-xdist>=3.5",
     "hypothesis>=6.0",
     "ruff~=0.15",
     "mypy>=2.0",
@@ -75,9 +79,9 @@ ignore = [
 ]
 
 [tool.ruff.lint.per-file-ignores]
-"scripts/*.py" = ["E402", "F841"]   # sys.path manipulation before imports; result-capture vars
+"scripts/*.py" = ["E402", "F841"]   # matplotlib.use("Agg") before imports; result-capture vars
 "tests/*.py" = ["E402", "F841"]     # fixture imports; assertion intermediate vars
-"examples/*.py" = ["E402"]          # sys.path manipulation
+"examples/*.py" = ["E402"]          # matplotlib backend setup
 
 [tool.ruff.lint.isort]
 known-first-party = ["aac", "experiments"]

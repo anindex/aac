@@ -15,14 +15,11 @@ from __future__ import annotations
 
 import argparse
 import csv
-import sys
 import time
 from pathlib import Path
 
 _SCRIPT_DIR = Path(__file__).resolve().parent
 _PROJECT_ROOT = _SCRIPT_DIR.parent
-sys.path.insert(0, str(_PROJECT_ROOT / "src"))
-sys.path.insert(0, str(_PROJECT_ROOT))
 
 import networkx as nx
 import numpy as np
@@ -57,7 +54,6 @@ BUDGETS = [
     {"label": "128", "alt_K": 32, "cdh_P": 64, "cdh_r": 25},
 ]
 
-
 def _generate_sbm() -> Graph:
     """5-community SBM with 10k vertices. Matches run_synthetic_experiments.py."""
     sizes = [2000] * 5
@@ -75,7 +71,6 @@ def _generate_sbm() -> Graph:
     tgt = torch.tensor([v for _, v in edges], dtype=torch.int64)
     wts = torch.tensor(rng.uniform(1.0, 10.0, size=len(edges)), dtype=torch.float64)
     return edges_to_graph(src, tgt, wts, num_nodes=G.number_of_nodes(), is_directed=False)
-
 
 def _run_seeded(graph: Graph, lcc_seed: int, lcc_tensor: torch.Tensor,
                 budget: dict, seed: int, queries: list, dij_exps: np.ndarray) -> list[dict]:
@@ -132,7 +127,6 @@ def _run_seeded(graph: Graph, lcc_seed: int, lcc_tensor: torch.Tensor,
     })
     return rows
 
-
 def run_comparison(graph: Graph, graph_name: str, seeds: list[int],
                    budgets: list[dict], num_queries: int) -> list[dict]:
     lcc_nodes, lcc_seed = compute_strong_lcc(graph)
@@ -159,7 +153,6 @@ def run_comparison(graph: Graph, graph_name: str, seeds: list[int],
                       f"reduction={row['mean_reduction_vs_dijkstra']*100:.1f}%")
                 all_rows.append(row)
     return all_rows
-
 
 def main():
     ap = argparse.ArgumentParser()
@@ -198,7 +191,6 @@ def main():
         w.writerows(rows)
     print(f"Wrote {len(rows)} rows to {out}")
     return 0
-
 
 if __name__ == "__main__":
     raise SystemExit(main())

@@ -1,9 +1,9 @@
 #!/usr/bin/env python
-"""Admissibility audit for OGB-arXiv.
+"""Admissibility check for OGB-arXiv.
 
-Theorem 2 guarantees AAC admissibility architecturally; max(admissible,
+Proposition 2 guarantees AAC admissibility architecturally; max(admissible,
 admissible) preserves admissibility. This script is an independent empirical
-audit of the ALT pipeline on the weighted OGB-arXiv graph at the same
+verification of the ALT pipeline on the weighted OGB-arXiv graph at the same
 (seed, budget) cells the pre-registered prediction was evaluated on, plus a
 20-query sanity check at K=16. It writes:
 
@@ -17,12 +17,9 @@ admissibility violations" claim (Section 5.9.3 / Appendix E.3).
 from __future__ import annotations
 
 import csv
-import sys
 from pathlib import Path
 
 _PROJECT_ROOT = Path(__file__).resolve().parent.parent
-sys.path.insert(0, str(_PROJECT_ROOT / "src"))
-sys.path.insert(0, str(_PROJECT_ROOT))
 
 import numpy as np
 
@@ -33,8 +30,8 @@ import torch as _torch
 _orig_load = _torch.load
 _torch.load = lambda *a, **kw: _orig_load(*a, **{**kw, "weights_only": False})
 
-from scripts.run_nonroad_real import load_ogbn_arxiv
-from scripts.run_synthetic_experiments import nx_to_graph
+from run_nonroad_real import load_ogbn_arxiv
+from run_synthetic_experiments import nx_to_graph
 
 from aac.baselines.alt import alt_preprocess, make_alt_heuristic
 from aac.search.astar import astar
@@ -49,9 +46,8 @@ SEEDS = [42, 123, 456, 789, 1024]
 BUDGETS = [(32, 4), (64, 8), (128, 16)]
 NUM_QUERIES = 100
 
-
-def _audit_cell(graph, K: int, seed: int, num_queries: int) -> dict:
-    """Run admissibility audit over ``num_queries`` random pairs at ALT K."""
+def _check_cell(graph, K: int, seed: int, num_queries: int) -> dict:
+    """Run an admissibility check over ``num_queries`` random pairs at ALT K."""
     V = graph.num_nodes
     rng = np.random.default_rng(seed)
     srcs = rng.integers(0, V, size=num_queries)
@@ -82,7 +78,6 @@ def _audit_cell(graph, K: int, seed: int, num_queries: int) -> dict:
         "max_ratio": float(max_ratio),
     }
 
-
 def main() -> int:
     print("Loading OGB-arXiv ...")
     nxg = load_ogbn_arxiv()
@@ -97,7 +92,7 @@ def main() -> int:
     for budget_bpv, K in BUDGETS:
         for seed in SEEDS:
             print(f"  cell: B={budget_bpv} B/v (ALT K={K}), seed={seed}")
-            res = _audit_cell(graph, K, seed, NUM_QUERIES)
+            res = _check_cell(graph, K, seed, NUM_QUERIES)
             row = {
                 "graph": "ogbn_arxiv",
                 "budget_bpv": budget_bpv,
@@ -126,7 +121,6 @@ def main() -> int:
     print(f"Wrote {OUTPUT_CSV}")
     print(f"Summary: {n_clean}/{n_cells} cells with zero admissibility violations")
     return 0
-
 
 if __name__ == "__main__":
     raise SystemExit(main())

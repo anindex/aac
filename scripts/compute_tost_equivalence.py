@@ -22,10 +22,9 @@ OUTPUT = PROJECT_ROOT / "results" / "synthetic" / "tost_equivalence.csv"
 DELTA = 1.0  # equivalence margin in percentage points
 ALPHA = 0.05
 
-
 def _student_t_sf(t: float, df: int) -> float:
     """Survival function of Student's t (two arguments). Tries scipy then
-    falls back to a numerical approximation of the regularised incomplete
+    falls back to a numerical approximation of the regularized incomplete
     beta function (Abramowitz-Stegun 26.5.27)."""
     try:
         from scipy.stats import t as _t  # type: ignore
@@ -36,11 +35,10 @@ def _student_t_sf(t: float, df: int) -> float:
         x = df / (df + t * t)
         return 0.5 * _betainc_reg(df / 2.0, 0.5, x) if t >= 0 else 1.0 - 0.5 * _betainc_reg(df / 2.0, 0.5, df / (df + t * t))
 
-
 def _betainc_reg(a: float, b: float, x: float) -> float:
-    """Regularised incomplete beta function I_x(a,b) via continued fraction
+    """Regularized incomplete beta function I_x(a,b) via continued fraction
     (Numerical Recipes-style). Pure-Python fallback used only if scipy is
-    unavailable; not optimised."""
+    unavailable; not optimized."""
     if x < 0 or x > 1:
         raise ValueError("x must be in [0, 1]")
     if x == 0 or x == 1:
@@ -53,7 +51,6 @@ def _betainc_reg(a: float, b: float, x: float) -> float:
     if x < (a + 1.0) / (a + b + 2.0):
         return bt * _betacf(a, b, x) / a
     return 1.0 - bt * _betacf(b, a, 1.0 - x) / b
-
 
 def _betacf(a: float, b: float, x: float, max_iter: int = 200, eps: float = 3e-7) -> float:
     qab, qap, qam = a + b, a + 1.0, a - 1.0
@@ -86,7 +83,6 @@ def _betacf(a: float, b: float, x: float, max_iter: int = 200, eps: float = 3e-7
         if abs(delta - 1.0) < eps:
             return h
     return h
-
 
 def main() -> int:
     cells: dict[tuple[str, int], list[float]] = defaultdict(list)
@@ -151,7 +147,6 @@ def main() -> int:
     with OUTPUT.open() as f:
         print(f.read())
     return 0
-
 
 if __name__ == "__main__":
     raise SystemExit(main())

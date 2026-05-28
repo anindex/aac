@@ -1,11 +1,27 @@
 cff-version: 1.2.0
-message: "If you use this software, please cite it as below."
+message: "If you use this software, please cite the preferred-citation entry below."
 title: "AAC: Admissible-by-Architecture Differentiable Landmark Compression for ALT"
+version: "1.0.0"
 type: software
 authors:
   - family-names: Le
     given-names: An T.
     email: an@robot-learning.de
     orcid: "https://orcid.org/0000-0003-0929-3316"
+  - family-names: Ngo
+    given-names: Vien A.
 repository-code: "https://github.com/anindex/aac"
+url: "https://github.com/anindex/aac"
+license: Apache-2.0
 date-released: "2026-04-22"
+preferred-citation:
+  type: article
+  title: "AAC: Admissible-by-Architecture Differentiable Landmark Compression for ALT"
+  authors:
+    - family-names: Le
+      given-names: An T.
+    - family-names: Ngo
+      given-names: Vien A.
+  year: 2026
+  journal: "arXiv preprint arXiv:2604.20744"
+  url: "https://arxiv.org/abs/2604.20744"

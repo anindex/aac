@@ -9,7 +9,7 @@
 
 At deployment the module reduces to classical ALT on the learned subset, preserving the full classical toolchain (BPMX, bound substitution, bidirectional search).
 
-> **Paper:** *"AAC: An Admissible-by-Architecture Differentiable Compressor for Learned ALT Landmark Selection"* -- An T. Le and Vien Ngo ([arXiv:2604.20744](https://arxiv.org/abs/2604.20744)).
+> **Paper:** *"AAC: Admissible-by-Architecture Differentiable Landmark Compression for ALT"* -- An T. Le and Vien A. Ngo ([arXiv:2604.20744](https://arxiv.org/abs/2604.20744)).
 
 <p align="center">
   <img src="assets/showcase_training.gif" alt="AAC training dynamics: expansion heatmap with landmarks, selection matrix sharpening, and loss curve" width="900">
@@ -23,7 +23,7 @@ At deployment the module reduces to classical ALT on the learned subset, preserv
   <img src="assets/method_diagram.png" alt="AAC method diagram" width="800">
 </p>
 
-AAC learns *which* landmarks matter by parameterizing a row-stochastic compression matrix **A** over a pool of K teacher landmarks (selected by farthest-point sampling). Each of the m output dimensions is a convex combination of teacher distances. Since a convex combination of admissible lower bounds is itself admissible (Proposition 1 in the paper), the compressed heuristic is admissible for every value of **A** -- not just at convergence, but at initialization and every intermediate checkpoint.
+AAC learns *which* landmarks matter by parameterizing a row-stochastic compression matrix **A** over a pool of K teacher landmarks (selected by farthest-point sampling). Each of the m output dimensions is a convex combination of teacher distances. Since a convex combination of admissible lower bounds is itself admissible (Proposition 2 in the paper), the compressed heuristic is admissible for every value of **A** -- not just at convergence, but at initialization and every intermediate checkpoint.
 
 During training, Gumbel-softmax annealing sharpens each row of **A** from a diffuse mixture toward a one-hot selection, so the final model selects a discrete landmark subset. The training objective minimizes the gap between the learned heuristic and the teacher, driving the selected landmarks toward those that most reduce A\* node expansions.
 
@@ -33,7 +33,7 @@ AAC provides three compression architectures, all with provable admissibility gu
 
 | Architecture | Mechanism | Guarantee | Use Case |
 |---|---|---|---|
-| **LinearCompressor** (primary) | Row-stochastic Gumbel-softmax selection | Convex combination ≤ max (Prop. 1) | Standard landmark selection |
+| **LinearCompressor** (primary) | Row-stochastic Gumbel-softmax selection | Convex combination ≤ max (Prop. 2) | Standard landmark selection |
 | **LipschitzCompressor** | 1-Lipschitz neural network (GroupSort + spectral norm) | L∞ contraction (Theorem) | Nonlinear compression |
 | **PositiveCompressor** | Log-domain max-plus contraction | Max-plus contraction | Tropical embedding compression |
 
@@ -58,7 +58,7 @@ Standard [farthest-point sampling](https://en.wikipedia.org/wiki/Farthest-first_
 <p align="center">
   <img src="assets/expansion_comparison.gif" alt="Dijkstra vs ALT vs AAC search expansion comparison" width="800">
   <br>
-  <em>A* search expansions: Dijkstra (no heuristic) vs ALT (K=16 landmarks) vs AAC (m=16 from K₀=32). At matched memory, AAC achieves competitive search focus through learned landmark selection.</em>
+  <em>A* search expansions on a 30×30 maze: Dijkstra (no heuristic) vs ALT (K=16 landmarks) vs AAC (m=16 from K₀=32). At matched memory, AAC achieves competitive search focus through learned landmark selection. Regenerate with <code>python scripts/generate_readme_gif.py</code>.</em>
 </p>
 
 ## Key Results
@@ -162,7 +162,7 @@ src/
                             (DIMACS, OSMnx, Warcraft, Cabspotting)
 scripts/                 -- experiment scripts, figure/table generators
                             (50+ scripts, see scripts/README.md)
-tests/                   -- pytest suite (25 modules, 360+ tests)
+tests/                   -- pytest suite (20 modules, ~330 tests)
 results/                 -- experiment outputs (CSVs, logs); see results/README.md
 examples/                -- three self-contained demos (no dataset downloads)
 ```
@@ -186,7 +186,7 @@ If you find this work useful, please consider citing:
 
 ```bibtex
 @article{le2026aac,
-  title={AAC: An Admissible-by-Architecture Differentiable Compressor for Learned ALT Landmark Selection},
+  title={AAC: Admissible-by-Architecture Differentiable Landmark Compression for ALT},
   author={Le, An T. and Ngo, Vien A.},
   journal={arXiv preprint arXiv:2604.20744},
   year={2026}
@@ -195,6 +195,6 @@ If you find this work useful, please consider citing:
 
 ## License
 
-Copyright © 2026 An T. Le. All Rights Reserved.
+Apache License 2.0. See [`LICENSE`](LICENSE) for the full text.
 
-This code is provided solely for academic peer-review and reproducibility purposes. No license is granted for commercial or derivative use.
+Copyright © 2026 An T. Le and Vien A. Ngo.

@@ -1,10 +1,15 @@
-"""Tests for graph data structures, conversion, and validation."""
+"""Tests for graph data structures, conversion, validation, and NPZ I/O."""
 
+import pickle
+import zipfile
+
+import numpy as np
 import pytest
 import scipy.sparse
 import torch
 
 from aac.graphs.convert import edges_to_graph, graph_to_scipy, scipy_to_graph
+from aac.graphs.io import load_graph_npz, save_graph_npz
 from aac.graphs.types import Graph
 from aac.graphs.validate import validate_graph
 
@@ -148,3 +153,110 @@ class TestValidation:
     def test_validate_passes_on_valid_undirected(self, small_undirected_graph: Graph) -> None:
         """validate_graph passes on valid undirected graph."""
         validate_graph(small_undirected_graph)  # Should not raise
+
+
+# ---------------------------------------------------------------------------
+# NPZ serialization (formerly tests/test_io.py)
+# ---------------------------------------------------------------------------
+
+
+@pytest.fixture
+def graph_with_coordinates() -> Graph:
+    """5-node directed graph with (V, 2) coordinates."""
+    s = torch.tensor([0, 0, 1, 1, 2, 2, 3], dtype=torch.int64)
+    t = torch.tensor([1, 2, 2, 3, 3, 4, 4], dtype=torch.int64)
+    w = torch.tensor([2.0, 5.0, 1.0, 6.0, 2.0, 7.0, 1.0], dtype=torch.float64)
+    coords = torch.tensor(
+        [[0.0, 0.0], [1.0, 0.0], [1.0, 1.0], [2.0, 1.0], [2.0, 2.0]],
+        dtype=torch.float64,
+    )
+    return edges_to_graph(s, t, w, 5, is_directed=True, coordinates=coords)
+
+
+class TestNpzIO:
+    """Round-trip tests for save_graph_npz / load_graph_npz."""
+
+    def test_npz_roundtrip_directed(self, tmp_path, small_directed_graph) -> None:
+        """Save directed graph to NPZ and load back. All fields must match exactly."""
+        path = tmp_path / "graph.npz"
+        save_graph_npz(small_directed_graph, path)
+        loaded = load_graph_npz(path)
+
+        assert torch.equal(loaded.crow_indices, small_directed_graph.crow_indices)
+        assert torch.equal(loaded.col_indices, small_directed_graph.col_indices)
+        assert torch.equal(loaded.values, small_directed_graph.values)
+        assert loaded.num_nodes == small_directed_graph.num_nodes
+        assert loaded.num_edges == small_directed_graph.num_edges
+        assert loaded.is_directed is True
+        assert loaded.coordinates is None
+
+    def test_npz_roundtrip_undirected(self, tmp_path, small_undirected_graph) -> None:
+        """Save undirected graph to NPZ and load back. is_directed=False must round-trip."""
+        path = tmp_path / "graph.npz"
+        save_graph_npz(small_undirected_graph, path)
+        loaded = load_graph_npz(path)
+
+        assert torch.equal(loaded.crow_indices, small_undirected_graph.crow_indices)
+        assert torch.equal(loaded.col_indices, small_undirected_graph.col_indices)
+        assert torch.equal(loaded.values, small_undirected_graph.values)
+        assert loaded.num_nodes == small_undirected_graph.num_nodes
+        assert loaded.num_edges == small_undirected_graph.num_edges
+        assert loaded.is_directed is False
+
+    def test_npz_roundtrip_with_coordinates(self, tmp_path, graph_with_coordinates) -> None:
+        """Graph with coordinates=(V, 2). Loaded coordinates must match exactly."""
+        path = tmp_path / "graph.npz"
+        save_graph_npz(graph_with_coordinates, path)
+        loaded = load_graph_npz(path)
+
+        assert loaded.coordinates is not None
+        assert torch.equal(loaded.coordinates, graph_with_coordinates.coordinates)
+
+    def test_npz_roundtrip_no_coordinates(self, tmp_path, small_directed_graph) -> None:
+        """Graph without coordinates. Loaded graph must have coordinates=None."""
+        path = tmp_path / "graph.npz"
+        save_graph_npz(small_directed_graph, path)
+        loaded = load_graph_npz(path)
+
+        assert loaded.coordinates is None
+
+    def test_npz_dtypes_preserved(self, tmp_path, small_directed_graph) -> None:
+        """CSR arrays must preserve their dtypes after round-trip."""
+        path = tmp_path / "graph.npz"
+        save_graph_npz(small_directed_graph, path)
+        loaded = load_graph_npz(path)
+
+        assert loaded.crow_indices.dtype == torch.int64
+        assert loaded.col_indices.dtype == torch.int64
+        assert loaded.values.dtype == torch.float64
+
+    def test_npz_load_rejects_pickle(self, tmp_path) -> None:
+        """np.load must be called with allow_pickle=False -- pickle-based files must fail."""
+        path = tmp_path / "malicious.npz"
+        with zipfile.ZipFile(str(path), "w") as zf:
+            # Write a pickle-based .npy entry
+            buf = pickle.dumps({"malicious": True})
+            zf.writestr("crow_indices.npy", buf)
+
+        with pytest.raises((ValueError, Exception)):
+            load_graph_npz(path)
+
+    def test_npz_load_missing_keys(self, tmp_path) -> None:
+        """NPZ file missing required keys must raise ValueError with descriptive message."""
+        path = tmp_path / "incomplete.npz"
+        np.savez(str(path), crow_indices=np.array([0, 1, 2]))
+
+        with pytest.raises(ValueError, match="missing required keys"):
+            load_graph_npz(path)
+
+    def test_npz_suffix_handling(self, tmp_path, small_directed_graph) -> None:
+        """Saving to a path without .npz suffix must still create a loadable file."""
+        path = tmp_path / "graph_no_suffix"
+        save_graph_npz(small_directed_graph, path)
+
+        # np.savez automatically appends .npz if not present
+        actual_path = tmp_path / "graph_no_suffix.npz"
+        loaded = load_graph_npz(actual_path)
+
+        assert torch.equal(loaded.crow_indices, small_directed_graph.crow_indices)
+        assert loaded.num_nodes == small_directed_graph.num_nodes

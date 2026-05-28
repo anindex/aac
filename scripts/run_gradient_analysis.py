@@ -14,18 +14,9 @@ import csv
 import math
 import os
 import random
-import sys
 import time
-from pathlib import Path
 
 # Make src/ importable so `aac` and `experiments` resolve to src/.
-_project_root = str(Path(__file__).resolve().parent.parent)
-_src_dir = str(Path(_project_root) / "src")
-if _src_dir not in sys.path:
-    sys.path.insert(0, _src_dir)
-if _project_root not in sys.path:
-    sys.path.insert(0, _project_root)
-
 import scipy.sparse.csgraph
 import torch
 import torch.nn as nn
@@ -79,7 +70,6 @@ CSV_COLUMNS = [
     "loss",
 ]
 
-
 # ---------------------------------------------------------------------------
 # Gradient collection
 # ---------------------------------------------------------------------------
@@ -116,7 +106,6 @@ def collect_gradient_norms(
         result[f"{name}_max_grad"] = max_norm
 
     return result
-
 
 # ---------------------------------------------------------------------------
 # Custom training loop with gradient logging
@@ -249,7 +238,6 @@ def run_gradient_analysis(
 
     return records
 
-
 # ---------------------------------------------------------------------------
 # Main
 # ---------------------------------------------------------------------------
@@ -354,7 +342,6 @@ def main() -> None:
 
     print("=" * 70)
     print("Done.")
-
 
 if __name__ == "__main__":
     main()

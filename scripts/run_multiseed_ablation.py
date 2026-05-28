@@ -63,7 +63,6 @@ PATIENCE = 15
 
 ABLATION_MODES = ["full_e2e", "frozen_compressor", "frozen_encoder"]
 
-
 def _build_encoder(encoder_kind: str) -> nn.Module:
     """Construct the requested encoder for the Warcraft 12x12 grid maps."""
     if encoder_kind == "cnn":
@@ -74,11 +73,9 @@ def _build_encoder(encoder_kind: str) -> nn.Module:
         f"Unknown encoder kind {encoder_kind!r}; expected 'cnn' or 'resnet'."
     )
 
-
 def freeze_params(module: nn.Module, freeze: bool) -> None:
     for param in module.parameters():
         param.requires_grad_(not freeze)
-
 
 def _path_cost_on_graph(path, graph) -> float:
     if len(path) < 2:
@@ -108,7 +105,6 @@ def _path_cost_on_graph(path, graph) -> float:
             raise ValueError(f"Edge ({u}, {v}) not found in graph")
     return total
 
-
 def _compute_path_metrics(pred_path, gt_path, pred_cost, opt_cost):
     pred_edges = set(zip(pred_path[:-1], pred_path[1:])) if len(pred_path) > 1 else set()
     gt_edges = set(zip(gt_path[:-1], gt_path[1:])) if len(gt_path) > 1 else set()
@@ -121,7 +117,6 @@ def _compute_path_metrics(pred_path, gt_path, pred_cost, opt_cost):
         jaccard = len(pred_edges & gt_edges) / len(pred_edges | gt_edges)
     cost_regret = (pred_cost - opt_cost) / opt_cost if opt_cost > 0 and not math.isinf(opt_cost) else 0.0
     return {"match": match, "jaccard": jaccard, "cost_regret": cost_regret}
-
 
 def train_and_evaluate(
     mode: str,
@@ -214,7 +209,6 @@ def train_and_evaluate(
     print(f"    Results: match={result['path_match']:.3f}, jaccard={result['jaccard']:.3f}, regret={result['cost_regret']:.4f}")
     return result
 
-
 def _parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description=(
@@ -239,7 +233,6 @@ def _parse_args() -> argparse.Namespace:
              "Paper's ResNet row uses --alpha-cost 10.",
     )
     return parser.parse_args()
-
 
 def main():
     args = _parse_args()
@@ -408,7 +401,6 @@ def main():
               f"{row['cost_regret_mean']:.4f}+/-{row['cost_regret_std']:.4f}")
 
     print(f"\nResults: {per_seed_tagged}, {agg_tagged}, {compat_path}")
-
 
 if __name__ == "__main__":
     main()

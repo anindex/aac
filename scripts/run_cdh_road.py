@@ -14,14 +14,11 @@ from __future__ import annotations
 
 import argparse
 import csv
-import sys
 import time
 from pathlib import Path
 
 _SCRIPT_DIR = Path(__file__).resolve().parent
 _PROJECT_ROOT = _SCRIPT_DIR.parent
-sys.path.insert(0, str(_PROJECT_ROOT / "src"))
-sys.path.insert(0, str(_PROJECT_ROOT))
 
 import numpy as np
 import torch
@@ -65,13 +62,11 @@ GRAPHS = {
                   "co": "data/dimacs/USA-road-d.NY.co"},
 }
 
-
 def _load(graph_key: str) -> Graph:
     spec = GRAPHS[graph_key]
     if spec["loader"] == "osmnx":
         return load_graph_npz(_PROJECT_ROOT / spec["path"])
     return load_dimacs(_PROJECT_ROOT / spec["gr"], _PROJECT_ROOT / spec["co"])
-
 
 def _run_seeded(graph: Graph, lcc_seed: int, lcc_tensor: torch.Tensor,
                 budget: dict, seed: int, queries: list,
@@ -145,7 +140,6 @@ def _run_seeded(graph: Graph, lcc_seed: int, lcc_tensor: torch.Tensor,
         })
     return rows
 
-
 def run_comparison(graph: Graph, graph_name: str, seeds: list[int],
                    budgets: list[dict], num_queries: int) -> list[dict]:
     lcc_nodes, lcc_seed = compute_strong_lcc(graph)
@@ -178,7 +172,6 @@ def run_comparison(graph: Graph, graph_name: str, seeds: list[int],
                 all_rows.append(row)
     return all_rows
 
-
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--graph", required=True, choices=sorted(GRAPHS.keys()))
@@ -201,7 +194,6 @@ def main():
         w.writeheader()
         w.writerows(rows)
     print(f"Wrote {len(rows)} rows to {out}", flush=True)
-
 
 if __name__ == "__main__":
     main()

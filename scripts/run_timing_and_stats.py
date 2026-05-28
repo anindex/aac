@@ -18,18 +18,9 @@ Outputs:
 from __future__ import annotations
 
 import os
-import sys
 import time
-from pathlib import Path
 
 # Make src/ importable so `experiments` resolves to src/experiments/.
-_project_root = str(Path(__file__).resolve().parent.parent)
-_src_dir = str(Path(_project_root) / "src")
-if _src_dir not in sys.path:
-    sys.path.insert(0, _src_dir)
-if _project_root not in sys.path:
-    sys.path.insert(0, _project_root)
-
 import numpy as np
 import torch
 
@@ -147,7 +138,6 @@ def preprocess_aac_standalone(graph, K0: int, m: int) -> tuple:
     )
     return heuristic, preprocess_metrics
 
-
 def preprocess_alt_standalone(graph, num_landmarks: int) -> tuple:
     """ALT preprocessing: FPS -> SSSP -> heuristic.
 
@@ -182,7 +172,6 @@ def preprocess_alt_standalone(graph, num_landmarks: int) -> tuple:
     )
     return heuristic, preprocess_metrics
 
-
 def run_queries(graph, heuristic, queries: list[tuple[int, int]]) -> tuple:
     """Run A* queries and collect per-query expansions and latency.
 
@@ -200,7 +189,6 @@ def run_queries(graph, heuristic, queries: list[tuple[int, int]]) -> tuple:
         latency_ms_list.append(elapsed_ms)
 
     return expansions_list, latency_ms_list
-
 
 def main() -> None:
     """Run timing benchmarks and Wilcoxon tests on all DIMACS graphs."""
@@ -434,7 +422,6 @@ def main() -> None:
             print(f"{graph_name:<8} {aac_p50:>9.1f}ms {aac_p95:>9.1f}ms {alt_p50:>9.1f}ms {alt_p95:>9.1f}ms {wrow['reduction_pct']:>7.1f}% {wrow['p_value_less']:>12.2e}")
     print(f"{'='*70}")
     print("Done.")
-
 
 if __name__ == "__main__":
     main()

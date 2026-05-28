@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""Audit result CSVs that log per-run path optimality.
+"""Check result CSVs that log per-run path optimality.
 
 Several experiment CSVs include an ``all_optimal`` boolean column recording
 whether A*-without-reopenings, under the tested admissible heuristic, returned
@@ -11,9 +11,9 @@ The main DIMACS/OSMnx multi-seed Wilcoxon, hybrid, and Pareto CSVs do not
 carry this column (only admissibility-violation counts and expansion numbers
 are logged); path-cost checks on those benchmarks were performed at run time
 but not persisted. The paper's path-optimality claim in Section 5.5 is
-therefore scoped to the five audited benchmarks below; for the remaining
+therefore scoped to the five checked benchmarks below; for the remaining
 benchmarks we rely on the architectural admissibility chain
-(Theorem~\ref{thm:admissibility}) together with the zero admissibility-
+(Proposition 2) together with the zero admissibility-
 violation counts reported in their CSVs.
 """
 from __future__ import annotations
@@ -22,7 +22,7 @@ import csv
 import sys
 from pathlib import Path
 
-AUDITED = [
+CHECKED = [
     "results/ablation_selection/exp1_selection_strategy.csv",
     "results/ablation_selection/exp2_admissibility_robustness.csv",
     "results/coverage_aware/coverage_aware_results.csv",
@@ -39,7 +39,6 @@ PER_QUERY_DIMACS = [
     "results/dimacs/aac_COL.csv",
 ]
 
-
 def _parse_bool(x: str) -> bool | None:
     if x is None:
         return None
@@ -52,8 +51,7 @@ def _parse_bool(x: str) -> bool | None:
         return None
     return None
 
-
-def audit(path: Path) -> tuple[int, int, list[int]]:
+def check_path_optimality(path: Path) -> tuple[int, int, list[int]]:
     """Return (n_rows, n_optimal, suboptimal_row_indices)."""
     with path.open() as f:
         reader = csv.DictReader(f)
@@ -70,17 +68,16 @@ def audit(path: Path) -> tuple[int, int, list[int]]:
         # None -> column missing or blank; skip (does not count against total)
     return n_rows, n_opt, suboptimal
 
-
 def main() -> int:
     repo = Path(__file__).resolve().parent.parent
     any_fail = False
     summary_rows = []
-    for rel in AUDITED:
+    for rel in CHECKED:
         p = repo / rel
         if not p.exists():
             print(f"[SKIP] {rel}: not found")
             continue
-        n, n_opt, bad = audit(p)
+        n, n_opt, bad = check_path_optimality(p)
         status = "OK" if not bad else "FAIL"
         if bad:
             any_fail = True
@@ -93,7 +90,7 @@ def main() -> int:
         print(f"[{status}] {rel}: {n_opt}/{n} rows all_optimal=True{detail}")
         summary_rows.append((rel, n, n_opt, len(bad)))
 
-    # Per-query DIMACS audit: column is "optimal" rather than "all_optimal".
+    # Per-query DIMACS check: column is "optimal" rather than "all_optimal".
     for rel in PER_QUERY_DIMACS:
         p = repo / rel
         if not p.exists():
@@ -121,7 +118,6 @@ def main() -> int:
             w.writerow(row)
     print(f"\nSummary written to {out.relative_to(repo)}")
     return 1 if any_fail else 0
-
 
 if __name__ == "__main__":
     sys.exit(main())

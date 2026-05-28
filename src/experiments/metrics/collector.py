@@ -158,7 +158,7 @@ class MetricsCollector:
                 if q.cost - q.ref_cost > suboptimality_atol:
                     num_violations += 1
         else:
-            # Fallback: use the optimal flag (legacy behaviour)
+            # Fallback: use the optimal flag (legacy behavior)
             num_violations = sum(1 for q in self._queries if not q.optimal)
 
         return {

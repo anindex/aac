@@ -25,13 +25,11 @@ GRAPH_DISPLAY = {
 ALT_K_VALUES = [4, 8, 16, 32]  # corresponds to 32, 64, 128, 256 B/v
 HIT_CONFIGS = [(16, 8), (32, 8), (32, 16), (64, 16), (64, 32)]
 
-
 def fmt(mean, std, bold=False):
     std_val = std if not np.isnan(std) else 0.0
     if bold:
         return f"$\\mathbf{{{mean:.1f} \\pm {std_val:.1f}}}$"
     return f"${mean:.1f} \\pm {std_val:.1f}$"
-
 
 def main():
     df = pd.read_csv(INPUT_PATH)
@@ -135,7 +133,6 @@ def main():
     print(f"Written to {OUTPUT_PATH}")
     print()
     print(table)
-
 
 if __name__ == "__main__":
     main()

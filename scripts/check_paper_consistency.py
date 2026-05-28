@@ -56,12 +56,10 @@ HEADER_END = "%%% END-PROVENANCE"
 FIELD_RE = re.compile(r"^%%%\s*(generator|sources|paper-ref|verify):\s*(.*)$")
 CONT_RE = re.compile(r"^%%%\s+(\S.*)$")
 
-
 class Provenance(NamedTuple):
     generator: str
     sources: list[Path]
     paper_ref: str
-
 
 def parse_provenance(tex_path: Path) -> Provenance | None:
     """Parse the %%% PAPER-TABLE-PROVENANCE block. Returns None if missing."""
@@ -91,7 +89,6 @@ def parse_provenance(tex_path: Path) -> Provenance | None:
         sources=sources,
         paper_ref=" ".join(fields.get("paper-ref", [""])),
     )
-
 
 # ---------------------------------------------------------------------------
 # Table body tokenisation
@@ -129,15 +126,13 @@ PARAM_ASSIGN_RE = re.compile(r"[A-Za-z_\\][A-Za-z_0-9\\{}\\^]*\s*[{=]?=[}=]?\s*-
 THOUSANDS_BRACE_RE = re.compile(r"(\d)\{,\}(\d)")
 THOUSANDS_COMMA_RE = re.compile(r"(\d),(\d)")
 
-
-def normalise_thousands(s: str) -> str:
+def normalize_thousands(s: str) -> str:
     while True:
         new = THOUSANDS_BRACE_RE.sub(r"\1\2", s)
         new = THOUSANDS_COMMA_RE.sub(r"\1\2", new)
         if new == s:
             return s
         s = new
-
 
 def extract_data_cells(tex_path: Path) -> list[tuple[int, str]]:
     """Return [(line_no, raw_cell_content)] for every data cell in the table.
@@ -173,14 +168,13 @@ def extract_data_cells(tex_path: Path) -> list[tuple[int, str]]:
         line_offset += 1
     return cells
 
-
 def tokens_for_csv(cell: str) -> list[str]:
     """Return numeric tokens to look up in CSVs.
 
     Converts LaTeX scientific notation (1.3 \\times 10^{-3}) to canonical
     (1.3e-3); strips thousands braces; skips parameter assignments.
     """
-    cell = normalise_thousands(cell)
+    cell = normalize_thousands(cell)
     out: list[str] = []
     # First: scientific notation.
     for sci_match in SCI_RE.finditer(cell):
@@ -201,11 +195,9 @@ def tokens_for_csv(cell: str) -> list[str]:
     seen: set[str] = set()
     return [t for t in out if not (t in seen or seen.add(t))]
 
-
 # ---------------------------------------------------------------------------
-# CSV side: load every numeric cell as a normalised string set
+# CSV side: load every numeric cell as a normalized string set
 # ---------------------------------------------------------------------------
-
 
 def load_csv_strings(csv_path: Path) -> tuple[set[str], list[float]]:
     """Return (string-set, float-list) of every cell in csv_path.
@@ -230,7 +222,6 @@ def load_csv_strings(csv_path: Path) -> tuple[set[str], list[float]]:
                 except ValueError:
                     continue
     return strings, floats
-
 
 def load_json_strings(json_path: Path) -> tuple[set[str], list[float]]:
     """Recursively flatten every numeric leaf in a JSON document."""
@@ -260,7 +251,6 @@ def load_json_strings(json_path: Path) -> tuple[set[str], list[float]]:
         pass
     return strings, floats
 
-
 def value_matches(token: str, strings: set[str], floats: list[float]) -> bool:
     """Return True if token appears in CSV (string) or matches a CSV float."""
     if token in strings:
@@ -285,11 +275,9 @@ def value_matches(token: str, strings: set[str], floats: list[float]) -> bool:
             return True
     return False
 
-
 # ---------------------------------------------------------------------------
 # Per-table check
 # ---------------------------------------------------------------------------
-
 
 class TableResult(NamedTuple):
     table: Path
@@ -298,7 +286,6 @@ class TableResult(NamedTuple):
     warned: int
     missing_sources: list[Path]
     warn_samples: list[tuple[str, str]]  # (cell, token)
-
 
 def check_table(tex_path: Path, max_warn_samples: int = 5) -> TableResult:
     prov = parse_provenance(tex_path)
@@ -333,7 +320,6 @@ def check_table(tex_path: Path, max_warn_samples: int = 5) -> TableResult:
         return TableResult(tex_path, "PASS", found, 0, [], [])
     return TableResult(tex_path, "WARN", found, warned, [], warn_samples)
 
-
 # ---------------------------------------------------------------------------
 # Unescaped-% guard for matplotlib label strings
 # ---------------------------------------------------------------------------
@@ -355,7 +341,6 @@ _PLOT_SCAN_DIRS = (
     Path("src") / "aac" / "viz",
     Path("src") / "experiments" / "reporting",
 )
-
 
 def _scan_unescaped_percent(py_path: Path) -> list[tuple[int, str, str]]:
     """Return list of (line_number, raw_line, offending_string) hits.
@@ -385,7 +370,6 @@ def _scan_unescaped_percent(py_path: Path) -> list[tuple[int, str, str]]:
                 in_call = False
     return hits
 
-
 def check_unescaped_percent_in_plot_scripts() -> list[tuple[Path, int, str, str]]:
     """Scan plotting code for unescaped ``%`` in matplotlib label strings.
 
@@ -405,11 +389,9 @@ def check_unescaped_percent_in_plot_scripts() -> list[tuple[Path, int, str, str]
                 violations.append((py_path, lineno, raw_line, body))
     return violations
 
-
 # ---------------------------------------------------------------------------
 # CLI
 # ---------------------------------------------------------------------------
-
 
 def main() -> int:
     parser = argparse.ArgumentParser(
@@ -517,7 +499,6 @@ def main() -> int:
             "Inspect the listed samples manually; the underlying CSVs are present."
         )
     return 0
-
 
 if __name__ == "__main__":
     sys.exit(main())

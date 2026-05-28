@@ -19,7 +19,6 @@ Usage:
 
 from __future__ import annotations
 
-import sys
 from pathlib import Path
 
 # ---------------------------------------------------------------------------
@@ -27,14 +26,12 @@ from pathlib import Path
 # ---------------------------------------------------------------------------
 _SCRIPT_DIR = Path(__file__).resolve().parent
 _PROJECT_ROOT = _SCRIPT_DIR.parent
-sys.path.insert(0, str(_PROJECT_ROOT / "src"))
-sys.path.insert(0, str(_PROJECT_ROOT))
 
 import networkx as nx
 
 # Reuse the exact experiment runner / CSV writer from the synthetic script
 # so the schema is identical and table-generation code can be reused.
-from scripts.run_synthetic_experiments import (
+from run_synthetic_experiments import (
     BUDGET_LEVELS,
     NUM_QUERIES,
     QUERY_SEED,
@@ -46,7 +43,6 @@ from scripts.run_synthetic_experiments import (
 
 OUTPUT_DIR = _PROJECT_ROOT / "results" / "synthetic"
 GRAPH_SEED = 42
-
 
 def load_ogbn_arxiv() -> nx.Graph:
     """Load the OGB-arXiv citation graph as an undirected networkx graph.
@@ -99,7 +95,6 @@ def load_ogbn_arxiv() -> nx.Graph:
     print(f"  Final LCC: {G.number_of_nodes():,} nodes, {G.number_of_edges():,} edges")
     return G
 
-
 def main() -> None:
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -125,7 +120,6 @@ def main() -> None:
     )
     write_csv(rows, OUTPUT_DIR / "ogbn_arxiv_results.csv")
     print("\nDone.")
-
 
 if __name__ == "__main__":
     main()

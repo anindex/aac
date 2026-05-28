@@ -75,7 +75,6 @@ def generate_smooth_cost_map(
 
     return cost_map
 
-
 def main() -> None:
     parser = argparse.ArgumentParser(description="Generate synthetic Warcraft terrain data")
     parser.add_argument("--output-dir", type=str, default="data/warcraft", help="Output directory")
@@ -95,7 +94,6 @@ def main() -> None:
         np.savez(npz_path, cost_map=cost_map)
 
     print(f"Generated {args.num_maps} maps in {output_dir}")
-
 
 if __name__ == "__main__":
     main()

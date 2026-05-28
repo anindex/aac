@@ -29,16 +29,13 @@ def astar(
         track_expansions: If True, populate ``expanded_nodes`` and
             ``g_values`` in the returned :class:`SearchResult` for
             visualization.  Disabled by default to avoid overhead.
-        use_bpmx: If True, apply Felner-style one-step Bidirectional Pathmax
-            propagation at expansion time. For each expanded node ``u`` we
-            evaluate ``h(v, target)`` on every successor ``v`` and tighten
-            ``h(u, target) := max(h(u, target), max_v h(v, target) - w(u,v))``;
-            successors are then enqueued with ``f(v) = g(v) + max(h(v),
-            h_BPMX(u) - w(u,v))``. BPMX preserves admissibility under
-            closed-set A* without node reopenings, because it only ever
-            replaces an admissible value with the max of admissible values.
-            Default False (matches the rest of the paper's protocol).
-
+        use_bpmx: If True, apply Felner-style one-step Bidirectional
+            Pathmax (BPMX): tighten ``h(u)`` to
+            ``max(h(u), max_v h(v) - w(u,v))`` over successors, then
+            propagate the boosted ``h(u)`` back down to each successor.
+            BPMX preserves admissibility because every value taken is
+            already an admissible lower bound. Default False (matches
+            the paper's protocol).
     Returns:
         SearchResult with optimal path, cost, and expansion count.
         When *track_expansions* is True, ``expanded_nodes`` contains

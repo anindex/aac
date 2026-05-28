@@ -11,7 +11,6 @@ from __future__ import annotations
 
 import argparse
 import csv
-import sys
 import time
 from pathlib import Path
 from typing import Iterable
@@ -20,9 +19,6 @@ import numpy as np
 import torch
 
 _ROOT = Path(__file__).resolve().parent.parent
-sys.path.insert(0, str(_ROOT / "src"))
-sys.path.insert(0, str(_ROOT))
-sys.path.insert(0, str(_ROOT / "scripts"))
 
 from aac.baselines.alt import make_alt_heuristic
 from aac.embeddings.anchors import farthest_point_sampling
@@ -90,7 +86,6 @@ GRAPHS = {
     "ogb_arxiv": {"loader": "ogb_arxiv", "configs": NONROAD_CONFIGS},
 }
 
-
 def _load(graph_key: str) -> Graph:
     spec = GRAPHS[graph_key]
     kind = spec["loader"]
@@ -115,7 +110,6 @@ def _load(graph_key: str) -> Graph:
         return load_ogb_arxiv(_ROOT / "data" / "ogb")
     raise ValueError(f"Unknown loader for graph {graph_key}: {kind}")
 
-
 def _first_m_heuristic(graph: Graph, pool_K: int, m: int,
                        seed_vertex: int,
                        valid_vertices: torch.Tensor | None,
@@ -135,7 +129,6 @@ def _first_m_heuristic(graph: Graph, pool_K: int, m: int,
     first_m = pool[:m]
     teacher = compute_teacher_labels(graph, first_m, use_gpu=False)
     return make_alt_heuristic(teacher)
-
 
 def run_graph(graph_key: str, seeds: Iterable[int], num_queries: int) -> list[dict]:
     spec = GRAPHS[graph_key]
@@ -181,7 +174,6 @@ def run_graph(graph_key: str, seeds: Iterable[int], num_queries: int) -> list[di
                   flush=True)
     return rows
 
-
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--graphs", nargs="+", default=sorted(GRAPHS.keys()))
@@ -198,7 +190,6 @@ def main() -> None:
             w.writeheader()
             w.writerows(rows)
         print(f"[{graph_key}] wrote {len(rows)} rows to {out}", flush=True)
-
 
 if __name__ == "__main__":
     main()

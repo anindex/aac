@@ -15,19 +15,16 @@ Output: results/hybrid_nonroad/matched_budget_hybrid.csv
 from __future__ import annotations
 
 import csv
-import sys
 import time
 from pathlib import Path
 
 _SCRIPT_DIR = Path(__file__).resolve().parent
 _PROJECT_ROOT = _SCRIPT_DIR.parent
-sys.path.insert(0, str(_PROJECT_ROOT / "src"))
-sys.path.insert(0, str(_PROJECT_ROOT))
 
 import numpy as np
 import scipy.stats
 import torch
-from scripts.run_synthetic_experiments import (
+from run_synthetic_experiments import (
     GRAPH_SEED,
     NUM_QUERIES,
     QUERY_SEED,
@@ -54,7 +51,6 @@ TOTAL_BUDGETS_BYTES = [32, 64, 128]
 
 # K0 over-sampling factor for AAC anchors (matches synthetic defaults: K0 = 4*m).
 K0_FACTOR = 4
-
 
 def matched_configs(B: int, is_directed: bool) -> dict:
     """Return the three matched arms at a fixed total budget B bytes/vertex.
@@ -85,7 +81,6 @@ def matched_configs(B: int, is_directed: bool) -> dict:
         "hybrid_half": {"m": B // 8, "K": hybrid_K,   "K0": (B // 8) * K0_FACTOR},
     }
 
-
 # ---------------------------------------------------------------------------
 # Heuristic builders
 # ---------------------------------------------------------------------------
@@ -115,7 +110,6 @@ def build_aac(graph, lcc_tensor, lcc_seed, K0: int, m: int, seed: int):
     h = make_linear_heuristic(y_fwd, y_bwd, graph.is_directed)
     return h, time.perf_counter() - t0
 
-
 def build_alt(graph, lcc_tensor, lcc_seed, K: int):
     """Build the ALT heuristic and return a callable + prep time."""
     t0 = time.perf_counter()
@@ -124,7 +118,6 @@ def build_alt(graph, lcc_tensor, lcc_seed, K: int):
     )
     h = make_alt_heuristic(teacher_alt)
     return h, time.perf_counter() - t0
-
 
 # ---------------------------------------------------------------------------
 # Per-graph experiment
@@ -232,7 +225,6 @@ def run_graph(graph_type: str, graph) -> list[dict]:
 
     return rows
 
-
 CSV_COLUMNS = [
     "graph_type", "total_budget_B", "seed",
     "pure_aac_m", "pure_aac_K0", "pure_alt_K",
@@ -244,7 +236,6 @@ CSV_COLUMNS = [
     "aac_prep_time_s", "hybrid_aac_prep_time_s", "alt_prep_time_s",
 ]
 
-
 def write_csv(rows: list[dict], path: Path) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     with open(path, "w", newline="") as f:
@@ -252,7 +243,6 @@ def write_csv(rows: list[dict], path: Path) -> None:
         w.writeheader()
         w.writerows(rows)
     print(f"  Written: {path}")
-
 
 # ---------------------------------------------------------------------------
 # Main
@@ -277,7 +267,7 @@ def main() -> None:
 
     # --- OGB-arXiv citation graph ---
     print(f"\n{'='*70}\n  OGB-ARXIV (~170k nodes, symmetrized LCC)\n{'='*70}")
-    from scripts.run_nonroad_real import load_ogbn_arxiv
+    from run_nonroad_real import load_ogbn_arxiv
     G_arx = load_ogbn_arxiv()
     graph_arx = nx_to_graph(G_arx, weight_seed=GRAPH_SEED)
     print(f"  AAC: {graph_arx.num_nodes:,} nodes, {graph_arx.num_edges:,} edges")
@@ -285,7 +275,6 @@ def main() -> None:
 
     write_csv(all_rows, OUTPUT_DIR / "matched_budget_hybrid.csv")
     print("\nDone.")
-
 
 if __name__ == "__main__":
     main()

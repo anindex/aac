@@ -533,7 +533,7 @@ class TestCDH:
         # Allow at most 5% of pairs to go up by 1 expansion due to FIFO
         # tie-breaking interactions; BPMX is a tightening, but tie-break
         # ordering can shuffle small inflations on tiny graphs. The test
-        # asserts the bulk behaviour.
+        # asserts the bulk behavior.
         total_pairs = graph.num_nodes * (graph.num_nodes - 1)
         assert worse <= max(2, int(0.05 * total_pairs)), (
             f"BPMX increased expansions on {worse}/{total_pairs} pairs"

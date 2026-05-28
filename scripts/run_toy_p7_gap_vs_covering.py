@@ -53,16 +53,13 @@ N_VERTICES = 7                       # P_7: vertices 0..6
 LANDMARK_BUDGET = 2                  # m = 2
 QUERY_SUPPORT = tuple(range(1, 6))   # interior vertices {1, 2, 3, 4, 5}
 
-
 def covering_radius(S: Tuple[int, ...]) -> int:
     """max_{v in V} min_{l in S} |v - l|  on P_7 with unit edges."""
     return max(min(abs(v - l) for l in S) for v in range(N_VERTICES))
 
-
 def alt_heuristic(S: Tuple[int, ...], s: int, t: int) -> int:
     """h_ALT^S(s, t) = max_{l in S} |d(s, l) - d(l, t)|  on P_7."""
     return max(abs(abs(s - l) - abs(l - t)) for l in S)
-
 
 def query_pairs() -> Iterable[Tuple[int, int]]:
     """Uniform support over ordered pairs in QUERY_SUPPORT^2 \\ diag."""
@@ -70,7 +67,6 @@ def query_pairs() -> Iterable[Tuple[int, int]]:
         for t in QUERY_SUPPORT:
             if s != t:
                 yield s, t
-
 
 def expected_gap(S: Tuple[int, ...]) -> Tuple[Fraction, int]:
     """Returns (E[gap] as Fraction, count of queries with gap == 0)."""
@@ -83,7 +79,6 @@ def expected_gap(S: Tuple[int, ...]) -> Tuple[Fraction, int]:
             n_exact += 1
         total += Fraction(gap)
     return total / len(pairs), n_exact
-
 
 def enumerate_all_subsets() -> list[dict]:
     rows = []
@@ -102,7 +97,6 @@ def enumerate_all_subsets() -> list[dict]:
         })
     return rows
 
-
 def write_csv(path: str, rows: list[dict], fieldnames: list[str]) -> None:
     os.makedirs(os.path.dirname(path), exist_ok=True)
     with open(path, "w", newline="") as f:
@@ -110,7 +104,6 @@ def write_csv(path: str, rows: list[dict], fieldnames: list[str]) -> None:
         w.writeheader()
         for r in rows:
             w.writerow(r)
-
 
 def main() -> int:
     rows = enumerate_all_subsets()
@@ -173,7 +166,6 @@ def main() -> int:
     print(f"  Wrote {os.path.relpath(HIGHLIGHT_CSV, PROJECT_ROOT)} "
           f"(2 highlighted)")
     return 0
-
 
 if __name__ == "__main__":
     sys.exit(main())

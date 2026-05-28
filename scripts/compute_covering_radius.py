@@ -14,11 +14,7 @@ from __future__ import annotations
 
 import csv
 import os
-import sys
 import time
-
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 import numpy as np
 import torch
@@ -35,7 +31,6 @@ OUTPUT_PATH = os.path.join(RESULTS_DIR, "covering_radius.csv")
 
 K_VALUES = [4, 8, 16, 32, 64]
 SENTINEL = 1e18
-
 
 def covering_radius_from_d(d: np.ndarray) -> float:
     """Compute covering radius: max_v(min_k(d[k,v])).
@@ -57,7 +52,6 @@ def covering_radius_from_d(d: np.ndarray) -> float:
     if not finite_mask.any():
         return float("inf")
     return float(np.max(min_per_vertex[finite_mask]))
-
 
 def main() -> None:
     torch.manual_seed(42)
@@ -162,7 +156,6 @@ def main() -> None:
         if bwd != "":
             bwd = f"{bwd:>14,.1f}"
         print(f"{r['graph']:<10} {r['K']:>4} {r['covering_radius']:>14,.1f} {bwd:>14} {str(r['is_directed']):>9}")
-
 
 if __name__ == "__main__":
     main()

@@ -24,8 +24,7 @@ import matplotlib.patches as mpatches
 import matplotlib.pyplot as plt
 
 _PROJECT_ROOT = Path(__file__).resolve().parent.parent
-sys.path.insert(0, str(_PROJECT_ROOT / "src"))
-from aac.viz.style import OKABE_ITO, TMLR_FULL_WIDTH, setup_style  # noqa: E402
+from aac.viz.style import OKABE_ITO, TMLR_FULL_WIDTH, setup_style
 
 DEFAULT_INPUT_DIR = _PROJECT_ROOT / "results" / "toy_p7"
 DEFAULT_OUTPUT = _PROJECT_ROOT / "paper" / "figures" / "toy_p7_divergence.pdf"
@@ -37,7 +36,6 @@ COLOR_COV = OKABE_ITO["blue"]        # #0072B2 -- matches AAC color
 COLOR_GAP = OKABE_ITO["vermillion"]  # #D55E00 -- matches ALT color
 COLOR_INK = "#1A1A1A"
 COLOR_MUTE = "#6B6B6B"
-
 
 # ---------------------------------------------------------------------
 # Data helpers (closed-form on P_7; same logic as the data generator)
@@ -58,14 +56,11 @@ def _load_highlight(path: Path) -> dict[str, dict]:
             }
     return out
 
-
 def _alt_heuristic(S: tuple[int, int], s: int, t: int) -> int:
     return max(abs(abs(s - l) - abs(l - t)) for l in S)
 
-
 def _covering_radius(S: tuple[int, int]) -> int:
     return max(min(abs(v - l) for l in S) for v in range(N_VERTICES))
-
 
 def _coverage_union(S: tuple[int, int], r: int) -> list[tuple[float, float]]:
     """Returns sorted, merged list of (start, end) coverage intervals.
@@ -84,7 +79,6 @@ def _coverage_union(S: tuple[int, int], r: int) -> list[tuple[float, float]]:
             merged.append((s, e))
     return merged
 
-
 def _failing_queries(S: tuple[int, int]) -> list[tuple[int, int, int]]:
     """List of (s, t, gap) for every interior query with gap > 0."""
     out: list[tuple[int, int, int]] = []
@@ -97,14 +91,12 @@ def _failing_queries(S: tuple[int, int]) -> list[tuple[int, int, int]]:
                 out.append((s, t, gap))
     return out
 
-
 def _format_egap(meta: dict) -> str:
     """E[gap] string with both fraction and decimal where the value is nonzero."""
     if meta["exp_gap_num"] == 0:
         return r"$\mathbb{E}[\mathrm{gap}] = 0$"
     return (rf"$\mathbb{{E}}[\mathrm{{gap}}] = "
             rf"\frac{{{meta['exp_gap_num']}}}{{{meta['exp_gap_den']}}}$")
-
 
 # ---------------------------------------------------------------------
 # Path-graph drawing primitive
@@ -134,7 +126,6 @@ def _draw_path(ax, y: float, selected: set[int], fill_color: str,
         for v in range(N_VERTICES):
             ax.text(v, y - 0.45, str(v), ha="center", va="top",
                     fontsize=7.5, color=COLOR_INK)
-
 
 # ---------------------------------------------------------------------
 # Panel renderers
@@ -197,7 +188,6 @@ def _panel_coverage(ax, s_cov: tuple[int, int], s_gap: tuple[int, int]) -> None:
     ax.set_yticks([])
     for spine in ax.spines.values():
         spine.set_visible(False)
-
 
 def _panel_gap(ax, s_cov: tuple[int, int], s_gap: tuple[int, int],
                cov_meta: dict, gap_meta: dict) -> None:
@@ -280,7 +270,6 @@ def _panel_gap(ax, s_cov: tuple[int, int], s_gap: tuple[int, int],
     for spine in ax.spines.values():
         spine.set_visible(False)
 
-
 # ---------------------------------------------------------------------
 # Driver
 # ---------------------------------------------------------------------
@@ -316,7 +305,6 @@ def main() -> int:
     except ValueError:
         print(f"Wrote {args.output}")
     return 0
-
 
 if __name__ == "__main__":
     sys.exit(main())

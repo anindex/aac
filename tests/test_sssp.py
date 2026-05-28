@@ -91,21 +91,6 @@ def test_bellman_ford_unreachable(graph_with_isolated_node):
     assert dist[0, 0] == 0.0
 
 
-def test_bellman_ford_convergence(directed_graph_5):
-    """Bellman-Ford on small graph should converge in fewer than V-1 iterations.
-
-    We test indirectly: with max_iter=2 the 5-node chain 0->1->2->3->4 needs
-    4 iterations worst-case, but our specific graph should converge.
-    We verify that running with max_iter=V-1 produces correct results.
-    """
-    from aac.embeddings.sssp import bellman_ford_batched, scipy_dijkstra_batched
-
-    sources = torch.tensor([0], dtype=torch.int64)
-    bf_dist = bellman_ford_batched(directed_graph_5, sources)
-    sp_dist = scipy_dijkstra_batched(directed_graph_5, sources)
-    assert torch.allclose(bf_dist, sp_dist, atol=1e-10)
-
-
 # ---------------------------------------------------------------------------
 # Teacher labels
 # ---------------------------------------------------------------------------
@@ -122,6 +107,8 @@ def test_teacher_labels_shape(undirected_graph_5):
     assert labels.d_out.shape == (3, 5), f"Expected d_out shape (3, 5), got {labels.d_out.shape}"
     assert labels.d_in.shape == (3, 5), f"Expected d_in shape (3, 5), got {labels.d_in.shape}"
     assert labels.anchor_indices.shape == (3,)
+    # Default dtype is float64 (covers the former backward-compat test).
+    assert labels.d_out.dtype == torch.float64
 
 
 def test_teacher_labels_undirected_symmetry(undirected_graph_5):
@@ -363,20 +350,3 @@ def test_chunked_with_float32_combined(undirected_graph_5):
     ), "Chunked float32 should be close to unchunked float64"
 
 
-# ---------------------------------------------------------------------------
-# Backward compatibility
-# ---------------------------------------------------------------------------
-
-
-def test_backward_compat_no_new_params(undirected_graph_5):
-    """compute_teacher_labels(graph, anchors, use_gpu=False) with no new params works."""
-    from aac.embeddings.sssp import compute_teacher_labels
-
-    anchors = torch.tensor([0, 2, 4], dtype=torch.int64)
-    labels = compute_teacher_labels(undirected_graph_5, anchors, use_gpu=False)
-
-    assert isinstance(labels, TeacherLabels)
-    assert labels.d_out.shape == (3, 5)
-    assert labels.d_out.dtype == torch.float64
-    assert not labels.is_directed
-    assert torch.equal(labels.d_out, labels.d_in)

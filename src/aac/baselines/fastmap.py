@@ -4,13 +4,14 @@ FastMap embeds graph vertices into m-dimensional Euclidean space by iteratively
 selecting farthest pairs and projecting onto the connecting axis, subtracting
 already-assigned coordinate contributions (residual distance).
 
-The L1 (Manhattan) distance in the embedding is an admissible heuristic.
-L2 (Euclidean) is NOT admissible per AAAI 2023 analysis.
+The L1 (Manhattan) distance in the embedding is an admissible and consistent
+heuristic; the original L2 (Euclidean) FastMap embedding does not guarantee
+admissibility (Cohen et al., 2018, Theorem 1).
 
 References:
     Faloutsos & Lin (1995). FastMap: A Fast Algorithm for Indexing, Data-Mining
     and Visualization of Traditional and Multimedia Datasets. SIGMOD.
-    Cohen et al. (2018). FastMap, FastEmbedding and Scalable Heuristic Search. IJCAI.
+    Cohen et al. (2018). The FastMap Algorithm for Shortest Path Computations. IJCAI.
 """
 
 from __future__ import annotations
@@ -103,8 +104,9 @@ def fastmap_preprocess(graph: Graph, num_dims: int) -> torch.Tensor:
 def make_fastmap_heuristic(coords: torch.Tensor) -> Callable[[int, int], float]:
     """Create A*-compatible heuristic from FastMap coordinates.
 
-    Uses L1 (Manhattan) distance, NOT L2 -- L2 is NOT admissible
-    per AAAI 2023 analysis.
+    Uses L1 (Manhattan) distance, which is admissible and consistent for the
+    FastMap embedding (Cohen et al., 2018, Theorem 1); the L2 (Euclidean)
+    variant does not guarantee admissibility.
 
     Args:
         coords: (V, num_dims) fp64 tensor of vertex coordinates.

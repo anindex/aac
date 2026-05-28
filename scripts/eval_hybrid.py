@@ -70,14 +70,12 @@ CONFIGS = [
 ALT_ONLY_K_VALUES = [4, 8, 12, 16, 32]
 #  K=4 -> 32 B/v, K=8 -> 64 B/v, K=12 -> 96 B/v, K=16 -> 128 B/v, K=32 -> 256 B/v
 
-
 def load_graph(name, info):
     if info["loader"] == "npz":
         return load_graph_npz(info["path"])
     else:
         gr, co = info["path"]
         return load_dimacs(gr, co)
-
 
 def run_experiment(graph_name, graph, seed):
     """Run all configs on one graph with one seed."""
@@ -220,7 +218,6 @@ def run_experiment(graph_name, graph, seed):
 
     return results
 
-
 def main():
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     all_results = []
@@ -271,7 +268,6 @@ def main():
                       f"alt_K={int(row['alt_K']):2d}  {int(row['bytes_per_vertex']):4d}B/v: "
                       f"{row['reduction_mean']:.1f}%{std}")
         print("="*70)
-
 
 if __name__ == "__main__":
     main()

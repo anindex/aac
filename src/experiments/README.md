@@ -1,6 +1,6 @@
 # `src/experiments/` -- Hydra-configured experiment runners
 
-This package is the **single configuration-driven entry point** for the per-track experiments cited in the paper. Each scientific track (DIMACS road networks, OSMnx city graphs, Warcraft contextual planning, Cabspotting) is implemented as one runner whose behaviour is fully specified by composable Hydra configuration files under [`configs/`](configs/).
+This package is the **single configuration-driven entry point** for the per-track experiments cited in the paper. Each scientific track (DIMACS road networks, OSMnx city graphs, Warcraft contextual planning, Cabspotting) is implemented as one runner whose behavior is fully specified by composable Hydra configuration files under [`configs/`](configs/).
 
 For the per-experiment artifact index -- which CSV/log backs which paper Table or Figure -- see [`results/README.md`](../../results/README.md). For installation and the headline reproduction command, see the project [`README.md`](../../README.md).
 

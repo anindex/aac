@@ -57,18 +57,15 @@ LR = 1e-3
 # Memory budget groups: bytes_per_vertex -> desired budgets to report
 BUDGET_GROUPS = [32, 64, 128]
 
-
 def generate_val_test_queries(graph, num_val, num_test, seed=42):
     """Generate disjoint validation and test query sets."""
     total = num_val + num_test
     all_queries = generate_queries(graph, total, seed=seed)
     return all_queries[:num_val], all_queries[num_val:]
 
-
 def eval_queries(graph, queries, heuristic):
     """Run A* on queries, return per-query expansions."""
     return [astar(graph, s, t, heuristic=heuristic).expansions for s, t in queries]
-
 
 def run_aac_config(graph, K0, m, lcc_nodes, lcc_seed, seed):
     """Train AAC compressor and return heuristic + preprocessing time."""
@@ -93,7 +90,6 @@ def run_aac_config(graph, K0, m, lcc_nodes, lcc_seed, seed):
             y_fwd = y_bwd = y.detach()
     heuristic = make_linear_heuristic(y_fwd, y_bwd, graph.is_directed)
     return heuristic, time.perf_counter() - t0
-
 
 def run_graph(graph_name, graph, output_dir):
     """Run validation-split experiment for one graph."""
@@ -244,7 +240,6 @@ def run_graph(graph_name, graph, output_dir):
             print(f"  {graph_name} @ {bpv}B/v ALT: "
                   f"test={alt_rows['test_reduction_pct'].mean():.1f}+/-{alt_rows['test_reduction_pct'].std():.1f}%")
 
-
 def main():
     # DIMACS graphs
     for name, (gr_file, co_file) in DIMACS_GRAPHS.items():
@@ -274,7 +269,6 @@ def main():
         run_graph(name, graph, OSMNX_OUT)
 
     print("\nDone!")
-
 
 if __name__ == "__main__":
     main()

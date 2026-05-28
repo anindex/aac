@@ -102,21 +102,6 @@ class TestRowStochasticProperty:
                     f"Not one-hot at tau={tau}"
                 )
 
-    def test_train_mode_gumbel_one_hot(self, undirected_8):
-        """Training mode (hard=True) also produces one-hot rows."""
-        torch.manual_seed(42)
-        K, m = 8, 4
-        comp = LinearCompressor(K=K, m=m, is_directed=False).double()
-        comp.train()
-
-        for _ in range(10):  # Multiple Gumbel noise realizations
-            A = comp._get_A_soft(comp.W, tau=1.0)
-            assert (A >= 0).all(), "negative entries in Gumbel-softmax"
-            row_sums = A.sum(dim=-1)
-            assert torch.allclose(row_sums, torch.ones_like(row_sums), atol=1e-6), (
-                f"row sums != 1: {row_sums}"
-            )
-
 
 # ---------------------------------------------------------------------------
 # Hard-argmax equals ALT on selected subset

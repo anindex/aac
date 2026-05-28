@@ -488,25 +488,6 @@ class TestContextualTraining:
             "m": m,
         }
 
-    def test_config_has_expected_fields(self) -> None:
-        """ContextualConfig has all expected fields."""
-        from aac.contextual.trainer import ContextualConfig
-
-        config = ContextualConfig()
-        assert hasattr(config, "num_epochs")
-        assert hasattr(config, "batch_size")
-        assert hasattr(config, "lr")
-        assert hasattr(config, "beta_init")
-        assert hasattr(config, "beta_max")
-        assert hasattr(config, "alpha_path")
-        assert hasattr(config, "cond_lambda")
-        assert hasattr(config, "beta_gamma")
-        assert hasattr(config, "T_init")
-        assert hasattr(config, "T_gamma")
-        assert hasattr(config, "patience")
-        assert hasattr(config, "K")
-        assert hasattr(config, "m")
-
     def test_training_decreases_loss(self) -> None:
         """Training on 3x3 grid with random CNN decreases loss over 120 epochs."""
         from aac.contextual.trainer import ContextualConfig, ContextualTrainer
@@ -587,36 +568,6 @@ class TestContextualTraining:
         assert all(t > 0 for t in metrics.per_epoch_time_sec), "Each epoch should take >0 seconds"
         assert metrics.total_time_sec > 0, "Total time should be positive"
         assert isinstance(metrics.peak_memory_bytes, int), "peak_memory_bytes should be int"
-
-    def test_training_result_structure(self) -> None:
-        """Training returns metrics with 'per_epoch_loss' (list), 'total_time_sec' (float), 'peak_memory_bytes' (int)."""
-        from aac.contextual.trainer import ContextualConfig, ContextualTrainer
-
-        fixtures = self._make_training_fixtures()
-        config = ContextualConfig(
-            num_epochs=2,
-            batch_size=4,
-            K=fixtures["K"],
-            m=fixtures["m"],
-            seed=42,
-        )
-
-        trainer = ContextualTrainer(
-            encoder=fixtures["encoder"],
-            compressor=fixtures["compressor"],
-            config=config,
-        )
-
-        metrics = trainer.train(
-            train_data=fixtures["train_data"],
-            graph_template=fixtures["template_graph"],
-            anchor_indices=fixtures["anchor_indices"],
-        )
-
-        assert isinstance(metrics.per_epoch_loss, list)
-        assert all(isinstance(x, float) for x in metrics.per_epoch_loss)
-        assert isinstance(metrics.total_time_sec, float)
-        assert isinstance(metrics.peak_memory_bytes, int)
 
     def test_beta_annealing(self) -> None:
         """Beta increases from beta_init toward beta_max over training epochs."""

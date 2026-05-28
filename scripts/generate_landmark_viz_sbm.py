@@ -24,7 +24,6 @@ Output: paper/figures/sbm_landmark_placement.pdf
 
 from __future__ import annotations
 
-import sys
 from pathlib import Path
 
 import matplotlib
@@ -38,10 +37,10 @@ import numpy as np
 import torch
 
 _PROJECT_ROOT = Path(__file__).resolve().parent.parent
-sys.path.insert(0, str(_PROJECT_ROOT / "src"))
-sys.path.insert(0, str(_PROJECT_ROOT))
 
-from scripts.run_synthetic_experiments import (
+# scripts/ is on sys.path when this file is executed directly (python scripts/X.py),
+# so the sibling module is importable by bare name.
+from run_synthetic_experiments import (
     GRAPH_SEED,
     generate_community_graph,
     nx_to_graph,
@@ -77,7 +76,6 @@ SEED = 42
 NUM_QUERIES_GREEDY = 100
 OUTPUT = _PROJECT_ROOT / "paper" / "figures" / "sbm_landmark_placement.pdf"
 
-
 def greedy_max_select_indices(teacher, m: int, queries) -> np.ndarray:
     """Mirror of scripts.run_ablation_selection.greedy_maximize_heuristic, but
     returns the selected pool indices instead of the assembled heuristic.
@@ -100,7 +98,6 @@ def greedy_max_select_indices(teacher, m: int, queries) -> np.ndarray:
         selected.append(best)
         current_max = np.maximum(current_max, h_per_lm[best])
     return np.array(selected, dtype=np.int64)
-
 
 def main() -> None:
     setup_style()
@@ -271,7 +268,6 @@ def main() -> None:
     OUTPUT.parent.mkdir(parents=True, exist_ok=True)
     fig.savefig(OUTPUT, dpi=200)
     print(f"Wrote {OUTPUT}")
-
 
 if __name__ == "__main__":
     main()

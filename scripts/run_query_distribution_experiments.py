@@ -18,7 +18,6 @@ Outputs:
 from __future__ import annotations
 
 import csv
-import sys
 import time
 from pathlib import Path
 
@@ -26,17 +25,10 @@ import numpy as np
 import pandas as pd
 import torch
 
-_PROJECT_ROOT = str(Path(__file__).resolve().parent.parent)
 # Make src/ importable so `experiments` resolves to src/experiments/. The
 # repo root is also on the path so `scripts.*` self-imports continue to
 # resolve.
-_SRC_DIR = str(Path(_PROJECT_ROOT) / "src")
-if _SRC_DIR not in sys.path:
-    sys.path.insert(0, _SRC_DIR)
-if _PROJECT_ROOT not in sys.path:
-    sys.path.insert(0, _PROJECT_ROOT)
-
-from scripts.run_ablation_selection import (
+from run_ablation_selection import (
     dijkstra_baseline,
     get_lcc,
     run_astar_queries,
@@ -72,7 +64,6 @@ K0 = 64
 M = 16
 OUTPUT_DIR = Path("results/query_distributions")
 
-
 def load_graph(spec: dict):
     """Load a graph from a graph specification entry."""
     if spec["kind"] == "dimacs":
@@ -81,12 +72,10 @@ def load_graph(spec: dict):
         return load_graph_npz(str(spec["path"]))
     raise ValueError(f"Unsupported graph kind: {spec['kind']}")
 
-
 def matched_alt_landmarks(graph, m: int) -> int:
     """Return ALT landmark count that matches an m-float AAC budget."""
     directional_factor = 2 if getattr(graph, "is_directed", False) else 1
     return max(1, m // directional_factor)
-
 
 def make_hybrid_heuristic(aac_h, alt_h):
     """Pointwise max of two admissible heuristics."""
@@ -94,7 +83,6 @@ def make_hybrid_heuristic(aac_h, alt_h):
         return max(aac_h(node, target), alt_h(node, target))
 
     return hybrid
-
 
 def main() -> None:
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
@@ -213,7 +201,6 @@ def main() -> None:
 
     print(f"\nSaved: {results_path}")
     print(f"Saved: {summary_path}")
-
 
 if __name__ == "__main__":
     main()

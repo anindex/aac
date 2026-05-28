@@ -15,7 +15,6 @@ reference, so they no longer need separate legend entries.
 from __future__ import annotations
 
 import csv
-import sys
 from collections import defaultdict
 from pathlib import Path
 
@@ -31,8 +30,7 @@ OUT_PDF = ROOT / "paper" / "figures" / "training_drift.pdf"
 
 # Adopt the publication style (Computer Modern Roman, real LaTeX rendering
 # when available). All paper figures share this style for consistency.
-sys.path.insert(0, str(ROOT / "src"))
-from aac.viz.style import (  # noqa: E402
+from aac.viz.style import (
     METHOD_COLORS,
     OKABE_ITO,
     TMLR_FULL_WIDTH,
@@ -44,7 +42,6 @@ setup_style()
 GRAPHS = ["sbm", "ba"]
 BUDGETS = [32, 64]
 GRAPH_LABEL = {"sbm": r"SBM ($5{\times}2000$)", "ba": r"BA ($10{,}000$, $m{=}5$)"}
-
 
 def load(graph: str, budget: int):
     path = DATA_DIR / f"drift_{graph}_B{budget}.csv"
@@ -61,7 +58,6 @@ def load(graph: str, budget: int):
     forced = float(rows[0]["forced_first_m_pct"])
     alt = float(rows[0]["alt_ref_pct"])
     return np.array(epochs), means, stds, forced, alt
-
 
 def main():
     # Tight panel spacing -- with sharex+sharey the inner ticks/labels are
@@ -143,7 +139,6 @@ def main():
     OUT_PDF.parent.mkdir(parents=True, exist_ok=True)
     fig.savefig(OUT_PDF)
     print(f"Wrote {OUT_PDF}")
-
 
 if __name__ == "__main__":
     main()

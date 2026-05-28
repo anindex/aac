@@ -16,7 +16,6 @@ Usage:
 
 from __future__ import annotations
 
-import sys
 from pathlib import Path
 
 import matplotlib
@@ -30,7 +29,6 @@ import torch
 from PIL import Image
 
 _PROJECT_ROOT = Path(__file__).resolve().parent.parent
-sys.path.insert(0, str(_PROJECT_ROOT / "src"))
 
 from aac.baselines.alt import alt_preprocess, make_alt_heuristic
 from aac.compression.compressor import LinearCompressor
@@ -48,7 +46,6 @@ M = 16      # AAC compressed dimensions (same budget as ALT)
 FPS = 12
 DURATION_SEC = 4.0
 OUTPUT = _PROJECT_ROOT / "assets" / "expansion_comparison.gif"
-
 
 def build_grid(grid_size: int, obstacles: set[tuple[int, int]]):
     """Build 8-connected grid graph with obstacles."""
@@ -86,7 +83,6 @@ def build_grid(grid_size: int, obstacles: set[tuple[int, int]]):
         num_nodes=V, is_directed=False,
     )
     return graph, node_to_rc, rc_to_node, V
-
 
 def make_obstacle_pattern(gs: int) -> set[tuple[int, int]]:
     """Create a maze-like obstacle pattern with guaranteed connectivity."""
@@ -128,7 +124,6 @@ def make_obstacle_pattern(gs: int) -> set[tuple[int, int]]:
         obs.add((5, c))
 
     return obs
-
 
 def render_frame(
     gs: int,
@@ -209,7 +204,6 @@ def render_frame(
     img = Image.fromarray(buf[:, :, :3])  # drop alpha
     plt.close(fig)
     return img
-
 
 def main():
     setup_style()
@@ -292,7 +286,6 @@ def main():
         optimize=True,
     )
     print(f"\nSaved GIF to {OUTPUT} ({len(frames)} frames, {len(frames) * frame_duration / 1000:.1f}s)")
-
 
 if __name__ == "__main__":
     main()

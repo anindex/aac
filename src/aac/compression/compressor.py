@@ -1,9 +1,9 @@
 """Compression modules for AAC.
 
-Primary: LinearCompressor (Proposition "admissibility") -- row-stochastic
-linear compression via Gumbel-softmax landmark selection.
+Primary: LinearCompressor (Proposition 2) -- row-stochastic linear
+compression via Gumbel-softmax landmark selection.
 
-Admissibility guarantee (Proposition "admissibility", paper Sec.3): For any
+Admissibility guarantee (Proposition 2, paper Sec. 3): For any
 m x K row-stochastic matrix A (nonneg entries, rows sum to 1), the
 compressed heuristic satisfies:
     h_A(u, t) <= h_teacher(u, t) <= d(u, t)
@@ -12,7 +12,7 @@ differences, and a convex combination cannot exceed the maximum.
 
 At inference, hard argmax selection produces one-hot rows (a special case
 of row-stochastic), preserving the admissibility guarantee
-(Corollary "inference").
+(Corollary 3).
 
 During training, Gumbel-softmax with straight-through estimator provides
 gradient flow while maintaining one-hot forward passes.
@@ -32,6 +32,8 @@ import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+
+from aac.utils.numerics import safe_log
 
 
 class LinearCompressor(nn.Module):
@@ -240,12 +242,12 @@ class LinearCompressor(nn.Module):
         if self.is_directed:
             A_fwd = torch.softmax(self.W_fwd.to(torch.float64), dim=-1)
             A_bwd = torch.softmax(self.W_bwd.to(torch.float64), dim=-1)
-            ent_fwd = -(A_fwd * torch.log(A_fwd + 1e-10)).sum(dim=-1).mean()
-            ent_bwd = -(A_bwd * torch.log(A_bwd + 1e-10)).sum(dim=-1).mean()
+            ent_fwd = -(A_fwd * safe_log(A_fwd)).sum(dim=-1).mean()
+            ent_bwd = -(A_bwd * safe_log(A_bwd)).sum(dim=-1).mean()
             return ent_fwd + ent_bwd
         else:
             A = torch.softmax(self.W.to(torch.float64), dim=-1)
-            return -(A * torch.log(A + 1e-10)).sum(dim=-1).mean()
+            return -(A * safe_log(A)).sum(dim=-1).mean()
 
     def condition_number(self) -> float:
         """Monitor effective sparsity."""
@@ -259,10 +261,11 @@ class LinearCompressor(nn.Module):
     def deduplicate_selections(self) -> int:
         """Post-training deduplication: resolve duplicate landmark selections.
 
-        When multiple rows select the same landmark via argmax, reassign
-        duplicates to their next-best unique choice. This is admissibility-
-        preserving because each row still selects exactly one landmark
-        (one-hot row-stochastic).
+        When multiple rows pick the same landmark by argmax, reassign
+        duplicates to their next-best unique choice. Admissibility is
+        preserved: any one-hot row is row-stochastic, so the resulting
+        heuristic is still a convex combination of admissible bounds
+        (Proposition 2).
 
         Returns:
             Number of duplicates resolved.

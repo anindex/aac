@@ -51,7 +51,6 @@ BATCH_SIZE = 256
 LR = 1e-3
 LAMBDA_COV_VALUES = [0.0, 0.001, 0.01, 0.1]  # 0.0 = baseline (no coverage)
 
-
 def compute_lcc(graph):
     scipy_csr = graph_to_scipy(graph)
     is_directed = getattr(graph, "is_directed", False)
@@ -63,7 +62,6 @@ def compute_lcc(graph):
     largest = int(np.argmax(sizes))
     lcc_nodes = np.where(labels == largest)[0]
     return lcc_nodes, int(lcc_nodes[0])
-
 
 def train_with_coverage(
     compressor: LinearCompressor,
@@ -194,7 +192,6 @@ def train_with_coverage(
 
     return {"train_loss": train_losses}
 
-
 def main():
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     results = []
@@ -313,7 +310,6 @@ def main():
         logger.info("Results written to %s", out_path)
     else:
         logger.warning("No results to write")
-
 
 if __name__ == "__main__":
     main()

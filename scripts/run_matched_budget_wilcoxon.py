@@ -18,17 +18,11 @@ Output: results/dimacs/wilcoxon_matched_budget.csv
 from __future__ import annotations
 
 import csv
-import sys
 import time
 from pathlib import Path
 
 # Ensure project root and src are importable
 _project_root = str(Path(__file__).resolve().parent.parent)
-if _project_root not in sys.path:
-    sys.path.insert(0, _project_root)
-_src_dir = str(Path(__file__).resolve().parent.parent / "src")
-if _src_dir not in sys.path:
-    sys.path.insert(0, _src_dir)
 
 import numpy as np
 import torch
@@ -70,7 +64,6 @@ BUDGET_CONFIGS = [
 NUM_QUERIES = 100
 SEEDS = [42, 123, 456, 789, 1024]
 QUERY_SEED = 42  # Fixed seed for query generation (same queries across all runs)
-
 
 def main() -> None:
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
@@ -249,7 +242,6 @@ def main() -> None:
                   f"alt_wins={wins}")
 
     print(f"\nResults saved to: {csv_path}")
-
 
 if __name__ == "__main__":
     main()

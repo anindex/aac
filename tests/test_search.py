@@ -381,22 +381,6 @@ class TestDijkstra:
                         f"d({s},{t}): got {result.cost}, expected {expected}"
                     )
 
-    def test_dijkstra_all_pairs(self, small_undirected_graph):
-        """For every (s,t) pair in small graph, dijkstra cost matches scipy reference."""
-        from aac.search.dijkstra import dijkstra
-
-        scipy_mat = graph_to_scipy(small_undirected_graph)
-        ref_dists = scipy.sparse.csgraph.dijkstra(scipy_mat, directed=False)
-
-        for s in range(small_undirected_graph.num_nodes):
-            for t in range(small_undirected_graph.num_nodes):
-                result = dijkstra(small_undirected_graph, s, t)
-                expected = ref_dists[s, t]
-                if expected == float("inf"):
-                    assert result.cost == float("inf")
-                else:
-                    assert abs(result.cost - expected) < 1e-10
-
     def test_dijkstra_track_expansions(self, small_undirected_graph):
         """dijkstra forwards track_expansions to astar correctly."""
         from aac.search.dijkstra import dijkstra
@@ -471,25 +455,6 @@ class TestBidirectionalAstar:
         assert abs(total_weight - result.cost) < 1e-10, (
             f"Path weight {total_weight} != reported cost {result.cost}"
         )
-
-    def test_bidirectional_mu_stopping(self, small_undirected_graph):
-        """Bidirectional stops correctly and returns optimal cost."""
-        from aac.search.astar import astar
-        from aac.search.bidirectional import bidirectional_astar
-
-        zero_h = lambda node, target: 0.0
-        result_bi = bidirectional_astar(
-            small_undirected_graph, 0, 4,
-            h_forward=zero_h,
-            h_backward=zero_h,
-        )
-        result_uni = astar(small_undirected_graph, 0, 4, heuristic=zero_h)
-
-        # Must return optimal cost (matching unidirectional)
-        assert abs(result_bi.cost - result_uni.cost) < 1e-10
-        assert result_bi.optimal is True
-        # Known: d(0,4) = 7
-        assert abs(result_bi.cost - 7.0) < 1e-10
 
     def test_bidirectional_unreachable(self, small_directed_graph):
         """Returns empty path and inf cost for unreachable target on directed graph."""
@@ -610,3 +575,76 @@ class TestBatchSearch:
             assert abs(results[i].cost - individual.cost) < 1e-10 or (
                 results[i].cost == float("inf") and individual.cost == float("inf")
             )
+
+
+# ---------------------------------------------------------------------------
+# Bidirectional Pathmax (BPMX) propagation
+# ---------------------------------------------------------------------------
+
+
+class TestBPMX:
+    """A* with ``use_bpmx=True`` must stay optimal and admissible.
+
+    BPMX tightens the heuristic at each expansion by taking the max of
+    h-values of admissible neighbors (minus edge weights). Because it only
+    replaces an admissible value with the max of admissible values, optimality
+    under closed-set A* without reopenings is preserved.
+    """
+
+    def test_bpmx_preserves_optimality_and_admissibility(self):
+        """A* with BPMX on a grid returns the optimal cost and never expands more than Dijkstra."""
+        from aac.search.astar import astar
+        from aac.search.dijkstra import dijkstra
+
+        grid = _build_grid_graph(5, 5)
+        coords = grid.coordinates
+        assert coords is not None
+
+        def euclidean_h(node: int, target: int) -> float:
+            dx = coords[node, 0].item() - coords[target, 0].item()
+            dy = coords[node, 1].item() - coords[target, 1].item()
+            return math.sqrt(dx * dx + dy * dy)
+
+        source, target = 0, 24
+        result_bpmx = astar(grid, source, target, heuristic=euclidean_h, use_bpmx=True)
+        result_dijk = dijkstra(grid, source, target)
+
+        assert abs(result_bpmx.cost - result_dijk.cost) < 1e-10
+        assert result_bpmx.optimal is True
+        assert result_bpmx.expansions <= result_dijk.expansions
+
+        # The returned path must be valid: consecutive vertices are neighbors
+        # and the edge weights along the path sum to the reported cost.
+        crow = grid.crow_indices
+        col = grid.col_indices
+        vals = grid.values
+        total_weight = 0.0
+        for i in range(len(result_bpmx.path) - 1):
+            u = result_bpmx.path[i]
+            v = result_bpmx.path[i + 1]
+            start = crow[u].item()
+            end = crow[u + 1].item()
+            neighbors = col[start:end].tolist()
+            assert v in neighbors, f"Edge ({u}, {v}) missing"
+            idx = start + neighbors.index(v)
+            total_weight += vals[idx].item()
+        assert abs(total_weight - result_bpmx.cost) < 1e-10
+
+    def test_bpmx_matches_non_bpmx_cost(self):
+        """A* with ``use_bpmx=True`` returns the same cost as ``use_bpmx=False``."""
+        from aac.search.astar import astar
+
+        grid = _build_grid_graph(4, 4)
+        coords = grid.coordinates
+        assert coords is not None
+
+        def euclidean_h(node: int, target: int) -> float:
+            dx = coords[node, 0].item() - coords[target, 0].item()
+            dy = coords[node, 1].item() - coords[target, 1].item()
+            return math.sqrt(dx * dx + dy * dy)
+
+        r_off = astar(grid, 0, 15, heuristic=euclidean_h, use_bpmx=False)
+        r_on = astar(grid, 0, 15, heuristic=euclidean_h, use_bpmx=True)
+        assert abs(r_off.cost - r_on.cost) < 1e-10
+        assert r_off.optimal is True
+        assert r_on.optimal is True

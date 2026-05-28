@@ -63,40 +63,27 @@ def contextual_loss(
     aux_loss_val: torch.Tensor | float = 0.0,
     alpha_aux: float = 1.0,
     cond_lambda: float = 0.01,
-    # Backward-compatible aliases
-    path_loss_val: torch.Tensor | float | None = None,
-    alpha_path: float | None = None,
 ) -> torch.Tensor:
-    """Combined Contextual loss: gap-closing + auxiliary loss + condition regularization.
+    """Combined contextual loss: gap-closing + auxiliary loss + condition regularization.
 
     loss = gap_closing + alpha_aux * aux_loss_val + cond_lambda * cond_reg
 
-    The gap-closing component (d_true - h_smooth).mean() should be >= 0
-    by admissibility and is minimized to tighten the heuristic.
-
-    The auxiliary loss can be cost supervision (MSE on cell costs) or
+    The gap-closing component ``(d_true - h_smooth).clamp(min=0).mean()`` is
+    non-negative by admissibility and is minimized to tighten the heuristic.
+    The auxiliary loss is typically cost supervision (MSE on cell costs) or
     path supervision (KL on edge usage).
 
     Args:
         d_true: (B,) true shortest-path distances.
         h_smooth: (B,) smoothed heuristic values.
         compressor: Compressor module with condition_regularization() method.
-        aux_loss_val: Pre-computed auxiliary loss (scalar). Cost or path supervision.
+        aux_loss_val: Pre-computed auxiliary loss (scalar).
         alpha_aux: Weight for auxiliary loss term.
         cond_lambda: Weight for condition number regularization.
-        path_loss_val: Deprecated alias for aux_loss_val.
-        alpha_path: Deprecated alias for alpha_aux.
 
     Returns:
         Scalar loss tensor.
     """
-    # Support deprecated aliases
-    if path_loss_val is not None:
-        aux_loss_val = path_loss_val
-    if alpha_path is not None:
-        alpha_aux = alpha_path
-
     gap = (d_true - h_smooth).clamp(min=0).mean()
     cond_reg = compressor.condition_regularization()
-    loss = gap + alpha_aux * aux_loss_val + cond_lambda * cond_reg
-    return loss
+    return gap + alpha_aux * aux_loss_val + cond_lambda * cond_reg

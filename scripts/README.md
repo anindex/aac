@@ -5,6 +5,13 @@ reproduction pipeline. For each entry below, the **Output**
 column points at the result file under `results/` (or `paper/figures/` for
 figure scripts) that the script is responsible for producing.
 
+**Setup.** Scripts import from the `aac` and `experiments` packages, so
+install the project in editable mode first:
+
+```bash
+pip install -e ".[experiments]"
+```
+
 For where each output is consumed by the paper, see
 [`../results/README.md`](../results/README.md). For the per-table
 provenance / drift verification protocol, see
@@ -106,9 +113,9 @@ Contextual (Warcraft):
 
 | Script | Purpose |
 |---|---|
-| [`verify_path_optimality.py`](verify_path_optimality.py) | Audits per-query path optimality across DIMACS aac CSVs; writes `results/dimacs/path_optimality_audit.csv` |
-| [`verify_ogbn_admissibility.py`](verify_ogbn_admissibility.py) | OGB-arXiv per-cell admissibility audit (5 seeds x 3 budgets); writes `results/synthetic/ogbn_arxiv_admissibility.csv` (Appendix E.3) |
-| [`check_scc_reachability.py`](check_scc_reachability.py) | Section 2.1 SCC reachability audit; writes `results/scc_reachability.csv` |
+| [`verify_path_optimality.py`](verify_path_optimality.py) | Checks per-query path optimality across DIMACS aac CSVs; writes `results/dimacs/path_optimality_audit.csv` |
+| [`verify_ogbn_admissibility.py`](verify_ogbn_admissibility.py) | OGB-arXiv per-cell admissibility check (5 seeds x 3 budgets); writes `results/synthetic/ogbn_arxiv_admissibility.csv` (Appendix E.3) |
+| [`check_scc_reachability.py`](check_scc_reachability.py) | Section 2.1 SCC reachability check; writes `results/scc_reachability.csv` |
 | [`check_paper_consistency.py`](check_paper_consistency.py) | Drift detector that cross-checks every `paper/table_*.tex` cell against its CSV via the `%%% PAPER-TABLE-PROVENANCE` headers |
 
 ## Bootstrap (one-off dataset preparation; not in `STEPS`)

@@ -101,7 +101,6 @@ GRAPH_CONFIG = {
 }
 DEFAULT_CONFIG = {"dtype": torch.float64, "chunk_size": 8}
 
-
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
@@ -109,7 +108,6 @@ DEFAULT_CONFIG = {"dtype": torch.float64, "chunk_size": 8}
 def get_peak_rss_mb() -> float:
     """Peak RSS in MB (Linux: ru_maxrss is kB)."""
     return resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1024
-
 
 def compute_lcc(graph):
     """Compute largest connected component nodes and a seed vertex in LCC.
@@ -127,7 +125,6 @@ def compute_lcc(graph):
     lcc_nodes = np.where(labels == largest)[0]
     return lcc_nodes, int(lcc_nodes[0])
 
-
 def run_queries_fn(graph, queries, heuristic):
     """Run A* queries, returning (expansions_list, latencies_ms_list)."""
     expansions = []
@@ -139,7 +136,6 @@ def run_queries_fn(graph, queries, heuristic):
         expansions.append(result.expansions)
         latencies_ms.append((t1 - t0) * 1000)
     return expansions, latencies_ms
-
 
 def run_queries_full(graph, queries, heuristic):
     """Run A* queries, returning (SearchResult_list, latencies_ms_list)."""
@@ -153,7 +149,6 @@ def run_queries_full(graph, queries, heuristic):
         latencies_ms.append((t1 - t0) * 1000)
     return results, latencies_ms
 
-
 def parse_args():
     parser = argparse.ArgumentParser(
         description="OSMnx road network experiments: AAC vs ALT vs Dijkstra at scale.",
@@ -166,7 +161,6 @@ def parse_args():
         help="Which graphs to run (default: all 5). Example: --graphs berlin los_angeles",
     )
     return parser.parse_args()
-
 
 # ---------------------------------------------------------------------------
 # Main
@@ -446,7 +440,6 @@ def main():
                 )
 
         print(f"\nResults: {csv_path}, {agg_path}")
-
 
 if __name__ == "__main__":
     main()

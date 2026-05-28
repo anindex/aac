@@ -39,7 +39,6 @@ GRAPH_DISPLAY = {
     "netherlands": ("Netherlands", "4.5M"),
 }
 
-
 def best_aac_at_budget(df, graph, budget):
     """Get best AAC reduction at a given budget (best K0 for that m)."""
     mask = (df["graph"] == graph) & (df["method"] == "AAC") & (df["bytes_per_vertex"] == budget)
@@ -56,7 +55,6 @@ def best_aac_at_budget(df, graph, budget):
     best = per_config.loc[per_config["red_mean"].idxmax()]
     return best["red_mean"], best["red_std"]
 
-
 def alt_at_budget(df, graph, budget):
     """Get ALT reduction at a given budget."""
     K = ALT_K_BY_BUDGET[budget]
@@ -69,7 +67,6 @@ def alt_at_budget(df, graph, budget):
         return None, None
     return subset["expansion_reduction_pct"].mean(), subset["expansion_reduction_pct"].std()
 
-
 def fmt(mean, std, bold=False):
     if mean is None:
         return "---"
@@ -78,7 +75,6 @@ def fmt(mean, std, bold=False):
     if bold:
         s = f"$\\mathbf{{{mean:.1f} \\pm {std_val:.1f}}}$"
     return s
-
 
 def main():
     df = pd.read_csv(INPUT_PATH)
@@ -164,7 +160,6 @@ Mean $\pm$ std over 5 seeds (3 for Netherlands).
     print(f"Written to {OUTPUT_PATH}")
     print()
     print(table)
-
 
 if __name__ == "__main__":
     main()

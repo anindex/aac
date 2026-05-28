@@ -12,21 +12,13 @@ Output: results/ablation_selection/
 from __future__ import annotations
 
 import csv
-import sys
 import time
 from pathlib import Path
 
 import numpy as np
 import torch
 
-_PROJECT_ROOT = str(Path(__file__).resolve().parent.parent)
 # Make src/ importable so `experiments` and `aac` resolve to src/.
-_SRC_DIR = str(Path(_PROJECT_ROOT) / "src")
-if _SRC_DIR not in sys.path:
-    sys.path.insert(0, _SRC_DIR)
-if _PROJECT_ROOT not in sys.path:
-    sys.path.insert(0, _PROJECT_ROOT)
-
 from aac.baselines.alt import alt_preprocess, make_alt_heuristic
 from aac.compression.compressor import LinearCompressor, make_linear_heuristic
 from aac.embeddings.anchors import farthest_point_sampling
@@ -55,7 +47,6 @@ TRAIN_CFG_DEFAULTS = dict(
     patience=20,
 )
 
-
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
@@ -65,7 +56,6 @@ def get_lcc(graph):
     nodes, seed = compute_strong_lcc(graph)
     return torch.tensor(nodes, dtype=torch.int64), seed
 
-
 def dijkstra_baseline(graph, queries):
     """Run Dijkstra on all queries, return mean expansions."""
     exps = []
@@ -73,7 +63,6 @@ def dijkstra_baseline(graph, queries):
         r = dijkstra(graph, s, t)
         exps.append(r.expansions)
     return np.array(exps)
-
 
 def run_astar_queries(graph, queries, heuristic):
     """Run A* with given heuristic, return (expansions, all_optimal)."""
@@ -86,7 +75,6 @@ def run_astar_queries(graph, queries, heuristic):
             all_optimal = False
     return np.array(exps), all_optimal
 
-
 def check_admissibility_queries(graph, queries, heuristic):
     """Check admissibility: h(u,t) <= d(u,t) for all queries."""
     violations = 0
@@ -96,7 +84,6 @@ def check_admissibility_queries(graph, queries, heuristic):
         if h_val > r_dij.cost + 1e-6:
             violations += 1
     return violations
-
 
 def train_aac(graph, K0, m, seed, lcc_nodes, lcc_seed, num_epochs=200, patience=20):
     """Full AAC pipeline: FPS -> SSSP -> train compressor -> heuristic."""
@@ -124,7 +111,6 @@ def train_aac(graph, K0, m, seed, lcc_nodes, lcc_seed, num_epochs=200, patience=
     heuristic = make_linear_heuristic(y_fwd, y_bwd, graph.is_directed)
     return heuristic, teacher_labels, anchors, compressor, metrics
 
-
 def random_subset_heuristic(teacher_labels, m, seed, is_directed):
     """Pick m/2 random fwd + m/2 random bwd landmarks from K0 teachers."""
     rng = np.random.RandomState(seed)
@@ -145,7 +131,6 @@ def random_subset_heuristic(teacher_labels, m, seed, is_directed):
         y_bwd = y_fwd
 
     return make_linear_heuristic(y_fwd, y_bwd, is_directed)
-
 
 def greedy_maximize_heuristic(teacher_labels, m, queries, is_directed):
     """Greedily select landmarks maximizing average ALT heuristic over queries.
@@ -197,7 +182,6 @@ def greedy_maximize_heuristic(teacher_labels, m, queries, is_directed):
 
     return make_linear_heuristic(y_fwd, y_bwd, is_directed)
 
-
 def fps_subset_heuristic(graph, m, seed, lcc_nodes, lcc_seed):
     """Select m landmarks directly via FPS (not from a K0 pool)."""
     rng = torch.Generator().manual_seed(seed)
@@ -210,7 +194,6 @@ def fps_subset_heuristic(graph, m, seed, lcc_nodes, lcc_seed):
     teacher = alt_preprocess(graph, K, seed_vertex=lcc_seed, rng=rng,
                              valid_vertices=lcc_nodes)
     return make_alt_heuristic(teacher)
-
 
 def nominal_selection_stats(is_directed: bool, m: int) -> dict[str, int | float]:
     """Return ideal no-duplicate selection stats for non-learned baselines."""
@@ -242,7 +225,6 @@ def nominal_selection_stats(is_directed: bool, m: int) -> dict[str, int | float]
         "effective_unique_total": m,
         "effective_unique_ratio": 1.0,
     }
-
 
 # ===================================================================
 # Experiment 1: Selection strategy ablation
@@ -337,7 +319,6 @@ def experiment_1_selection_strategy():
 
     return rows
 
-
 # ===================================================================
 # Experiment 2: Admissibility under early stopping
 # ===================================================================
@@ -426,7 +407,6 @@ def experiment_2_admissibility_robustness():
               f"{np.mean(viols):>10.0f}        {'Yes' if all(opts) else 'NO'}")
 
     return rows
-
 
 # ===================================================================
 # Experiment 3: Compression efficiency curve
@@ -548,7 +528,6 @@ def experiment_3_compression_curve():
                       f"{hm-am:>+6.1f}%")
 
     return rows
-
 
 # ===================================================================
 # Main

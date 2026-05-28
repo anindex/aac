@@ -16,30 +16,25 @@ from __future__ import annotations
 
 import argparse
 import os
-import sys
 from pathlib import Path
 
 import matplotlib
 
 matplotlib.use("Agg")
 
-import matplotlib.lines as mlines  # noqa: E402
-import matplotlib.pyplot as plt  # noqa: E402
-import numpy as np  # noqa: E402
-import torch  # noqa: E402
-
-# Add project root to sys.path so aac module is importable
 _PROJECT_ROOT = str(Path(__file__).resolve().parent.parent)
-if _PROJECT_ROOT not in sys.path:
-    sys.path.insert(0, os.path.join(_PROJECT_ROOT, "src"))
 
-import scipy.sparse.csgraph  # noqa: E402
+import matplotlib.lines as mlines
+import matplotlib.pyplot as plt
+import numpy as np
+import scipy.sparse.csgraph
+import torch
 
-from aac.compression.compressor import LinearCompressor  # noqa: E402
-from aac.embeddings.anchors import farthest_point_sampling  # noqa: E402
-from aac.graphs.convert import graph_to_scipy  # noqa: E402
-from aac.graphs.loaders.dimacs import load_dimacs  # noqa: E402
-from aac.viz.style import (  # noqa: E402
+from aac.compression.compressor import LinearCompressor
+from aac.embeddings.anchors import farthest_point_sampling
+from aac.graphs.convert import graph_to_scipy
+from aac.graphs.loaders.dimacs import load_dimacs
+from aac.viz.style import (
     METHOD_COLORS,
     OKABE_ITO,
     TMLR_FULL_WIDTH,
@@ -68,7 +63,6 @@ TAU_END = 0.1
 SEED = 42
 BG_SUBSAMPLE = 5000  # Background nodes to plot
 
-
 def compute_sssp_from_landmarks(
     scipy_csr: "scipy.sparse.csr_matrix",
     landmark_ids: np.ndarray,
@@ -92,7 +86,6 @@ def compute_sssp_from_landmarks(
     d_in = np.where(np.isinf(d_in), 1e18, d_in)
 
     return d_out, d_in
-
 
 def train_compressor(
     d_out: np.ndarray,
@@ -159,7 +152,6 @@ def train_compressor(
 
     compressor.eval()
     return compressor
-
 
 def main(output: str) -> None:
     setup_style()
@@ -326,7 +318,6 @@ def main(output: str) -> None:
     fig.savefig(str(outpath), format="pdf")
     plt.close(fig)
     print(f"Saved landmark visualization to {outpath}")
-
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(

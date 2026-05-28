@@ -11,7 +11,6 @@ from __future__ import annotations
 
 import argparse
 import csv
-import sys
 import time
 from pathlib import Path
 
@@ -19,9 +18,6 @@ import numpy as np
 import torch
 
 _ROOT = Path(__file__).resolve().parent.parent
-sys.path.insert(0, str(_ROOT / "src"))
-sys.path.insert(0, str(_ROOT))
-sys.path.insert(0, str(_ROOT / "scripts"))
 
 from run_synthetic_experiments import generate_community_graph, nx_to_graph
 
@@ -38,7 +34,6 @@ NUM_QUERIES = 100
 QUERY_SEED = 42
 EPOCHS = 200
 
-
 def _identity_first_m_init(K: int, m: int) -> torch.Tensor:
     """Initialization with one-hot rows on the first m pool indices."""
     W = torch.full((m, K), -10.0)
@@ -46,12 +41,10 @@ def _identity_first_m_init(K: int, m: int) -> torch.Tensor:
         W[i, i] = 10.0
     return W + 0.001 * torch.randn(m, K)
 
-
 def _eval(graph, queries, h, dij_mean):
     exps = np.array([astar(graph, s, t, heuristic=h).expansions for s, t in queries])
     mean = float(exps.mean())
     return mean, 100.0 * (1.0 - mean / dij_mean)
-
 
 def _make_compressor(K: int, m: int, init: str) -> LinearCompressor:
     comp = LinearCompressor(K=K, m=m, is_directed=False)
@@ -59,7 +52,6 @@ def _make_compressor(K: int, m: int, init: str) -> LinearCompressor:
         with torch.no_grad():
             comp.W.copy_(_identity_first_m_init(K, m))
     return comp
-
 
 def _forced_first_m_eval(teacher, m: int, graph, queries, dij_mean) -> tuple[float, float]:
     K = teacher.d_out.shape[0]
@@ -74,7 +66,6 @@ def _forced_first_m_eval(teacher, m: int, graph, queries, dij_mean) -> tuple[flo
         y = comp(teacher.d_out.t())
     h = make_linear_heuristic(y, y, is_directed=False)
     return _eval(graph, queries, h, dij_mean)
-
 
 def main() -> None:
     ap = argparse.ArgumentParser()
@@ -148,7 +139,6 @@ def main() -> None:
     elapsed = time.perf_counter() - t_start
     print(f"\nWrote {len(rows)} rows to {args.out} in {elapsed/60:.1f} min.",
           flush=True)
-
 
 if __name__ == "__main__":
     main()

@@ -15,7 +15,6 @@ GRAPHS = {
     "FLA": {"nodes": 1070376, "edges": 2712798},
 }
 
-
 def download_graph(name: str, data_dir: str = "data/dimacs") -> None:
     """Download and decompress a DIMACS road network graph.
 
@@ -44,14 +43,12 @@ def download_graph(name: str, data_dir: str = "data/dimacs") -> None:
             shutil.copyfileobj(f_in, f_out)
         gz_path.unlink()
 
-
 def main() -> None:
     """Download all configured DIMACS graphs."""
     for name in GRAPHS:
         print(f"Downloading {name} ...")
         download_graph(name)
     print("Done.")
-
 
 if __name__ == "__main__":
     main()
